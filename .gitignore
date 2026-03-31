@@ -1,0 +1,41 @@
+# Maven / Java build output
+/target/
+
+# Logs
+*.log
+logs/
+
+# Spring Boot
+*.pid
+*.pid.lock
+
+# Packaged artifacts
+*.jar
+*.war
+*.ear
+
+# Environment and secrets
+.env
+.env.*
+application-local.properties
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE - Eclipse/STS
+.classpath
+.project
+.settings/
+.factorypath
+
+# IDE - IntelliJ
+.idea/
+*.iml
+
+# IDE - VS Code
+.vscode/
+
+# Temporary files
+*.tmp
+*.swp
