@@ -102,7 +102,10 @@ h1 span{background:linear-gradient(135deg,var(--accent),var(--accent2));-webkit-
       </div>
       <div class="field">
         <div class="field-label">Member Since</div>
-        <div class="field-value"><fmt:formatDate value="${user.createdAt}" pattern="dd/MM/yyyy" /></div>
+        <div class="field-value">
+            <fmt:parseDate value="${user.createdAt}" pattern="yyyy-MM-dd" var="parsedCreatedAt" type="date" />
+            <fmt:formatDate value="${parsedCreatedAt}" pattern="dd/MM/yyyy" />
+        </div>
       </div>
       <div class="field">
         <div class="field-label">Country</div>

@@ -2,7 +2,9 @@ package com.grownited.controller.participant;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -102,11 +104,26 @@ public class ParticipantWorkflowController {
             return "redirect:/login";
         }
 
-        List<TeamEntity> myTeams = teamRepository.findByLeaderUserId(currentUser.getUserId());
+        Map<Integer, TeamEntity> visibleTeamsById = new LinkedHashMap<>();
+        List<TeamEntity> leaderTeams = teamRepository.findByLeaderUserId(currentUser.getUserId());
+        for (TeamEntity team : leaderTeams) {
+            visibleTeamsById.put(team.getTeamId(), team);
+        }
+
+        List<TeamMemberEntity> memberships = teamMemberRepository.findByUserId(currentUser.getUserId());
+        for (TeamMemberEntity membership : memberships) {
+            Optional<TeamEntity> opTeam = teamRepository.findById(membership.getTeamId());
+            opTeam.ifPresent(team -> visibleTeamsById.putIfAbsent(team.getTeamId(), team));
+        }
+
         List<TeamView> teamViews = new ArrayList<>();
-        for (TeamEntity team : myTeams) {
+        for (TeamEntity team : visibleTeamsById.values()) {
             TeamView view = new TeamView();
             view.setTeam(team);
+            boolean isLeader = team.getLeaderUserId() != null && team.getLeaderUserId().equals(currentUser.getUserId());
+            view.setCanManageMembers(isLeader);
+            view.setRoleInTeam(isLeader ? "Leader" : "Member");
+
             Optional<HackathonEntity> opHackathon = hackathonRepository.findById(team.getHackathonId());
             view.setHackathonTitle(opHackathon.map(HackathonEntity::getTitle).orElse("Unknown Hackathon"));
             List<TeamMemberEntity> members = teamMemberRepository.findByTeamId(team.getTeamId());
@@ -201,6 +218,8 @@ public class ParticipantWorkflowController {
         private String hackathonTitle;
         private Integer memberCount;
         private List<String> memberNames;
+        private Boolean canManageMembers;
+        private String roleInTeam;
 
         public TeamEntity getTeam() {
             return team;
@@ -232,6 +251,22 @@ public class ParticipantWorkflowController {
 
         public void setMemberNames(List<String> memberNames) {
             this.memberNames = memberNames;
+        }
+
+        public Boolean getCanManageMembers() {
+            return canManageMembers;
+        }
+
+        public void setCanManageMembers(Boolean canManageMembers) {
+            this.canManageMembers = canManageMembers;
+        }
+
+        public String getRoleInTeam() {
+            return roleInTeam;
+        }
+
+        public void setRoleInTeam(String roleInTeam) {
+            this.roleInTeam = roleInTeam;
         }
     }
 

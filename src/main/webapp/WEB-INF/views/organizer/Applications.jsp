@@ -76,7 +76,8 @@ th{font-size:12px;color:#64748b;text-transform:uppercase}
             <td>${a.participantName}</td>
             <td>${a.application.status}</td>
             <td>${a.application.paymentStatus}</td>
-            <td><fmt:formatDate value="${a.application.appliedAt}" pattern="dd/MM/yyyy" /></td>
+            <fmt:parseDate value="${a.application.appliedAt}" pattern="yyyy-MM-dd" var="parsedAppliedAt" type="date" />
+            <td><fmt:formatDate value="${parsedAppliedAt}" pattern="dd/MM/yyyy" /></td>
             <td>
               <form class="rowform" action="<c:url value='/organizer/update-application-status' />" method="post">
                 <input type="hidden" name="applicationId" value="${a.application.applicationId}">

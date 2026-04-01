@@ -1,6 +1,7 @@
 package com.grownited.config;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 import java.util.stream.Collectors;
@@ -61,20 +62,47 @@ public class DemoDataSeeder implements CommandLineRunner {
         }
 
         UserEntity admin = upsertUser("Admin", "CodeVerse", "admin@codeverse.dev", "ADMIN", "9876500001");
-        UserEntity organizer = upsertUser("Om", "Organizer", "organizer1@codeverse.dev", "ORGANIZER", "9876500005");
-        UserEntity participant1 = upsertUser("Nihar", "Participant", "participant1@codeverse.dev", "PARTICIPANT", "9876500002");
-        UserEntity participant2 = upsertUser("Aarav", "Participant", "participant2@codeverse.dev", "PARTICIPANT", "9876500003");
-        UserEntity judge = upsertUser("Riya", "Judge", "judge1@codeverse.dev", "JUDGE", "9876500004");
+
+        List<UserEntity> organizers = new ArrayList<>();
+        organizers.add(upsertUser("Om", "Organizer", "organizer1@codeverse.dev", "ORGANIZER", "9876500101"));
+        organizers.add(upsertUser("Meera", "Organizer", "organizer2@codeverse.dev", "ORGANIZER", "9876500102"));
+        organizers.add(upsertUser("Karan", "Organizer", "organizer3@codeverse.dev", "ORGANIZER", "9876500103"));
+        organizers.add(upsertUser("Diya", "Organizer", "organizer4@codeverse.dev", "ORGANIZER", "9876500104"));
+
+        List<UserEntity> participants = new ArrayList<>();
+        participants.add(upsertUser("Nihar", "Participant", "participant1@codeverse.dev", "PARTICIPANT", "9876500201"));
+        participants.add(upsertUser("Aarav", "Participant", "participant2@codeverse.dev", "PARTICIPANT", "9876500202"));
+        participants.add(upsertUser("Anaya", "Participant", "participant3@codeverse.dev", "PARTICIPANT", "9876500203"));
+        participants.add(upsertUser("Rohan", "Participant", "participant4@codeverse.dev", "PARTICIPANT", "9876500204"));
+        participants.add(upsertUser("Priya", "Participant", "participant5@codeverse.dev", "PARTICIPANT", "9876500205"));
+
+        List<UserEntity> judges = new ArrayList<>();
+        judges.add(upsertUser("Riya", "Judge", "judge1@codeverse.dev", "JUDGE", "9876500301"));
+        judges.add(upsertUser("Vivek", "Judge", "judge2@codeverse.dev", "JUDGE", "9876500302"));
+        judges.add(upsertUser("Ishita", "Judge", "judge3@codeverse.dev", "JUDGE", "9876500303"));
+        judges.add(upsertUser("Manav", "Judge", "judge4@codeverse.dev", "JUDGE", "9876500304"));
 
         Integer defaultUserTypeId = userTypes.get(0).getUserTypeId();
-        upsertUserDetail(organizer.getUserId(), defaultUserTypeId, "B.Tech", "Ahmedabad", "Gujarat", "India");
-        upsertUserDetail(participant1.getUserId(), defaultUserTypeId, "B.Tech", "Ahmedabad", "Gujarat", "India");
-        upsertUserDetail(participant2.getUserId(), defaultUserTypeId, "MCA", "Surat", "Gujarat", "India");
-        upsertUserDetail(judge.getUserId(), defaultUserTypeId, "M.Tech", "Vadodara", "Gujarat", "India");
+        for (UserEntity organizer : organizers) {
+            upsertUserDetail(organizer.getUserId(), defaultUserTypeId, "B.Tech", "Ahmedabad", "Gujarat", "India");
+        }
+        upsertUserDetail(participants.get(0).getUserId(), defaultUserTypeId, "B.Tech", "Ahmedabad", "Gujarat", "India");
+        upsertUserDetail(participants.get(1).getUserId(), defaultUserTypeId, "MCA", "Surat", "Gujarat", "India");
+        upsertUserDetail(participants.get(2).getUserId(), defaultUserTypeId, "BCA", "Vadodara", "Gujarat", "India");
+        upsertUserDetail(participants.get(3).getUserId(), defaultUserTypeId, "B.E.", "Rajkot", "Gujarat", "India");
+        upsertUserDetail(participants.get(4).getUserId(), defaultUserTypeId, "M.Tech", "Mumbai", "Maharashtra", "India");
+        for (UserEntity judge : judges) {
+            upsertUserDetail(judge.getUserId(), defaultUserTypeId, "M.Tech", "Vadodara", "Gujarat", "India");
+        }
 
-        List<Integer> creatorUserIds = List.of(admin.getUserId(), organizer.getUserId(), participant1.getUserId(), judge.getUserId());
+        List<Integer> creatorUserIds = new ArrayList<>();
+        creatorUserIds.add(admin.getUserId());
+        for (UserEntity organizer : organizers) {
+            creatorUserIds.add(organizer.getUserId());
+        }
         seedHackathons(userTypes, creatorUserIds);
-        seedJudgeAssignments(organizer.getUserId(), judge.getUserId());
+        ensureOrganizerHackathons(organizers, userTypes);
+        seedJudgeAssignments(organizers, judges, userTypes);
 
         System.out.println("[SEED] Demo data seeding finished.");
         System.out.println("[SEED] Test password for all seeded users: " + DEFAULT_PASSWORD);
@@ -203,37 +231,68 @@ public class DemoDataSeeder implements CommandLineRunner {
         System.out.println("[SEED] Created demo hackathons: " + created);
     }
 
-    private void seedJudgeAssignments(Integer organizerUserId, Integer judgeUserId) {
-        List<HackathonEntity> organizerHackathons = hackathonRepository.findByUserId(organizerUserId);
-        if (organizerHackathons.isEmpty()) {
-                HackathonEntity organizerHackathon = new HackathonEntity();
-                organizerHackathon.setTitle(DEMO_PREFIX + " Organizer Evaluation Event");
-                organizerHackathon.setDescription("Organizer-owned demo hackathon for judge assignment flow.");
-                organizerHackathon.setStatus("UPCOMING");
-                organizerHackathon.setEventType("ONLINE");
-                organizerHackathon.setPayment("FREE");
-                organizerHackathon.setMinTeamSize(1);
-                organizerHackathon.setMaxTeamSize(4);
-                organizerHackathon.setLocation("Ahmedabad");
-                organizerHackathon.setUserTypeId(userTypeRepository.findAll().get(0).getUserTypeId());
-                organizerHackathon.setRegistrationStartDate(LocalDate.now().plusDays(1));
-                organizerHackathon.setRegistrationEndDate(LocalDate.now().plusDays(15));
-                organizerHackathon.setUserId(organizerUserId);
-                hackathonRepository.save(organizerHackathon);
-                organizerHackathons = List.of(organizerHackathon);
+    private void ensureOrganizerHackathons(List<UserEntity> organizers, List<UserTypeEntity> userTypes) {
+        for (int i = 0; i < organizers.size(); i++) {
+            UserEntity organizer = organizers.get(i);
+            List<HackathonEntity> organizerHackathons = hackathonRepository.findByUserId(organizer.getUserId());
+            if (!organizerHackathons.isEmpty()) {
+                continue;
+            }
+
+            UserTypeEntity anyType = userTypes.get(i % userTypes.size());
+            HackathonEntity organizerHackathon = new HackathonEntity();
+            organizerHackathon.setTitle(DEMO_PREFIX + " Organizer " + (i + 1) + " Evaluation Event");
+            organizerHackathon.setDescription("Organizer-owned demo hackathon for judge assignment flow.");
+            organizerHackathon.setStatus("UPCOMING");
+            organizerHackathon.setEventType("ONLINE");
+            organizerHackathon.setPayment("FREE");
+            organizerHackathon.setMinTeamSize(1);
+            organizerHackathon.setMaxTeamSize(4);
+            organizerHackathon.setLocation("Ahmedabad");
+            organizerHackathon.setUserTypeId(anyType.getUserTypeId());
+            organizerHackathon.setRegistrationStartDate(LocalDate.now().plusDays(1));
+            organizerHackathon.setRegistrationEndDate(LocalDate.now().plusDays(15));
+            organizerHackathon.setUserId(organizer.getUserId());
+            hackathonRepository.save(organizerHackathon);
+        }
+    }
+
+    private void seedJudgeAssignments(List<UserEntity> organizers, List<UserEntity> judges, List<UserTypeEntity> userTypes) {
+        if (organizers.isEmpty() || judges.isEmpty()) {
+            return;
         }
 
-        HackathonEntity firstHackathon = organizerHackathons.get(0);
-        boolean exists = judgeAssignmentRepository.existsByHackathonIdAndJudgeUserId(firstHackathon.getHackathonId(),
-                judgeUserId);
-        if (exists) {
+        ensureOrganizerHackathons(organizers, userTypes);
+
+        for (int i = 0; i < organizers.size(); i++) {
+            UserEntity organizer = organizers.get(i);
+            UserEntity mappedJudge = judges.get(i % judges.size());
+            List<HackathonEntity> organizerHackathons = hackathonRepository.findByUserId(organizer.getUserId());
+
+            if (organizerHackathons.isEmpty()) {
+                continue;
+            }
+
+            HackathonEntity primaryHackathon = organizerHackathons.get(0);
+            assignJudgeIfMissing(primaryHackathon.getHackathonId(), mappedJudge.getUserId(), organizer.getUserId());
+
+            if (organizerHackathons.size() > 1 && judges.size() > 1) {
+                UserEntity secondaryJudge = judges.get((i + 1) % judges.size());
+                HackathonEntity secondaryHackathon = organizerHackathons.get(1);
+                assignJudgeIfMissing(secondaryHackathon.getHackathonId(), secondaryJudge.getUserId(), organizer.getUserId());
+            }
+        }
+    }
+
+    private void assignJudgeIfMissing(Integer hackathonId, Integer judgeUserId, Integer assignedByUserId) {
+        if (judgeAssignmentRepository.existsByHackathonIdAndJudgeUserId(hackathonId, judgeUserId)) {
             return;
         }
 
         JudgeAssignmentEntity assignment = new JudgeAssignmentEntity();
-        assignment.setHackathonId(firstHackathon.getHackathonId());
+        assignment.setHackathonId(hackathonId);
         assignment.setJudgeUserId(judgeUserId);
-        assignment.setAssignedByUserId(organizerUserId);
+        assignment.setAssignedByUserId(assignedByUserId);
         assignment.setAssignedAt(LocalDate.now());
         judgeAssignmentRepository.save(assignment);
     }

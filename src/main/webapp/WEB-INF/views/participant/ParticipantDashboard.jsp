@@ -112,6 +112,7 @@ body::before {
 		</a>
 		<nav class="nav">
 			<a href="<c:url value='/participant/home' />">Explore</a>
+			<a href="<c:url value='/participant/profile' />">Profile</a>
 			<a href="<c:url value='/logout' />" class="btn">Logout</a>
 		</nav>
 	</header>
@@ -151,6 +152,10 @@ body::before {
 			<a class="quick-card" href="<c:url value='/participant/my-teams' />">
 				<h4>My Teams</h4>
 				<p>View team roster and linked hackathons.</p>
+			</a>
+			<a class="quick-card" href="<c:url value='/participant/profile' />">
+				<h4>My Profile</h4>
+				<p>See your account and personal details.</p>
 			</a>
 			<a class="quick-card" href="<c:url value='/charge' />">
 				<h4>Open Payments</h4>

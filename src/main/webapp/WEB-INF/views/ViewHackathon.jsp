@@ -84,7 +84,11 @@ h1 span{background:linear-gradient(135deg,var(--accent),var(--accent2));-webkit-
       </div>
       <div class="field">
         <div class="field-label">Registration Period</div>
-        <div class="field-value"><fmt:formatDate value="${hackathon.registrationStartDate}" pattern="dd/MM/yyyy" /> to <fmt:formatDate value="${hackathon.registrationEndDate}" pattern="dd/MM/yyyy" /></div>
+        <div class="field-value">
+            <fmt:parseDate value="${hackathon.registrationStartDate}" pattern="yyyy-MM-dd" var="parsedRegStart" type="date" />
+            <fmt:parseDate value="${hackathon.registrationEndDate}" pattern="yyyy-MM-dd" var="parsedRegEnd" type="date" />
+            <fmt:formatDate value="${parsedRegStart}" pattern="dd/MM/yyyy" /> to <fmt:formatDate value="${parsedRegEnd}" pattern="dd/MM/yyyy" />
+        </div>
       </div>
     </div>
 

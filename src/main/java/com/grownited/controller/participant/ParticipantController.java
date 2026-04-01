@@ -7,12 +7,14 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 
 import com.grownited.entity.HackathonEntity;
+import com.grownited.entity.UserDetailEntity;
 import com.grownited.entity.UserEntity;
 
 import java.util.Optional;
 
 import com.grownited.repository.HackathonApplicationRepository;
 import com.grownited.repository.HackathonRepository;
+import com.grownited.repository.UserDetailRepository;
 
 import jakarta.servlet.http.HttpSession;
 
@@ -26,6 +28,9 @@ public class ParticipantController {
 
 	@Autowired
 	HackathonApplicationRepository hackathonApplicationRepository;
+
+	@Autowired
+	UserDetailRepository userDetailRepository;
 	
 	@GetMapping("/participant/participant-dashboard")
 	public String participantDashboard(Model model) {
@@ -40,6 +45,19 @@ public class ParticipantController {
 	public String home( Model model) {
 		model.addAttribute("hackathons",hackathonRepository.findAll()); 
 		return   "participant/Home";
+	}
+
+	@GetMapping("/participant/profile")
+	public String profile(HttpSession session, Model model) {
+		UserEntity currentUser = (UserEntity) session.getAttribute("user");
+		if (currentUser == null) {
+			return "redirect:/login";
+		}
+
+		Optional<UserDetailEntity> opUserDetail = userDetailRepository.findByUserId(currentUser.getUserId());
+		model.addAttribute("profileUser", currentUser);
+		model.addAttribute("profileUserDetail", opUserDetail.orElse(null));
+		return "participant/Profile";
 	}
 
 	@GetMapping("/participant/hackathon/{hackathonId}")

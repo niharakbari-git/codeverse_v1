@@ -89,7 +89,11 @@ th{font-size:12px;text-transform:uppercase;letter-spacing:.8px;color:var(--muted
                 </td>
                 <td>${h.minTeamSize} - ${h.maxTeamSize}</td>
                 <td>${h.location}</td>
-                <td><fmt:formatDate value="${h.registrationStartDate}" pattern="dd/MM/yyyy" /> to <fmt:formatDate value="${h.registrationEndDate}" pattern="dd/MM/yyyy" /></td>
+                <td>
+                    <fmt:parseDate value="${h.registrationStartDate}" pattern="yyyy-MM-dd" var="parsedRegStart" type="date" />
+                    <fmt:parseDate value="${h.registrationEndDate}" pattern="yyyy-MM-dd" var="parsedRegEnd" type="date" />
+                    <fmt:formatDate value="${parsedRegStart}" pattern="dd/MM/yyyy" /> to <fmt:formatDate value="${parsedRegEnd}" pattern="dd/MM/yyyy" />
+                </td>
                 <td>
                   <div class="row-actions">
                     <a class="btn" href="<c:url value='/viewHackathon?hackathonId=${h.hackathonId}' />">View</a>

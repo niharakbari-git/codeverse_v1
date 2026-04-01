@@ -27,6 +27,7 @@ th{font-size:12px;color:#64748b;text-transform:uppercase}
   <div class="top">
     <h2>My Applications</h2>
     <div>
+      <a class="btn" href="<c:url value='/participant/profile' />">Profile</a>
       <a class="btn" href="<c:url value='/participant/my-teams' />">My Teams</a>
       <a class="btn" href="<c:url value='/participant/home' />">Explore</a>
     </div>
@@ -50,7 +51,8 @@ th{font-size:12px;color:#64748b;text-transform:uppercase}
             <td>${v.teamName}</td>
             <td><span class="badge applied">${v.application.status}</span></td>
             <td><span class="badge pending">${v.application.paymentStatus}</span></td>
-            <td><fmt:formatDate value="${v.application.appliedAt}" pattern="dd/MM/yyyy" /></td>
+            <fmt:parseDate value="${v.application.appliedAt}" pattern="yyyy-MM-dd" var="parsedAppliedAt" type="date" />
+            <td><fmt:formatDate value="${parsedAppliedAt}" pattern="dd/MM/yyyy" /></td>
           </tr>
         </c:forEach>
         <c:if test="${empty appViews}">

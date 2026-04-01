@@ -31,6 +31,8 @@
 						href="<c:url value='/participant/participant-dashboard' />">Participant Dashboard</a></li>
 					<li class="nav-item"><a class="nav-link"
 						href="<c:url value='/participant/home' />">All Hackathons</a></li>
+					<li class="nav-item"><a class="nav-link"
+						href="<c:url value='/participant/profile' />">My Profile</a></li>
 				</ul>
 			</div></li>
 		<li class="nav-item"><a class="nav-link"

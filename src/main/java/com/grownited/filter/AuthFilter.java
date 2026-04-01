@@ -56,13 +56,16 @@ public class AuthFilter implements Filter {
 		} else {
 			System.out.println("AuthFilter ......" + new Date());
 			System.out.println(uri);
-			session = req.getSession();
-			user = (UserEntity) session.getAttribute("user");
+			session = req.getSession(false);
+			user = session == null ? null : (UserEntity) session.getAttribute("user");
 			userRole = user == null || user.getRole() == null ? "" : user.getRole().trim().toUpperCase();
 			if (user == null) {
-				// login
-//				req.getRequestDispatcher("/login").forward(request, response);
-				res.sendRedirect("/login");
+				boolean isExpiredSession = req.getRequestedSessionId() != null && !req.isRequestedSessionIdValid();
+				if (isExpiredSession) {
+					res.sendRedirect("/login?timeout=1");
+				} else {
+					res.sendRedirect("/login");
+				}
 			} else {
 				if (isGovernanceRoute(uri) && !"ADMIN".equals(userRole)) {
 					res.sendRedirect("/participant/home");

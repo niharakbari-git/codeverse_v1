@@ -69,7 +69,11 @@ body::before {
 			<div class="item"><p>Team Size</p><h4>${hackathon.minTeamSize} - ${hackathon.maxTeamSize} members</h4></div>
 			<div class="item"><p>Location</p><h4>${hackathon.location}</h4></div>
 			<div class="item"><p>Eligibility Group</p><h4>${hackathon.userTypeId}</h4></div>
-			<div class="item"><p>Registration Window</p><h4><fmt:formatDate value="${hackathon.registrationStartDate}" pattern="dd/MM/yyyy" /> to <fmt:formatDate value="${hackathon.registrationEndDate}" pattern="dd/MM/yyyy" /></h4></div>
+			<div class="item"><p>Registration Window</p><h4>
+				<fmt:parseDate value="${hackathon.registrationStartDate}" pattern="yyyy-MM-dd" var="parsedRegStart" type="date" />
+				<fmt:parseDate value="${hackathon.registrationEndDate}" pattern="yyyy-MM-dd" var="parsedRegEnd" type="date" />
+				<fmt:formatDate value="${parsedRegStart}" pattern="dd/MM/yyyy" /> to <fmt:formatDate value="${parsedRegEnd}" pattern="dd/MM/yyyy" />
+			</h4></div>
 		</div>
 
 		<div class="desc">

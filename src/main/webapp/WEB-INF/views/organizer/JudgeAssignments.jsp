@@ -69,7 +69,8 @@ th{font-size:12px;color:#64748b;text-transform:uppercase}
           <tr>
             <td>${a.hackathonTitle}</td>
             <td>${a.judgeName}</td>
-            <td><fmt:formatDate value="${a.assignedAt}" pattern="dd/MM/yyyy" /></td>
+            <fmt:parseDate value="${a.assignedAt}" pattern="yyyy-MM-dd" var="parsedAssignedAt" type="date" />
+            <td><fmt:formatDate value="${parsedAssignedAt}" pattern="dd/MM/yyyy" /></td>
           </tr>
         </c:forEach>
         <c:if test="${empty assignmentViews}">

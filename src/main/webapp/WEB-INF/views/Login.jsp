@@ -40,6 +40,7 @@ input:-webkit-autofill:active{
 .row{margin-top:12px;display:flex;justify-content:space-between;gap:8px;align-items:center;flex-wrap:wrap}
 .row a{color:#9ad8e3;text-decoration:none;font-weight:700}
 .error{margin-top:10px;color:#fca5a5;min-height:20px;font-size:13px}
+.info{margin-top:10px;color:#7dd3fc;min-height:20px;font-size:13px}
 @media(max-width:950px){.layout{grid-template-columns:1fr}.visual{min-height:260px}.visual-content{padding:28px}.hero h1{max-width:100%}}
 </style>
 </head>
@@ -75,6 +76,9 @@ input:-webkit-autofill:active{
           <a href="forgetpassword">Forgot password?</a>
           <span>New here? <a href="signup">Create account</a></span>
         </div>
+        <c:if test="${param.timeout == '1'}">
+          <div class="info">Session expired due to inactivity. Please login again.</div>
+        </c:if>
         <div class="error">${error}</div>
       </form>
     </div>

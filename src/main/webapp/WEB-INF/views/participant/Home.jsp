@@ -822,6 +822,7 @@ to {
 		</a>
 		<nav class="nav-links">
 			<a href="<c:url value='/participant/home' />">Explore</a> <a href="<c:url value='/participant/participant-dashboard' />">Dashboard</a>
+			<a href="<c:url value='/participant/profile' />">Profile</a>
 			<a href="<c:url value='/participant/my-applications' />">My Applications</a>
 			<a href="<c:url value='/logout' />">Logout</a>
 		</nav>
