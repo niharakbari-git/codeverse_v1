@@ -72,6 +72,7 @@ button:hover{transform:translateY(-1px);filter:brightness(1.05)}
         </p>
 
         <form class="form" action="<c:url value='/judge/submit-score' />" method="post">
+          <input type="hidden" name="_csrf" value="${_csrfToken}">
           <input type="hidden" name="applicationId" value="${s.application.applicationId}">
           <input type="hidden" name="hackathonId" value="${s.application.hackathonId}">
 

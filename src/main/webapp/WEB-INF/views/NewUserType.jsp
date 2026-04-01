@@ -30,6 +30,7 @@
                     <h4 class="text-center mb-4">Add New User Type</h4>
 
                     <form action="saveUserType" method="post">
+                        <input type="hidden" name="_csrf" value="${_csrfToken}" />
                         
                         <!-- User Type -->
                         <div class="mb-3">

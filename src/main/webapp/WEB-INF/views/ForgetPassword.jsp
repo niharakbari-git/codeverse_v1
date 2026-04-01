@@ -22,25 +22,21 @@ input:focus{outline:none;border-color:var(--accent2);box-shadow:0 0 0 3px rgba(6
 button{margin-top:14px;width:100%;padding:12px;border:none;border-radius:11px;background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;font-weight:800;cursor:pointer}
 .row{margin-top:12px;text-align:center}
 .row a{color:#9ad8e3;text-decoration:none;font-weight:700}
-.msg{margin-top:12px;padding:10px 12px;border-radius:10px;font-size:13px}
-.msg.success{background:#072e2f;border:1px solid #0f766e;color:#ccfbf1}
-.msg.error{background:#3b0d0d;border:1px solid #7f1d1d;color:#fecaca}
 </style>
 </head>
 <body>
+    <c:set var="toastMessage" value="${empty error ? success : error}" />
+    <c:set var="toastType" value="${empty error ? 'success' : 'error'}" />
+    <c:if test="${not empty toastMessage}">
+        <div id="toast-data" data-type="${toastType}" style="display:none;"><c:out value="${toastMessage}" /></div>
+    </c:if>
     <div class="card">
         <div class="brand">CODEVERSE</div>
         <h2>Forgot Password</h2>
         <p class="sub">Enter your registered email and we will process your reset request.</p>
 
-        <c:if test="${not empty success}">
-            <div class="msg success">${success}</div>
-        </c:if>
-        <c:if test="${not empty error}">
-            <div class="msg error">${error}</div>
-        </c:if>
-
         <form action="sendResetLink" method="post" autocomplete="off">
+            <input type="hidden" name="_csrf" value="${_csrfToken}">
             <div class="field">
                 <label for="email">Email Address</label>
                 <input type="email" name="email" id="email" placeholder="Enter your registered email" required>
@@ -49,5 +45,6 @@ button{margin-top:14px;width:100%;padding:12px;border:none;border-radius:11px;ba
             <div class="row"><a href="login">Back to Login</a></div>
         </form>
     </div>
+<%@ include file="shared/Toast.jspf" %>
 </body>
 </html>

@@ -23,7 +23,6 @@ body{font-family:'Syne',sans-serif;background:radial-gradient(circle at 18% 18%,
 .card{width:min(760px,100%);background:rgba(18,31,43,.95);border:1px solid var(--border);border-radius:18px;padding:24px;box-shadow:0 18px 50px rgba(0,0,0,.28)}
 .card h2{font-size:28px}
 .card p{margin-top:7px;color:var(--muted)}
-.error{margin-top:10px;color:#fca5a5;min-height:18px;font-size:13px}
 .grid{margin-top:14px;display:grid;grid-template-columns:1fr 1fr;gap:12px}
 .field{display:flex;flex-direction:column;gap:6px}
 .field.full{grid-column:1 / -1}
@@ -51,6 +50,9 @@ input[type='file']::file-selector-button{margin-right:10px;padding:8px 12px;bord
 </style>
 </head>
 <body>
+<c:if test="${not empty error}">
+  <div id="toast-data" data-type="error" style="display:none;"><c:out value="${error}" /></div>
+</c:if>
 <div class="layout">
   <section class="visual">
     <div class="visual-content">
@@ -67,9 +69,9 @@ input[type='file']::file-selector-button{margin-right:10px;padding:8px 12px;bord
     <div class="card">
       <h2>Create Account</h2>
       <p>Start in less than a minute.</p>
-      <div class="error">${error}</div>
 
       <form action="register" method="post" enctype="multipart/form-data" autocomplete="off">
+        <input type="hidden" name="_csrf" value="${_csrfToken}">
         <input type="text" name="fake-user" style="display:none" autocomplete="off">
         <input type="password" name="fake-pass" style="display:none" autocomplete="new-password">
         <div class="grid">
@@ -150,5 +152,6 @@ input[type='file']::file-selector-button{margin-right:10px;padding:8px 12px;bord
     </div>
   </section>
 </div>
+<%@ include file="shared/Toast.jspf" %>
 </body>
 </html>

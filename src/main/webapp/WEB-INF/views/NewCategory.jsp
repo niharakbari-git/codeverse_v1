@@ -35,6 +35,7 @@ input:focus{outline:none;border-color:var(--accent2);box-shadow:0 0 0 3px rgba(6
   </div>
 
   <form class="card" action="saveCategory" method="post">
+    <input type="hidden" name="_csrf" value="${_csrfToken}">
     <input type="hidden" name="categoryId" value="${category.categoryId}">
     <input type="hidden" name="active" value="${category.active}">
 

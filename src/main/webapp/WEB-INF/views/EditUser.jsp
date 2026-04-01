@@ -17,6 +17,7 @@
 			</div>
 			<div class="card-body">
 				<form action="updateUser" method="post">
+					<input type="hidden" name="_csrf" value="${_csrfToken}" />
 					<input type="hidden" name="userId" value="${user.userId}" />
 
 					<div class="row g-3">

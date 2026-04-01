@@ -6,6 +6,8 @@ import java.util.List;
 import java.util.Random;
 import java.util.stream.Collectors;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -25,6 +27,8 @@ import com.grownited.repository.UserTypeRepository;
 @Component
 @ConditionalOnProperty(name = "app.seed-demo-data", havingValue = "true")
 public class DemoDataSeeder implements CommandLineRunner {
+
+    private static final Logger logger = LoggerFactory.getLogger(DemoDataSeeder.class);
 
     private static final String DEFAULT_PASSWORD = "00000000";
     private static final String DEMO_PREFIX = "[DEMO]";
@@ -53,11 +57,11 @@ public class DemoDataSeeder implements CommandLineRunner {
 
     @Override
     public void run(String... args) {
-        System.out.println("[SEED] Demo data seeding started...");
+        logger.info("[SEED] Demo data seeding started...");
 
         List<UserTypeEntity> userTypes = ensureUserTypes();
         if (userTypes.isEmpty()) {
-            System.out.println("[SEED] No user types available. Seeding aborted.");
+            logger.warn("[SEED] No user types available. Seeding aborted.");
             return;
         }
 
@@ -104,8 +108,8 @@ public class DemoDataSeeder implements CommandLineRunner {
         ensureOrganizerHackathons(organizers, userTypes);
         seedJudgeAssignments(organizers, judges, userTypes);
 
-        System.out.println("[SEED] Demo data seeding finished.");
-        System.out.println("[SEED] Test password for all seeded users: " + DEFAULT_PASSWORD);
+        logger.info("[SEED] Demo data seeding finished.");
+        logger.info("[SEED] Test password for all seeded users: {}", DEFAULT_PASSWORD);
     }
 
     private List<UserTypeEntity> ensureUserTypes() {
@@ -174,7 +178,7 @@ public class DemoDataSeeder implements CommandLineRunner {
         int targetCount = 10;
         int toCreate = targetCount - (int) existingDemoCount;
         if (toCreate <= 0) {
-            System.out.println("[SEED] Demo hackathons already present: " + existingDemoCount);
+            logger.info("[SEED] Demo hackathons already present: {}", existingDemoCount);
             return;
         }
 
@@ -228,7 +232,7 @@ public class DemoDataSeeder implements CommandLineRunner {
             created++;
         }
 
-        System.out.println("[SEED] Created demo hackathons: " + created);
+        logger.info("[SEED] Created demo hackathons: {}", created);
     }
 
     private void ensureOrganizerHackathons(List<UserEntity> organizers, List<UserTypeEntity> userTypes) {

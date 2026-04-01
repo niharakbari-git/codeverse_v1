@@ -12,6 +12,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import com.grownited.common.AppConstants;
+import com.grownited.dto.OrganizerApplicationManageView;
 import com.grownited.entity.HackathonEntity;
 import com.grownited.entity.HackathonApplicationEntity;
 import com.grownited.entity.JudgeAssignmentEntity;
@@ -22,6 +24,8 @@ import com.grownited.repository.HackathonRepository;
 import com.grownited.repository.JudgeAssignmentRepository;
 import com.grownited.repository.JudgeScoreRepository;
 import com.grownited.repository.UserRepository;
+import com.grownited.service.OrganizerApplicationService;
+import com.grownited.util.SessionUserUtil;
 
 import jakarta.servlet.http.HttpSession;
 
@@ -43,15 +47,18 @@ public class OrganizerController {
     @Autowired
     JudgeScoreRepository judgeScoreRepository;
 
+    @Autowired
+    OrganizerApplicationService organizerApplicationService;
+
     @GetMapping("/organizer/judge-assignments")
     public String judgeAssignments(HttpSession session, Model model) {
-        UserEntity currentUser = (UserEntity) session.getAttribute("user");
+        UserEntity currentUser = SessionUserUtil.getCurrentUser(session);
         if (currentUser == null) {
-            return "redirect:/login";
+            return AppConstants.REDIRECT_LOGIN;
         }
 
         List<HackathonEntity> myHackathons;
-        if ("ADMIN".equalsIgnoreCase(currentUser.getRole())) {
+        if (AppConstants.ROLE_ADMIN.equalsIgnoreCase(currentUser.getRole())) {
             myHackathons = hackathonRepository.findAll();
         } else {
             myHackathons = hackathonRepository.findByUserId(currentUser.getUserId());
@@ -80,9 +87,9 @@ public class OrganizerController {
 
     @PostMapping("/organizer/assign-judge")
     public String assignJudge(@RequestParam Integer hackathonId, @RequestParam Integer judgeUserId, HttpSession session) {
-        UserEntity currentUser = (UserEntity) session.getAttribute("user");
+        UserEntity currentUser = SessionUserUtil.getCurrentUser(session);
         if (currentUser == null) {
-            return "redirect:/login";
+            return AppConstants.REDIRECT_LOGIN;
         }
 
         if (judgeAssignmentRepository.existsByHackathonIdAndJudgeUserId(hackathonId, judgeUserId)) {
@@ -101,30 +108,18 @@ public class OrganizerController {
 
     @GetMapping("/organizer/applications")
     public String organizerApplications(@RequestParam(required = false) Integer hackathonId, HttpSession session, Model model) {
-        UserEntity currentUser = (UserEntity) session.getAttribute("user");
+        UserEntity currentUser = SessionUserUtil.getCurrentUser(session);
         if (currentUser == null) {
-            return "redirect:/login";
+            return AppConstants.REDIRECT_LOGIN;
         }
 
-        List<HackathonEntity> myHackathons = "ADMIN".equalsIgnoreCase(currentUser.getRole())
-                ? hackathonRepository.findAll()
-                : hackathonRepository.findByUserId(currentUser.getUserId());
+        List<HackathonEntity> myHackathons = organizerApplicationService.getManageableHackathons(currentUser);
 
         if (hackathonId == null && !myHackathons.isEmpty()) {
             hackathonId = myHackathons.get(0).getHackathonId();
         }
 
-        List<ApplicationManageView> views = new ArrayList<>();
-        if (hackathonId != null) {
-            List<HackathonApplicationEntity> apps = hackathonApplicationRepository.findByHackathonId(hackathonId);
-            for (HackathonApplicationEntity app : apps) {
-                ApplicationManageView view = new ApplicationManageView();
-                view.setApplication(app);
-                Optional<UserEntity> opParticipant = userRepository.findById(app.getParticipantUserId());
-                view.setParticipantName(opParticipant.map(p -> p.getFirstName() + " " + p.getLastName()).orElse("Unknown"));
-                views.add(view);
-            }
-        }
+        List<OrganizerApplicationManageView> views = organizerApplicationService.getApplicationViews(hackathonId);
 
         model.addAttribute("myHackathons", myHackathons);
         model.addAttribute("selectedHackathonId", hackathonId);
@@ -135,47 +130,24 @@ public class OrganizerController {
     @PostMapping("/organizer/update-application-status")
     public String updateApplicationStatus(@RequestParam Integer applicationId, @RequestParam String status,
             @RequestParam(required = false) String paymentStatus, HttpSession session) {
-        UserEntity currentUser = (UserEntity) session.getAttribute("user");
+        UserEntity currentUser = SessionUserUtil.getCurrentUser(session);
         if (currentUser == null) {
-            return "redirect:/login";
+            return AppConstants.REDIRECT_LOGIN;
         }
 
-        Optional<HackathonApplicationEntity> opApp = hackathonApplicationRepository.findById(applicationId);
-        if (opApp.isPresent()) {
-            HackathonApplicationEntity app = opApp.get();
-
-            Optional<HackathonEntity> opHackathon = hackathonRepository.findById(app.getHackathonId());
-            if (opHackathon.isEmpty()) {
-                return "redirect:/organizer/applications?msg=Hackathon+not+found&type=error";
-            }
-
-            HackathonEntity hackathon = opHackathon.get();
-            boolean isAdmin = "ADMIN".equalsIgnoreCase(currentUser.getRole());
-            boolean isOwner = hackathon.getUserId() != null && hackathon.getUserId().equals(currentUser.getUserId());
-            if (!isAdmin && !isOwner) {
-                return "redirect:/organizer/applications?hackathonId=" + app.getHackathonId()
-                        + "&msg=Unauthorized+update+attempt&type=error";
-            }
-
-            app.setStatus(status);
-            if (paymentStatus != null && !paymentStatus.isBlank()) {
-                app.setPaymentStatus(paymentStatus);
-            }
-            hackathonApplicationRepository.save(app);
-            return "redirect:/organizer/applications?hackathonId=" + app.getHackathonId()
-                    + "&msg=Application+updated+successfully&type=success";
-        }
-        return "redirect:/organizer/applications?msg=Application+not+found&type=error";
+        OrganizerApplicationService.UpdateApplicationResult result = organizerApplicationService
+                .updateApplicationStatus(applicationId, status, paymentStatus, currentUser);
+        return result.getRedirectPath();
     }
 
     @GetMapping("/organizer/results")
     public String organizerResults(@RequestParam(required = false) Integer hackathonId, HttpSession session, Model model) {
-        UserEntity currentUser = (UserEntity) session.getAttribute("user");
+        UserEntity currentUser = SessionUserUtil.getCurrentUser(session);
         if (currentUser == null) {
-            return "redirect:/login";
+            return AppConstants.REDIRECT_LOGIN;
         }
 
-        List<HackathonEntity> myHackathons = "ADMIN".equalsIgnoreCase(currentUser.getRole())
+        List<HackathonEntity> myHackathons = AppConstants.ROLE_ADMIN.equalsIgnoreCase(currentUser.getRole())
                 ? hackathonRepository.findAll()
                 : hackathonRepository.findByUserId(currentUser.getUserId());
 
@@ -234,27 +206,6 @@ public class OrganizerController {
 
         public void setAssignedAt(LocalDate assignedAt) {
             this.assignedAt = assignedAt;
-        }
-    }
-
-    public static class ApplicationManageView {
-        private HackathonApplicationEntity application;
-        private String participantName;
-
-        public HackathonApplicationEntity getApplication() {
-            return application;
-        }
-
-        public void setApplication(HackathonApplicationEntity application) {
-            this.application = application;
-        }
-
-        public String getParticipantName() {
-            return participantName;
-        }
-
-        public void setParticipantName(String participantName) {
-            this.participantName = participantName;
         }
     }
 

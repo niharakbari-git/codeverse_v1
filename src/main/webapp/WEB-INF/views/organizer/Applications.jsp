@@ -22,14 +22,14 @@ table{width:100%;border-collapse:collapse;min-width:950px}
 th,td{padding:12px;border-bottom:1px solid #2a2a3d;text-align:left;vertical-align:top}
 th{font-size:12px;color:#64748b;text-transform:uppercase}
 .rowform{display:grid;grid-template-columns:130px 130px auto;gap:8px;align-items:center}
-.msg{padding:10px 12px;border-radius:10px;margin-bottom:12px;font-size:13px}
-.msg.success{background:#072e2f;border:1px solid #0f766e;color:#ccfbf1}
-.msg.error{background:#3b0d0d;border:1px solid #7f1d1d;color:#fecaca}
 .empty{padding:16px;color:#64748b}
 @media(max-width:800px){.filter{grid-template-columns:1fr}.rowform{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
+<c:if test="${not empty param.msg}">
+  <div id="toast-data" data-type="${param.type == 'success' ? 'success' : 'error'}" style="display:none;"><c:out value="${param.msg}" /></div>
+</c:if>
 <div class="wrap">
   <div class="top">
     <h2>Application Management</h2>
@@ -38,10 +38,6 @@ th{font-size:12px;color:#64748b;text-transform:uppercase}
       <a class="btn" href="<c:url value='/organizer-dashboard' />">Dashboard</a>
     </div>
   </div>
-
-  <c:if test="${not empty param.msg}">
-    <div class="msg ${param.type == 'success' ? 'success' : 'error'}">${param.msg}</div>
-  </c:if>
 
   <form class="filter" action="<c:url value='/organizer/applications' />" method="get">
     <div>
@@ -80,6 +76,7 @@ th{font-size:12px;color:#64748b;text-transform:uppercase}
             <td><fmt:formatDate value="${parsedAppliedAt}" pattern="dd/MM/yyyy" /></td>
             <td>
               <form class="rowform" action="<c:url value='/organizer/update-application-status' />" method="post">
+                <input type="hidden" name="_csrf" value="${_csrfToken}">
                 <input type="hidden" name="applicationId" value="${a.application.applicationId}">
                 <select name="status" required>
                   <option value="APPLIED" ${a.application.status == 'APPLIED' ? 'selected' : ''}>APPLIED</option>
@@ -106,5 +103,6 @@ th{font-size:12px;color:#64748b;text-transform:uppercase}
     </table>
   </div>
 </div>
+<%@ include file="../shared/Toast.jspf" %>
 </body>
 </html>

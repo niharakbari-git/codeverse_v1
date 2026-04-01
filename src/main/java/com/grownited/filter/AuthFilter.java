@@ -1,12 +1,18 @@
 package com.grownited.filter;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Date;
+import java.util.Set;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
+import com.grownited.common.AppConstants;
 import com.grownited.entity.UserEntity;
+import com.grownited.util.SessionUserUtil;
+
+import org.springframework.beans.factory.annotation.Autowired;
 
 import jakarta.servlet.Filter;
 import jakarta.servlet.FilterChain;
@@ -18,7 +24,19 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 
 @Component
+@Order(2)
 public class AuthFilter implements Filter {
+
+	private static final Logger logger = LoggerFactory.getLogger(AuthFilter.class);
+
+	private static final Set<String> PUBLIC_ENDPOINTS = Set.of(
+			"/login",
+			"/signup",
+			"/forget-password",
+			"/forgetpassword",
+			"/authenticate",
+			"/register",
+			"/sendResetLink");
 
 	@Override
 	public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
@@ -26,39 +44,35 @@ public class AuthFilter implements Filter {
 
 		HttpServletRequest req = (HttpServletRequest) request;
 		HttpServletResponse res = (HttpServletResponse) response;
-		
+
 		String uri = req.getRequestURI().toString();
 
-		ArrayList<String> publicUrl = new ArrayList<>();
-
-		publicUrl.add("/login");
-		publicUrl.add("/signup");
-		publicUrl.add("/forget-password");
-		publicUrl.add("/forgetpassword");
-		publicUrl.add("/authenticate");
-		publicUrl.add("/register");
-		publicUrl.add("/sendResetLink");
-
-		boolean isPublicEndpoint = publicUrl.stream().anyMatch(uri::endsWith);
-		boolean isSignupOrRegister = uri.endsWith("/signup") || uri.endsWith("/register");
+		boolean isPublicEndpoint = PUBLIC_ENDPOINTS.stream().anyMatch(uri::endsWith);
+		boolean isAuthPage = uri.endsWith("/login") || uri.endsWith("/signup") || uri.endsWith("/register") || uri.endsWith("/authenticate");
 
 		HttpSession session = req.getSession(false);
-		UserEntity user = session == null ? null : (UserEntity) session.getAttribute("user");
-		String userRole = user == null || user.getRole() == null ? "" : user.getRole().trim().toUpperCase();
+		UserEntity user = SessionUserUtil.getCurrentUser(session);
+		String userRole = SessionUserUtil.getNormalizedRole(user);
 
 		if (isPublicEndpoint || uri.contains("assets")) {
-			if (isSignupOrRegister && user != null && !"ADMIN".equals(userRole)) {
-				res.sendRedirect("/participant/home");
+			if (isAuthPage && user != null) {
+				if (AppConstants.ROLE_ADMIN.equals(userRole)) {
+					res.sendRedirect("/admin-dashboard");
+				} else if (AppConstants.ROLE_ORGANIZER.equals(userRole)) {
+					res.sendRedirect("/organizer-dashboard");
+				} else if (AppConstants.ROLE_JUDGE.equals(userRole)) {
+					res.sendRedirect("/judge-dashboard");
+				} else {
+					res.sendRedirect(AppConstants.PARTICIPANT_HOME_PATH);
+				}
 				return;
 			}
-			// go ahead
 			chain.doFilter(request, response);
 		} else {
-			System.out.println("AuthFilter ......" + new Date());
-			System.out.println(uri);
+			logger.debug("AuthFilter intercepted URI: {}", uri);
 			session = req.getSession(false);
-			user = session == null ? null : (UserEntity) session.getAttribute("user");
-			userRole = user == null || user.getRole() == null ? "" : user.getRole().trim().toUpperCase();
+			user = SessionUserUtil.getCurrentUser(session);
+			userRole = SessionUserUtil.getNormalizedRole(user);
 			if (user == null) {
 				boolean isExpiredSession = req.getRequestedSessionId() != null && !req.isRequestedSessionIdValid();
 				if (isExpiredSession) {
@@ -67,23 +81,25 @@ public class AuthFilter implements Filter {
 					res.sendRedirect("/login");
 				}
 			} else {
-				if (isGovernanceRoute(uri) && !"ADMIN".equals(userRole)) {
-					res.sendRedirect("/participant/home");
+				if (isGovernanceRoute(uri) && !AppConstants.ROLE_ADMIN.equals(userRole)) {
+					res.sendRedirect(AppConstants.PARTICIPANT_HOME_PATH);
 					return;
 				}
 
-				if (isOrganizerRoute(uri) && !("ADMIN".equals(userRole) || "ORGANIZER".equals(userRole))) {
-					res.sendRedirect("/participant/home");
+				if (isOrganizerRoute(uri)
+						&& !(AppConstants.ROLE_ADMIN.equals(userRole) || AppConstants.ROLE_ORGANIZER.equals(userRole))) {
+					res.sendRedirect(AppConstants.PARTICIPANT_HOME_PATH);
 					return;
 				}
 
-				if (isJudgeRoute(uri) && !("ADMIN".equals(userRole) || "JUDGE".equals(userRole))) {
-					res.sendRedirect("/participant/home");
+				if (isJudgeRoute(uri)
+						&& !(AppConstants.ROLE_ADMIN.equals(userRole) || AppConstants.ROLE_JUDGE.equals(userRole))) {
+					res.sendRedirect(AppConstants.PARTICIPANT_HOME_PATH);
 					return;
 				}
 
-				if (isParticipantRoute(uri) && "ADMIN".equals(userRole)) {
-					chain.doFilter(request, response);
+				if (isParticipantStrictRoute(uri) && !AppConstants.ROLE_PARTICIPANT.equals(userRole)) {
+					res.sendRedirect(AppConstants.PARTICIPANT_HOME_PATH);
 					return;
 				}
 
@@ -91,10 +107,6 @@ public class AuthFilter implements Filter {
 			}
 
 		}
-
-		// login no
-		// forgetpassword no
-		// admin-dashboard yes
 
 	}
 
@@ -116,7 +128,12 @@ public class AuthFilter implements Filter {
 		return uri.endsWith("/judge-dashboard") || uri.contains("/judge/");
 	}
 
-	private boolean isParticipantRoute(String uri) {
+	private boolean isParticipantStrictRoute(String uri) {
+		// Everyone can visit /participant/home, /participant/hackathon/* (details)
+		if (uri.endsWith("/participant/home") || uri.contains("/participant/hackathon/")) {
+			return false;
+		}
+		// Participant-only actions
 		return uri.contains("/participant/") || uri.endsWith("/charge");
 	}
 }

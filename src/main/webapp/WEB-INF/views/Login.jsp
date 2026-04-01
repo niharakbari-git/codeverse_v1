@@ -39,12 +39,19 @@ input:-webkit-autofill:active{
 .submit{margin-top:16px;width:100%;padding:12px;border:none;border-radius:11px;background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;font-weight:800;cursor:pointer}
 .row{margin-top:12px;display:flex;justify-content:space-between;gap:8px;align-items:center;flex-wrap:wrap}
 .row a{color:#9ad8e3;text-decoration:none;font-weight:700}
-.error{margin-top:10px;color:#fca5a5;min-height:20px;font-size:13px}
-.info{margin-top:10px;color:#7dd3fc;min-height:20px;font-size:13px}
 @media(max-width:950px){.layout{grid-template-columns:1fr}.visual{min-height:260px}.visual-content{padding:28px}.hero h1{max-width:100%}}
 </style>
 </head>
 <body>
+<c:set var="toastMessage" value="${error}" />
+<c:set var="toastType" value="error" />
+<c:if test="${param.timeout == '1'}">
+  <c:set var="toastMessage" value="Session expired due to inactivity. Please login again." />
+  <c:set var="toastType" value="info" />
+</c:if>
+<c:if test="${not empty toastMessage}">
+  <div id="toast-data" data-type="${toastType}" style="display:none;"><c:out value="${toastMessage}" /></div>
+</c:if>
 <div class="layout">
   <section class="visual">
     <div class="visual-content">
@@ -61,6 +68,7 @@ input:-webkit-autofill:active{
       <h2>Welcome Back</h2>
       <p>Sign in to continue your CodeVerse journey.</p>
       <form action="authenticate" method="post" autocomplete="off">
+        <input type="hidden" name="_csrf" value="${_csrfToken}">
         <input type="text" name="fake-user" style="display:none" autocomplete="off">
         <input type="password" name="fake-pass" style="display:none" autocomplete="new-password">
         <div class="field">
@@ -76,13 +84,10 @@ input:-webkit-autofill:active{
           <a href="forgetpassword">Forgot password?</a>
           <span>New here? <a href="signup">Create account</a></span>
         </div>
-        <c:if test="${param.timeout == '1'}">
-          <div class="info">Session expired due to inactivity. Please login again.</div>
-        </c:if>
-        <div class="error">${error}</div>
       </form>
     </div>
   </section>
 </div>
+<%@ include file="shared/Toast.jspf" %>
 </body>
 </html>

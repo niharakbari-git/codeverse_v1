@@ -22,14 +22,14 @@ body{margin:0;background:#0a0a0f;color:#e2e8f0;font-family:'Syne',sans-serif}
 .form{display:grid;grid-template-columns:1fr auto;gap:8px;margin-top:10px}
 .input{width:100%;padding:9px 10px;border-radius:10px;border:1px solid #2a2a3d;background:#1c1c27;color:#e2e8f0}
 .submit{padding:9px 12px;border:1px solid #7c3aed;background:#7c3aed;color:#fff;border-radius:10px;font-weight:700;cursor:pointer}
-.msg{padding:10px 12px;border-radius:10px;margin-bottom:12px;font-size:13px}
-.msg.success{background:#072e2f;border:1px solid #0f766e;color:#ccfbf1}
-.msg.error{background:#3b0d0d;border:1px solid #7f1d1d;color:#fecaca}
 .empty{padding:16px;color:#64748b;background:#13131a;border:1px solid #2a2a3d;border-radius:14px}
 @media(max-width:560px){.form{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
+<c:if test="${not empty param.msg}">
+  <div id="toast-data" data-type="${param.type == 'success' ? 'success' : 'error'}" style="display:none;"><c:out value="${param.msg}" /></div>
+</c:if>
 <div class="wrap">
   <div class="top">
     <h2>My Teams</h2>
@@ -39,10 +39,6 @@ body{margin:0;background:#0a0a0f;color:#e2e8f0;font-family:'Syne',sans-serif}
       <a class="btn" href="<c:url value='/participant/home' />">Explore</a>
     </div>
   </div>
-
-  <c:if test="${not empty param.msg}">
-    <div class="msg ${param.type == 'success' ? 'success' : 'error'}">${param.msg}</div>
-  </c:if>
 
   <c:if test="${empty teamViews}">
     <div class="empty">No teams yet. Create a team while applying to a hackathon.</div>
@@ -66,6 +62,7 @@ body{margin:0;background:#0a0a0f;color:#e2e8f0;font-family:'Syne',sans-serif}
 
         <c:if test="${t.canManageMembers}">
           <form class="form" action="<c:url value='/participant/team/add-member' />" method="post">
+            <input type="hidden" name="_csrf" value="${_csrfToken}">
             <input type="hidden" name="teamId" value="${t.team.teamId}">
             <input class="input" type="email" name="memberEmail" placeholder="Add member by email" required>
             <button class="submit" type="submit">Add</button>
@@ -75,5 +72,6 @@ body{margin:0;background:#0a0a0f;color:#e2e8f0;font-family:'Syne',sans-serif}
     </c:forEach>
   </div>
 </div>
+<%@ include file="../shared/Toast.jspf" %>
 </body>
 </html>

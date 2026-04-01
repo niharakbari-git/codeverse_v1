@@ -26,6 +26,7 @@ button{background:#7c3aed;border-color:#7c3aed}
     <h1>Create Team</h1>
     <p>Apply to <strong>${hackathon.title}</strong> by creating your team.</p>
     <form action="<c:url value='/participant/team/create' />" method="post">
+      <input type="hidden" name="_csrf" value="${_csrfToken}">
       <input type="hidden" name="hackathonId" value="${hackathon.hackathonId}">
       <label for="teamName">Team Name</label>
       <input id="teamName" type="text" name="teamName" placeholder="e.g. CodeStorm" required>

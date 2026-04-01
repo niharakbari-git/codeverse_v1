@@ -3,6 +3,8 @@ package com.grownited.service;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import net.authorize.Environment;
@@ -22,6 +24,8 @@ import net.authorize.api.controller.base.ApiOperationBase;
 
 @Service
 public class PaymentService {
+
+	private static final Logger logger = LoggerFactory.getLogger(PaymentService.class);
 
 	
 	 public static ANetApiResponse run(String apiLoginId, String transactionKey, Double amount) {
@@ -71,34 +75,36 @@ public class PaymentService {
 	            if (response.getMessages().getResultCode() == MessageTypeEnum.OK) {
 	                TransactionResponse result = response.getTransactionResponse();
 	                if (result.getMessages() != null) {
-	                    System.out.println("Successfully created transaction with Transaction ID: " + result.getTransId());
-	                    System.out.println("Response Code: " + result.getResponseCode());
-	                    System.out.println("Message Code: " + result.getMessages().getMessage().get(0).getCode());
-	                    System.out.println("Description: " + result.getMessages().getMessage().get(0).getDescription());
-	                    System.out.println("Auth Code: " + result.getAuthCode());
+	                    logger.info("Transaction success: id={}, responseCode={}, authCode={}",
+	                            result.getTransId(), result.getResponseCode(), result.getAuthCode());
 	                } else {
-	                    System.out.println("Failed Transaction.");
+	                    logger.warn("Transaction failed without success messages.");
 	                    if (response.getTransactionResponse().getErrors() != null) {
-	                        System.out.println("Error Code: " + response.getTransactionResponse().getErrors().getError().get(0).getErrorCode());
-	                        System.out.println("Error message: " + response.getTransactionResponse().getErrors().getError().get(0).getErrorText());
+	                        logger.error("Gateway error {}: {}",
+	                                response.getTransactionResponse().getErrors().getError().get(0).getErrorCode(),
+	                                response.getTransactionResponse().getErrors().getError().get(0).getErrorText());
 	                    }
 	                }
 	            } else {
-	                System.out.println("Failed Transaction.");
+	                logger.warn("Transaction failed at API result level.");
 	                if (response.getTransactionResponse() != null && response.getTransactionResponse().getErrors() != null) {
-	                    System.out.println("Error Code: " + response.getTransactionResponse().getErrors().getError().get(0).getErrorCode());
-	                    System.out.println("Error message: " + response.getTransactionResponse().getErrors().getError().get(0).getErrorText());
+	                    logger.error("Gateway error {}: {}",
+	                            response.getTransactionResponse().getErrors().getError().get(0).getErrorCode(),
+	                            response.getTransactionResponse().getErrors().getError().get(0).getErrorText());
 	                } else {
-	                    System.out.println("Error Code: " + response.getMessages().getMessage().get(0).getCode());
-	                    System.out.println("Error message: " + response.getMessages().getMessage().get(0).getText());
+	                    logger.error("API message {}: {}",
+	                            response.getMessages().getMessage().get(0).getCode(),
+	                            response.getMessages().getMessage().get(0).getText());
 	                }
 	            }
 	        } else {
 	            // Display the error code and message when response is null 
 	            ANetApiResponse errorResponse = controller.getErrorResponse();
-	            System.out.println("Failed to get response");
+	            logger.error("Failed to get gateway response.");
 	            if (!errorResponse.getMessages().getMessage().isEmpty()) {
-	                System.out.println("Error: "+errorResponse.getMessages().getMessage().get(0).getCode()+" \n"+ errorResponse.getMessages().getMessage().get(0).getText());
+	                logger.error("Gateway error {}: {}",
+	                        errorResponse.getMessages().getMessage().get(0).getCode(),
+	                        errorResponse.getMessages().getMessage().get(0).getText());
 	            }
 	        }
 	        

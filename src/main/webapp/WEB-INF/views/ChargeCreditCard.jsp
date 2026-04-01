@@ -46,25 +46,6 @@ body {
     font-size: 14px;
 }
 
-.alert {
-    border-radius: 10px;
-    padding: 10px 12px;
-    margin-bottom: 14px;
-    font-size: 14px;
-}
-
-.alert-success {
-    color: #bbf7d0;
-    background: rgba(22, 163, 74, 0.18);
-    border: 1px solid rgba(34, 197, 94, 0.35);
-}
-
-.alert-error {
-    color: #fecaca;
-    background: rgba(220, 38, 38, 0.18);
-    border: 1px solid rgba(248, 113, 113, 0.35);
-}
-
 .field {
     margin-bottom: 14px;
 }
@@ -131,18 +112,15 @@ body {
 </style>
 </head>
 <body>
+    <c:if test="${not empty message}">
+        <div id="toast-data" data-type="${status == 'success' ? 'success' : 'error'}" style="display:none;"><c:out value="${message}" /></div>
+    </c:if>
 	<div class="card">
 		<h1 class="title">Card Payment</h1>
 		<p class="subtitle">Enter card details to continue.</p>
 
-		<c:if test="${status == 'success'}">
-			<div class="alert alert-success">${message}</div>
-		</c:if>
-		<c:if test="${status == 'error'}">
-			<div class="alert alert-error">${message}</div>
-		</c:if>
-
 		<form action="<c:url value='/charge' />" method="post" autocomplete="off">
+            <input type="hidden" name="_csrf" value="${_csrfToken}">
 			<div class="field">
 				<label for="amount">Amount</label>
 				<input class="input" id="amount" type="number" min="1" step="0.01" name="amount" placeholder="e.g. 499.00" required>
@@ -172,6 +150,7 @@ body {
 			<button class="btn" type="submit">Pay Now</button>
 		</form>
 	</div>
+        <%@ include file="shared/Toast.jspf" %>
 
 </body>
 </html>

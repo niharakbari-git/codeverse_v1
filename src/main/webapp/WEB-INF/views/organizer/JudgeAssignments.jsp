@@ -32,6 +32,7 @@ th{font-size:12px;color:#64748b;text-transform:uppercase}
   </div>
 
   <form class="form" action="<c:url value='/organizer/assign-judge' />" method="post">
+    <input type="hidden" name="_csrf" value="${_csrfToken}">
     <div>
       <label>Hackathon</label>
       <select name="hackathonId" required>

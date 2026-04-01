@@ -2,6 +2,8 @@ package com.grownited.service;
 
 import java.nio.charset.StandardCharsets;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
@@ -16,23 +18,13 @@ import jakarta.mail.internet.MimeMessage;
 @Service
 public class MailerService {
 
+	private static final Logger logger = LoggerFactory.getLogger(MailerService.class);
+
 	@Autowired
 	JavaMailSender javaMailSender;
 
 	@Autowired
 	private ResourceLoader resourceLoader;
-
-//	public void sendWelcomeMail(UserEntity user) {
-//	
-//		SimpleMailMessage message = new SimpleMailMessage(); 
-//		
-//		message.setTo(user.getEmail());
-//		message.setFrom("tejasshah2k19@gmail.com");
-//		message.setSubject("CodeVerse - Welcome aboard !!! ");
-//		message.setText("Hey "+user.getFirstName()+", We are happy to on board in CodeVerse.");
-//	
-//		javaMailSender.send(message);
-//	}
 
 	public void sendWelcomeMail(UserEntity user) {
 
@@ -54,9 +46,9 @@ public class MailerService {
 			helper.setText(body, true);
 
 			javaMailSender.send(message);
+			logger.info("Welcome email sent to {}", user.getEmail());
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			logger.error("Failed to send welcome mail to {}", user.getEmail(), e);
 		}
 
 	}

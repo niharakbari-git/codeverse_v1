@@ -816,14 +816,51 @@ to {
 
 	<!-- HEADER -->
 	<header class="header">
-		<a class="logo" href="<c:url value='/participant/home' />">
-			<div class="logo-icon"><span class="logo-mark">CV</span></div>
-			<span class="logo-text">CODEVERSE</span>
-		</a>
+		<c:choose>
+			<c:when test="${sessionScope.user.role == 'ADMIN'}">
+				<a class="logo" href="<c:url value='/admin-dashboard' />">
+					<div class="logo-icon"><span class="logo-mark">CV</span></div>
+					<span class="logo-text">CODEVERSE</span>
+				</a>
+			</c:when>
+			<c:when test="${sessionScope.user.role == 'ORGANIZER'}">
+				<a class="logo" href="<c:url value='/organizer-dashboard' />">
+					<div class="logo-icon"><span class="logo-mark">CV</span></div>
+					<span class="logo-text">CODEVERSE</span>
+				</a>
+			</c:when>
+			<c:when test="${sessionScope.user.role == 'JUDGE'}">
+				<a class="logo" href="<c:url value='/judge-dashboard' />">
+					<div class="logo-icon"><span class="logo-mark">CV</span></div>
+					<span class="logo-text">CODEVERSE</span>
+				</a>
+			</c:when>
+			<c:otherwise>
+				<a class="logo" href="<c:url value='/participant/home' />">
+					<div class="logo-icon"><span class="logo-mark">CV</span></div>
+					<span class="logo-text">CODEVERSE</span>
+				</a>
+			</c:otherwise>
+		</c:choose>
+		
 		<nav class="nav-links">
-			<a href="<c:url value='/participant/home' />">Explore</a> <a href="<c:url value='/participant/participant-dashboard' />">Dashboard</a>
-			<a href="<c:url value='/participant/profile' />">Profile</a>
-			<a href="<c:url value='/participant/my-applications' />">My Applications</a>
+			<a href="<c:url value='/participant/home' />">Explore</a> 
+			<c:choose>
+				<c:when test="${sessionScope.user.role == 'ADMIN'}">
+					<a href="<c:url value='/admin-dashboard' />">Dashboard</a>
+				</c:when>
+				<c:when test="${sessionScope.user.role == 'ORGANIZER'}">
+					<a href="<c:url value='/organizer-dashboard' />">Dashboard</a>
+				</c:when>
+				<c:when test="${sessionScope.user.role == 'JUDGE'}">
+					<a href="<c:url value='/judge-dashboard' />">Dashboard</a>
+				</c:when>
+				<c:otherwise>
+					<a href="<c:url value='/participant/participant-dashboard' />">Dashboard</a>
+					<a href="<c:url value='/participant/profile' />">Profile</a>
+					<a href="<c:url value='/participant/my-applications' />">My Applications</a>
+				</c:otherwise>
+			</c:choose>
 			<a href="<c:url value='/logout' />">Logout</a>
 		</nav>
 	</header>

@@ -52,6 +52,7 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:var(--accent2)
   </div>
 
   <form class="card" action="saveHackathon" method="post">
+    <input type="hidden" name="_csrf" value="${_csrfToken}">
     <input type="hidden" name="hackathonId" value="${hackathon.hackathonId}">
 
     <div class="grid">
