@@ -1,4 +1,4 @@
-<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+﻿<%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 
@@ -40,6 +40,8 @@ h1 span{background:linear-gradient(135deg,var(--accent),var(--accent2));-webkit-
 .field-value{font-size:15px;color:var(--text);line-height:1.5;word-break:break-word}
 .footer{margin-top:20px;display:flex;justify-content:flex-end;gap:8px;flex-wrap:wrap;padding-top:16px;border-top:1px solid var(--border)}
 </style>
+<link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/neo-viva-theme.css?v=20260409a">
+<script defer src="${pageContext.request.contextPath}/assets/js/neo-viva-theme.js?v=20260409a"></script>
 </head>
 
 <body>
@@ -129,3 +131,16 @@ h1 span{background:linear-gradient(135deg,var(--accent),var(--accent2));-webkit-
 </div>
 </body>
 </html>
+
+
+
+
+
+
+
+
+
+
+
+
+

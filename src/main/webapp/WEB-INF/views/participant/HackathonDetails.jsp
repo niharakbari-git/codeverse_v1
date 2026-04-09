@@ -1,4 +1,4 @@
-<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+﻿<%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 <!DOCTYPE html>
@@ -50,6 +50,8 @@ body::before {
 .btn.ok { background: rgba(34,197,94,.16); border-color: rgba(34,197,94,.35); color: #86efac; }
 @media (max-width: 680px) { .grid { grid-template-columns: 1fr; } }
 </style>
+<link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/neo-viva-theme.css?v=20260409a">
+<script defer src="${pageContext.request.contextPath}/assets/js/neo-viva-theme.js?v=20260409a"></script>
 </head>
 <body>
 <div class="wrap">
@@ -67,8 +69,8 @@ body::before {
 
 		<div class="grid">
 			<div class="item"><p>Team Size</p><h4>${hackathon.minTeamSize} - ${hackathon.maxTeamSize} members</h4></div>
-			<div class="item"><p>Location</p><h4>${hackathon.location}</h4></div>
-			<div class="item"><p>Eligibility Group</p><h4>${hackathon.userTypeId}</h4></div>
+			<div class="item"><p>Location</p><h4>${hackathon.eventType == 'ONLINE' ? 'Online Event' : hackathon.location}</h4></div>
+			<div class="item"><p>Eligibility</p><h4>All Participants</h4></div>
 			<div class="item"><p>Registration Window</p><h4>
 				<fmt:parseDate value="${hackathon.registrationStartDate}" pattern="yyyy-MM-dd" var="parsedRegStart" type="date" />
 				<fmt:parseDate value="${hackathon.registrationEndDate}" pattern="yyyy-MM-dd" var="parsedRegEnd" type="date" />
@@ -96,3 +98,16 @@ body::before {
 </div>
 </body>
 </html>
+
+
+
+
+
+
+
+
+
+
+
+
+

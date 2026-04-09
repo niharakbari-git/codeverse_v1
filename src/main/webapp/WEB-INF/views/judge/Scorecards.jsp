@@ -1,4 +1,4 @@
-<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+﻿<%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <!DOCTYPE html>
 <html>
@@ -28,6 +28,8 @@ button:hover{transform:translateY(-1px);filter:brightness(1.05)}
 .empty{padding:16px;color:#64748b;background:#13131a;border:1px solid #2a2a3d;border-radius:14px}
 @media(max-width:760px){.filter{grid-template-columns:1fr}}
 </style>
+<link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/neo-viva-theme.css?v=20260409a">
+<script defer src="${pageContext.request.contextPath}/assets/js/neo-viva-theme.js?v=20260409a"></script>
 </head>
 <body>
 <div class="wrap">
@@ -71,15 +73,50 @@ button:hover{transform:translateY(-1px);filter:brightness(1.05)}
           Payment: ${s.application.paymentStatus}
         </p>
 
+        <c:if test="${not empty s.application.submissionDescription || not empty s.application.submissionUrl || not empty s.application.frontendGithubLink || not empty s.application.backendGithubLink}">
+          <div style="background:#1c1c27;padding:12px;border-radius:10px;margin-bottom:12px;font-size:13px;">
+            <strong>Submission Details:</strong><br>
+            <c:if test="${not empty s.application.submissionDescription}">
+              <p style="margin:4px 0">${s.application.submissionDescription}</p>
+            </c:if>
+            <c:if test="${not empty s.application.submissionUrl}">
+              <a href="${s.application.submissionUrl}" target="_blank" style="color:var(--accent2);text-decoration:none;display:block;margin-top:4px;">Project Link &#8599;</a>
+            </c:if>
+            <c:if test="${not empty s.application.frontendGithubLink}">
+              <a href="${s.application.frontendGithubLink}" target="_blank" style="color:var(--accent2);text-decoration:none;display:block;margin-top:4px;">Frontend GitHub Link &#8599;</a>
+            </c:if>
+            <c:if test="${not empty s.application.backendGithubLink}">
+              <a href="${s.application.backendGithubLink}" target="_blank" style="color:var(--accent2);text-decoration:none;display:block;margin-top:4px;">Backend GitHub Link &#8599;</a>
+            </c:if>
+          </div>
+        </c:if>
+
         <form class="form" action="<c:url value='/judge/submit-score' />" method="post">
           <input type="hidden" name="_csrf" value="${_csrfToken}">
           <input type="hidden" name="applicationId" value="${s.application.applicationId}">
           <input type="hidden" name="hackathonId" value="${s.application.hackathonId}">
 
-          <label>Score (0-100)</label>
-          <input type="number" name="score" min="0" max="100" value="${s.givenScore}" required>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px;">
+              <div>
+                <label>Idea & Innovation (0-25)</label>
+                <input type="number" name="ideaScore" min="0" max="25" value="${s.ideaScore}" required>
+              </div>
+              <div>
+                <label>Design & UX (0-25)</label>
+                <input type="number" name="designScore" min="0" max="25" value="${s.designScore}" required>
+              </div>
+              <div>
+                <label>Execution & Code (0-25)</label>
+                <input type="number" name="executionScore" min="0" max="25" value="${s.executionScore}" required>
+              </div>
+              <div>
+                <label>Pitch & Presentation (0-25)</label>
+                <input type="number" name="pitchScore" min="0" max="25" value="${s.pitchScore}" required>
+              </div>
+            </div>
 
-          <label>Remarks</label>
+            <label>Total Score</label>
+            <div style="margin-bottom:8px;font-size:16px;font-weight:bold;color:var(--accent2);">${s.givenScore != null ? s.givenScore : 'Not Scored Yet'}</div>
           <textarea name="remarks" rows="3" placeholder="Strengths, weaknesses, innovation, execution...">${s.remarks}</textarea>
 
           <button type="submit">Save Score</button>
@@ -91,3 +128,16 @@ button:hover{transform:translateY(-1px);filter:brightness(1.05)}
 </div>
 </body>
 </html>
+
+
+
+
+
+
+
+
+
+
+
+
+

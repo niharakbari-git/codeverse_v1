@@ -1,4 +1,4 @@
-<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+﻿<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -27,6 +27,8 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:var(--accent2)
 .footer{margin-top:14px;display:flex;justify-content:flex-end;gap:10px;flex-wrap:wrap}
 @media(max-width:760px){.grid{grid-template-columns:1fr}.footer{justify-content:stretch}.footer .btn{width:100%;text-align:center}}
 </style>
+<link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/neo-viva-theme.css?v=20260409a">
+<script defer src="${pageContext.request.contextPath}/assets/js/neo-viva-theme.js?v=20260409a"></script>
 </head>
 <body>
 <div class="wrap">
@@ -73,7 +75,7 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:var(--accent2)
 
       <div class="field">
         <label>Event Type</label>
-        <select name="eventType" required>
+        <select name="eventType" id="eventTypeField" required>
           <option value="">-- Select Event Type --</option>
           <option value="ONLINE" ${hackathon.eventType == 'ONLINE' ? 'selected' : ''}>Online</option>
           <option value="OFFLINE" ${hackathon.eventType == 'OFFLINE' ? 'selected' : ''}>Offline</option>
@@ -91,16 +93,6 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:var(--accent2)
       </div>
 
       <div class="field">
-        <label>User Type</label>
-        <select name="userTypeId" required>
-          <option value="">-- Select User Type --</option>
-          <c:forEach var="u" items="${allUserType}">
-            <option value="${u.userTypeId}" ${hackathon.userTypeId == u.userTypeId ? 'selected' : ''}>${u.userType}</option>
-          </c:forEach>
-        </select>
-      </div>
-
-      <div class="field">
         <label>Minimum Team Size</label>
         <input type="number" name="minTeamSize" min="1" value="${hackathon.minTeamSize}" required>
       </div>
@@ -110,9 +102,9 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:var(--accent2)
         <input type="number" name="maxTeamSize" min="1" value="${hackathon.maxTeamSize}" required>
       </div>
 
-      <div class="field full">
-        <label>Location</label>
-        <input type="text" name="location" value="${hackathon.location}">
+      <div class="field full" id="locationFieldWrap">
+        <label id="locationLabel">Location</label>
+        <input type="text" name="location" id="locationField" value="${hackathon.location}">
       </div>
 
       <div class="field">
@@ -137,5 +129,44 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:var(--accent2)
     </div>
   </form>
 </div>
+<script>
+(function () {
+  const eventTypeField = document.getElementById('eventTypeField');
+  const locationField = document.getElementById('locationField');
+  const locationLabel = document.getElementById('locationLabel');
+
+  function syncLocationRules() {
+    const eventType = (eventTypeField.value || '').toUpperCase();
+    if (eventType === 'ONLINE') {
+      locationField.value = 'Online';
+      locationField.readOnly = true;
+      locationField.required = false;
+      locationLabel.textContent = 'Location (Auto)';
+    } else {
+      locationField.readOnly = false;
+      locationField.required = true;
+      locationLabel.textContent = eventType === 'OFFLINE' ? 'Venue Address' : 'Location';
+      if (locationField.value === 'Online') {
+        locationField.value = '';
+      }
+    }
+  }
+
+  eventTypeField.addEventListener('change', syncLocationRules);
+  syncLocationRules();
+})();
+</script>
 </body>
 </html>
+
+
+
+
+
+
+
+
+
+
+
+

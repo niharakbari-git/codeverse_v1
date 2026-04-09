@@ -1,4 +1,4 @@
-<style>
+﻿<style>
 .toast{position:fixed;right:18px;top:18px;z-index:1200;display:flex;align-items:center;gap:10px;min-width:260px;max-width:360px;padding:12px 14px;border-radius:12px;border:1px solid transparent;color:#f8fafc;font-size:13px;box-shadow:0 12px 30px rgba(0,0,0,.28);opacity:0;transform:translateY(-10px) scale(.98);pointer-events:none;animation:toastIn .28s ease forwards,toastOut .28s ease 3.6s forwards}
 .toast.success{background:rgba(15,118,110,.96);border-color:#14b8a6}
 .toast.error{background:rgba(153,27,27,.96);border-color:#f87171}

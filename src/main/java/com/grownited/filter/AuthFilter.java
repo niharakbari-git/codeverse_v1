@@ -12,8 +12,6 @@ import com.grownited.common.AppConstants;
 import com.grownited.entity.UserEntity;
 import com.grownited.util.SessionUserUtil;
 
-import org.springframework.beans.factory.annotation.Autowired;
-
 import jakarta.servlet.Filter;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -32,11 +30,12 @@ public class AuthFilter implements Filter {
 	private static final Set<String> PUBLIC_ENDPOINTS = Set.of(
 			"/login",
 			"/signup",
-			"/forget-password",
 			"/forgetpassword",
+			"/resetpassword",
 			"/authenticate",
 			"/register",
-			"/sendResetLink");
+			"/sendResetLink",
+			"/updatePassword");
 
 	@Override
 	public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
@@ -115,6 +114,7 @@ public class AuthFilter implements Filter {
 				|| uri.endsWith("/listCategory") || uri.endsWith("/editCategory") || uri.endsWith("/deleteCategory")
 				|| uri.endsWith("/listUser") || uri.endsWith("/viewUser")
 				|| uri.endsWith("/editUser") || uri.endsWith("/updateUser") || uri.endsWith("/deleteUser")
+				|| uri.endsWith("/admin/user/new") || uri.endsWith("/admin/user/save")
 				|| uri.endsWith("/newUserType") || uri.endsWith("/saveUserType");
 	}
 

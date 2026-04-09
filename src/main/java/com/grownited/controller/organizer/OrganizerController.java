@@ -11,6 +11,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.grownited.common.AppConstants;
 import com.grownited.dto.OrganizerApplicationManageView;
@@ -23,7 +24,9 @@ import com.grownited.repository.HackathonApplicationRepository;
 import com.grownited.repository.HackathonRepository;
 import com.grownited.repository.JudgeAssignmentRepository;
 import com.grownited.repository.JudgeScoreRepository;
+import com.grownited.repository.UserDetailRepository;
 import com.grownited.repository.UserRepository;
+import com.grownited.service.AuthService;
 import com.grownited.service.OrganizerApplicationService;
 import com.grownited.util.SessionUserUtil;
 
@@ -49,6 +52,12 @@ public class OrganizerController {
 
     @Autowired
     OrganizerApplicationService organizerApplicationService;
+
+    @Autowired
+    UserDetailRepository userDetailRepository;
+
+    @Autowired
+    AuthService authService;
 
     @GetMapping("/organizer/judge-assignments")
     public String judgeAssignments(HttpSession session, Model model) {
@@ -92,8 +101,25 @@ public class OrganizerController {
             return AppConstants.REDIRECT_LOGIN;
         }
 
+        Optional<HackathonEntity> opHackathon = hackathonRepository.findById(hackathonId);
+        if (opHackathon.isEmpty()) {
+            return "redirect:/organizer/judge-assignments?msg=Hackathon+not+found&type=error";
+        }
+
+        HackathonEntity hackathon = opHackathon.get();
+        boolean isAdmin = AppConstants.ROLE_ADMIN.equalsIgnoreCase(currentUser.getRole());
+        boolean isOwner = hackathon.getUserId() != null && hackathon.getUserId().equals(currentUser.getUserId());
+        if (!isAdmin && !isOwner) {
+            return "redirect:/organizer/judge-assignments?msg=You+can+assign+judges+only+to+your+hackathons&type=error";
+        }
+
+        Optional<UserEntity> opJudge = userRepository.findById(judgeUserId);
+        if (opJudge.isEmpty() || !AppConstants.ROLE_JUDGE.equalsIgnoreCase(opJudge.get().getRole())) {
+            return "redirect:/organizer/judge-assignments?msg=Selected+user+is+not+a+judge&type=error";
+        }
+
         if (judgeAssignmentRepository.existsByHackathonIdAndJudgeUserId(hackathonId, judgeUserId)) {
-            return "redirect:/organizer/judge-assignments";
+            return "redirect:/organizer/judge-assignments?msg=Judge+already+assigned&type=info";
         }
 
         JudgeAssignmentEntity assignment = new JudgeAssignmentEntity();
@@ -103,7 +129,7 @@ public class OrganizerController {
         assignment.setAssignedAt(LocalDate.now());
         judgeAssignmentRepository.save(assignment);
 
-        return "redirect:/organizer/judge-assignments";
+        return "redirect:/organizer/judge-assignments?msg=Judge+assigned+successfully&type=success";
     }
 
     @GetMapping("/organizer/applications")
@@ -119,7 +145,7 @@ public class OrganizerController {
             hackathonId = myHackathons.get(0).getHackathonId();
         }
 
-        List<OrganizerApplicationManageView> views = organizerApplicationService.getApplicationViews(hackathonId);
+        List<OrganizerApplicationManageView> views = organizerApplicationService.getApplicationViews(hackathonId, currentUser);
 
         model.addAttribute("myHackathons", myHackathons);
         model.addAttribute("selectedHackathonId", hackathonId);
@@ -177,6 +203,33 @@ public class OrganizerController {
         model.addAttribute("selectedHackathonId", hackathonId);
         model.addAttribute("resultViews", resultViews);
         return "organizer/Results";
+    }
+
+    @GetMapping("/organizer/profile")
+    public String organizerProfile(HttpSession session, Model model) {
+        UserEntity currentUser = SessionUserUtil.getCurrentUser(session);
+        if (currentUser == null) {
+            return AppConstants.REDIRECT_LOGIN;
+        }
+
+        model.addAttribute("profileUser", currentUser);
+        model.addAttribute("profileUserDetail", userDetailRepository.findByUserId(currentUser.getUserId()).orElse(null));
+        return "organizer/Profile";
+    }
+
+    @PostMapping("/organizer/profile/change-pfp")
+    public String changeOrganizerProfilePicture(MultipartFile profilePic, HttpSession session) {
+        UserEntity currentUser = SessionUserUtil.getCurrentUser(session);
+        if (currentUser == null) {
+            return AppConstants.REDIRECT_LOGIN;
+        }
+
+        AuthService.ProfilePictureUpdateResult result = authService.updateProfilePicture(currentUser.getUserId(), profilePic);
+        if (result.isSuccessful()) {
+            session.setAttribute(AppConstants.SESSION_USER, result.getUpdatedUser());
+            return "redirect:/organizer/profile?msg=Profile+picture+updated+successfully&type=success";
+        }
+        return "redirect:/organizer/profile?msg=" + result.getMessage().replace(" ", "+") + "&type=error";
     }
 
     public static class AssignmentView {

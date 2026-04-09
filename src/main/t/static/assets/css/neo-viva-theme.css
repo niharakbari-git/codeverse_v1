@@ -1,0 +1,173 @@
+﻿:root {
+	--cv-bg: #070b12;
+	--cv-surface: #0f1622;
+	--cv-surface-2: #131d2d;
+	--cv-border: #22344a;
+	--cv-text: #e6edf5;
+	--cv-muted: #8ea4bc;
+	--cv-cyan: #22d3ee;
+	--cv-blue: #3b82f6;
+	--cv-orange: #fb923c;
+	--cv-danger: #f97316;
+	--cv-shadow: 0 12px 28px rgba(0, 0, 0, 0.28);
+}
+
+html.cv-theme-root,
+body.cv-theme {
+	background: radial-gradient(circle at 18% 14%, rgba(34, 211, 238, 0.08), transparent 34%),
+							radial-gradient(circle at 84% 80%, rgba(251, 146, 60, 0.08), transparent 38%),
+							var(--cv-bg) !important;
+	color: var(--cv-text) !important;
+}
+
+body.cv-theme {
+	font-family: "Syne", "Segoe UI", sans-serif !important;
+}
+
+body.cv-theme .wrap,
+body.cv-theme .panel,
+body.cv-theme .card,
+body.cv-theme .filter,
+body.cv-theme .form,
+body.cv-theme .item,
+body.cv-theme .quick-card,
+body.cv-theme .chart,
+body.cv-theme .empty,
+body.cv-theme .table-wrap,
+body.cv-theme .container,
+body.cv-theme .cards-section,
+body.cv-theme .filters-inner {
+	background: rgba(15, 22, 34, 0.9) !important;
+	border: 1px solid var(--cv-border) !important;
+	box-shadow: var(--cv-shadow);
+}
+
+body.cv-theme h1,
+body.cv-theme h2,
+body.cv-theme h3,
+body.cv-theme h4,
+body.cv-theme h5,
+body.cv-theme h6 {
+	color: var(--cv-text) !important;
+}
+
+body.cv-theme p,
+body.cv-theme label,
+body.cv-theme th,
+body.cv-theme td,
+body.cv-theme .sub,
+body.cv-theme .subtitle,
+body.cv-theme .note,
+body.cv-theme .field-label {
+	color: var(--cv-muted) !important;
+}
+
+body.cv-theme input,
+body.cv-theme select,
+body.cv-theme textarea,
+body.cv-theme .input,
+body.cv-theme .filter-select,
+body.cv-theme .sort-select {
+	background: var(--cv-surface-2) !important;
+	color: var(--cv-text) !important;
+	border: 1px solid var(--cv-border) !important;
+}
+
+body.cv-theme input:focus,
+body.cv-theme select:focus,
+body.cv-theme textarea:focus {
+	border-color: var(--cv-cyan) !important;
+	box-shadow: 0 0 0 3px rgba(34, 211, 238, 0.16) !important;
+}
+
+body.cv-theme a {
+	color: #9fddff;
+}
+
+body.cv-theme .btn,
+body.cv-theme button,
+body.cv-theme .submit,
+body.cv-theme input[type='submit'] {
+	border-radius: 10px !important;
+	border: 1px solid var(--cv-border) !important;
+	background: linear-gradient(135deg, var(--cv-orange), var(--cv-cyan)) !important;
+	color: #ffffff !important;
+	font-weight: 700 !important;
+}
+
+body.cv-theme .btn:hover,
+body.cv-theme button:hover,
+body.cv-theme .submit:hover,
+body.cv-theme input[type='submit']:hover {
+	filter: brightness(1.05);
+}
+
+body.cv-theme a[href*='/logout'],
+body.cv-theme .btn.logout {
+	background: #fff7ed !important;
+	border-color: #fdba74 !important;
+	color: #9a3412 !important;
+}
+
+body.cv-theme .row-actions .btn,
+body.cv-theme .actions .btn,
+body.cv-theme .top .btn {
+	background: var(--cv-surface-2) !important;
+	color: var(--cv-text) !important;
+	border: 1px solid var(--cv-border) !important;
+}
+
+body.cv-theme .row-actions .btn[href*='view'] {
+	background: rgba(34, 211, 238, 0.14) !important;
+	color: #89ecff !important;
+	border-color: rgba(34, 211, 238, 0.45) !important;
+}
+
+body.cv-theme .row-actions .btn.warn,
+body.cv-theme .row-actions .btn[href*='edit'] {
+	background: rgba(59, 130, 246, 0.16) !important;
+	color: #a5c8ff !important;
+	border-color: rgba(59, 130, 246, 0.45) !important;
+}
+
+body.cv-theme .row-actions .btn.danger,
+body.cv-theme .row-actions .btn[href*='delete'] {
+	background: rgba(249, 115, 22, 0.18) !important;
+	color: #ffd3b4 !important;
+	border-color: rgba(249, 115, 22, 0.5) !important;
+}
+
+body.cv-theme table,
+body.cv-theme thead,
+body.cv-theme tbody,
+body.cv-theme tr,
+body.cv-theme th,
+body.cv-theme td {
+	background: transparent !important;
+	border-color: var(--cv-border) !important;
+}
+
+body.cv-theme .badge,
+body.cv-theme .chip,
+body.cv-theme .tag,
+body.cv-theme .role {
+	border-radius: 999px !important;
+	border: 1px solid rgba(34, 211, 238, 0.4) !important;
+	background: rgba(34, 211, 238, 0.14) !important;
+	color: #9eefff !important;
+}
+
+body.cv-theme .logo,
+body.cv-theme .brand,
+body.cv-theme .logo-text {
+	font-family: "Space Mono", monospace !important;
+	font-weight: 700 !important;
+	letter-spacing: 0.06em !important;
+}
+
+@media (max-width: 760px) {
+	body.cv-theme .top,
+	body.cv-theme .actions {
+		gap: 8px;
+	}
+}

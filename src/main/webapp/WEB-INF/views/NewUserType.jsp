@@ -1,4 +1,4 @@
-<%@ page language="java" contentType="text/html; charset=UTF-8"
+﻿<%@ page language="java" contentType="text/html; charset=UTF-8"
     pageEncoding="UTF-8"%>
 <!DOCTYPE html>
 <html>
@@ -18,6 +18,8 @@
         border-radius: 12px;
     }
 </style>
+<link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/neo-viva-theme.css?v=20260409a">
+<script defer src="${pageContext.request.contextPath}/assets/js/neo-viva-theme.js?v=20260409a"></script>
 </head>
 
 <body>
@@ -29,17 +31,24 @@
                 <div class="card-body p-4">
                     <h4 class="text-center mb-4">Add New User Type</h4>
 
+                    <% String error = request.getParameter("error"); %>
+                    <% if (error != null && !error.isBlank()) { %>
+                        <div class="alert alert-danger" role="alert"><%= error %></div>
+                    <% } %>
+
                     <form action="saveUserType" method="post">
                         <input type="hidden" name="_csrf" value="${_csrfToken}" />
                         
                         <!-- User Type -->
                         <div class="mb-3">
                             <label class="form-label">User Type</label>
-                            <input type="text"
-                                   name="userType"
-                                   class="form-control"
-                                   placeholder="Enter user type"
-                                   required>
+                            <select name="userType" class="form-select" required>
+                                <option value="">Select role</option>
+                                <option value="PARTICIPANT">PARTICIPANT</option>
+                                <option value="JUDGE">JUDGE</option>
+                                <option value="ORGANIZER">ORGANIZER</option>
+                                <option value="ADMIN">ADMIN</option>
+                            </select>
                         </div>
 
                         <!-- Buttons -->
@@ -65,3 +74,16 @@
 
 </body>
 </html>
+
+
+
+
+
+
+
+
+
+
+
+
+

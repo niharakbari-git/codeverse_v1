@@ -1,8 +1,11 @@
 package com.grownited.service;
 
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -18,6 +21,10 @@ import com.grownited.repository.UserRepository;
 
 @Service
 public class OrganizerApplicationService {
+
+    private static final Set<String> ALLOWED_STATUSES = Set.of("APPLIED", "SHORTLISTED", "REJECTED", "FINALIST", "WINNER");
+    private static final Set<String> ALLOWED_PAYMENT_STATUSES = Set.of("PENDING", "PAID", "FAILED", "WAIVED");
+    private static final Map<String, Set<String>> STATUS_TRANSITIONS = buildStatusTransitions();
 
     @Autowired
     private HackathonRepository hackathonRepository;
@@ -35,9 +42,13 @@ public class OrganizerApplicationService {
         return hackathonRepository.findByUserId(currentUser.getUserId());
     }
 
-    public List<OrganizerApplicationManageView> getApplicationViews(Integer hackathonId) {
+    public List<OrganizerApplicationManageView> getApplicationViews(Integer hackathonId, UserEntity currentUser) {
         List<OrganizerApplicationManageView> views = new ArrayList<>();
         if (hackathonId == null) {
+            return views;
+        }
+
+        if (!canManageHackathon(hackathonId, currentUser)) {
             return views;
         }
 
@@ -73,9 +84,29 @@ public class OrganizerApplicationService {
                     + "&msg=Unauthorized+update+attempt&type=error");
         }
 
-        app.setStatus(status);
-        if (paymentStatus != null && !paymentStatus.isBlank()) {
-            app.setPaymentStatus(paymentStatus);
+        String normalizedStatus = normalize(status);
+        if (!ALLOWED_STATUSES.contains(normalizedStatus)) {
+            return UpdateApplicationResult.error("redirect:/organizer/applications?hackathonId=" + app.getHackathonId()
+                    + "&msg=Invalid+application+status&type=error");
+        }
+
+        String currentStatus = normalize(app.getStatus());
+        if (!isValidTransition(currentStatus, normalizedStatus)) {
+            return UpdateApplicationResult.error("redirect:/organizer/applications?hackathonId=" + app.getHackathonId()
+                    + "&msg=Invalid+status+transition&type=error");
+        }
+
+        app.setStatus(normalizedStatus);
+
+        if ("FREE".equalsIgnoreCase(hackathon.getPayment())) {
+            app.setPaymentStatus("WAIVED");
+        } else if (paymentStatus != null && !paymentStatus.isBlank()) {
+            String normalizedPaymentStatus = normalize(paymentStatus);
+            if (!ALLOWED_PAYMENT_STATUSES.contains(normalizedPaymentStatus)) {
+                return UpdateApplicationResult.error("redirect:/organizer/applications?hackathonId=" + app.getHackathonId()
+                        + "&msg=Invalid+payment+status&type=error");
+            }
+            app.setPaymentStatus(normalizedPaymentStatus);
         }
         hackathonApplicationRepository.save(app);
 
@@ -107,5 +138,39 @@ public class OrganizerApplicationService {
         public String getRedirectPath() {
             return redirectPath;
         }
+    }
+
+    private static String normalize(String value) {
+        return value == null ? "" : value.trim().toUpperCase();
+    }
+
+    private boolean canManageHackathon(Integer hackathonId, UserEntity currentUser) {
+        if (currentUser == null) {
+            return false;
+        }
+        if (AppConstants.ROLE_ADMIN.equalsIgnoreCase(currentUser.getRole())) {
+            return true;
+        }
+        Optional<HackathonEntity> opHackathon = hackathonRepository.findById(hackathonId);
+        return opHackathon.isPresent() && opHackathon.get().getUserId() != null
+                && opHackathon.get().getUserId().equals(currentUser.getUserId());
+    }
+
+    private boolean isValidTransition(String currentStatus, String nextStatus) {
+        if (nextStatus.equals(currentStatus)) {
+            return true;
+        }
+        Set<String> allowedNext = STATUS_TRANSITIONS.get(currentStatus);
+        return allowedNext != null && allowedNext.contains(nextStatus);
+    }
+
+    private static Map<String, Set<String>> buildStatusTransitions() {
+        Map<String, Set<String>> transitions = new LinkedHashMap<>();
+        transitions.put("APPLIED", Set.of("SHORTLISTED", "REJECTED"));
+        transitions.put("SHORTLISTED", Set.of("FINALIST", "REJECTED"));
+        transitions.put("FINALIST", Set.of("WINNER", "REJECTED"));
+        transitions.put("REJECTED", Set.of());
+        transitions.put("WINNER", Set.of());
+        return transitions;
     }
 }

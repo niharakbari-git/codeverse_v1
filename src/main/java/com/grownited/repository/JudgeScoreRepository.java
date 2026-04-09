@@ -13,6 +13,8 @@ public interface JudgeScoreRepository extends JpaRepository<JudgeScoreEntity, In
 
     List<JudgeScoreEntity> findByHackathonId(Integer hackathonId);
 
+    List<JudgeScoreEntity> findByJudgeUserId(Integer judgeUserId);
+
     List<JudgeScoreEntity> findByApplicationId(Integer applicationId);
 
     Optional<JudgeScoreEntity> findByApplicationIdAndJudgeUserId(Integer applicationId, Integer judgeUserId);

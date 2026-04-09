@@ -1,4 +1,4 @@
-<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+﻿<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <!DOCTYPE html>
 <html lang="en">
@@ -48,6 +48,8 @@ input[type='file']::file-selector-button{margin-right:10px;padding:8px 12px;bord
 @media(max-width:1080px){.layout{grid-template-columns:1fr}.visual{min-height:240px}.visual-content{padding:28px}}
 @media(max-width:700px){.grid{grid-template-columns:1fr}.card{padding:18px}}
 </style>
+<link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/neo-viva-theme.css?v=20260409a">
+<script defer src="${pageContext.request.contextPath}/assets/js/neo-viva-theme.js?v=20260409a"></script>
 </head>
 <body>
 <c:if test="${not empty error}">
@@ -116,16 +118,6 @@ input[type='file']::file-selector-button{margin-right:10px;padding:8px 12px;bord
             <input type="text" name="qualification" placeholder="e.g. B.Tech, MCA" required>
           </div>
           <div class="field">
-            <label>User Type</label>
-            <select name="userTypeId" required>
-              <option value="-1">---Select User Type---</option>
-              <c:forEach items="${allUserType}" var="ut">
-                <option value="${ut.userTypeId}">${ut.userType}</option>
-              </c:forEach>
-            </select>
-          </div>
-
-          <div class="field">
             <label>City</label>
             <input type="text" name="city" required>
           </div>
@@ -142,6 +134,10 @@ input[type='file']::file-selector-button{margin-right:10px;padding:8px 12px;bord
             <label>Profile Picture</label>
             <input type="file" name="profilePic">
           </div>
+          <div class="field full">
+            <label>LinkedIn URL</label>
+            <input type="url" name="linkedinUrl" placeholder="https://linkedin.com/in/username">
+          </div>
         </div>
 
         <div class="actions">
@@ -155,3 +151,16 @@ input[type='file']::file-selector-button{margin-right:10px;padding:8px 12px;bord
 <%@ include file="shared/Toast.jspf" %>
 </body>
 </html>
+
+
+
+
+
+
+
+
+
+
+
+
+

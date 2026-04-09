@@ -1,5 +1,7 @@
 package com.grownited.common;
 
+import java.util.Set;
+
 public final class AppConstants {
 
     private AppConstants() {
@@ -16,7 +18,21 @@ public final class AppConstants {
     public static final String ROLE_PARTICIPANT = "PARTICIPANT";
     public static final String ROLE_JUDGE = "JUDGE";
 
+        public static final Set<String> ALLOWED_ROLES = Set.of(
+            ROLE_ADMIN,
+            ROLE_ORGANIZER,
+            ROLE_PARTICIPANT,
+            ROLE_JUDGE);
+
     public static final String REDIRECT_LOGIN = "redirect:/login";
     public static final String PARTICIPANT_HOME_PATH = "/participant/home";
     public static final String REDIRECT_PARTICIPANT_HOME = "redirect:/participant/home";
+
+    public static String normalizeRole(String role) {
+        return role == null ? "" : role.trim().toUpperCase();
+    }
+
+    public static boolean isAllowedRole(String role) {
+        return ALLOWED_ROLES.contains(normalizeRole(role));
+    }
 }

@@ -13,6 +13,7 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
+import com.grownited.common.AppConstants;
 import com.grownited.entity.HackathonEntity;
 import com.grownited.entity.JudgeAssignmentEntity;
 import com.grownited.entity.UserDetailEntity;
@@ -113,7 +114,11 @@ public class DemoDataSeeder implements CommandLineRunner {
     }
 
     private List<UserTypeEntity> ensureUserTypes() {
-        List<String> defaults = List.of("Working Professional", "Fresher", "College Student", "School Student");
+        List<String> defaults = List.of(
+            AppConstants.ROLE_PARTICIPANT,
+            AppConstants.ROLE_JUDGE,
+            AppConstants.ROLE_ORGANIZER,
+            AppConstants.ROLE_ADMIN);
         List<UserTypeEntity> allTypes = userTypeRepository.findAll();
 
         for (String typeName : defaults) {

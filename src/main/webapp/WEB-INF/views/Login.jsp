@@ -1,4 +1,4 @@
-<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+﻿<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <!DOCTYPE html>
 <html lang="en">
@@ -41,16 +41,31 @@ input:-webkit-autofill:active{
 .row a{color:#9ad8e3;text-decoration:none;font-weight:700}
 @media(max-width:950px){.layout{grid-template-columns:1fr}.visual{min-height:260px}.visual-content{padding:28px}.hero h1{max-width:100%}}
 </style>
+<link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/neo-viva-theme.css?v=20260409a">
+<script defer src="${pageContext.request.contextPath}/assets/js/neo-viva-theme.js?v=20260409a"></script>
 </head>
 <body>
-<c:set var="toastMessage" value="${error}" />
-<c:set var="toastType" value="error" />
+<c:set var="toastMessage" value="${empty success ? error : success}" />
+<c:set var="toastType" value="${empty success ? 'error' : 'success'}" />
 <c:if test="${param.timeout == '1'}">
   <c:set var="toastMessage" value="Session expired due to inactivity. Please login again." />
   <c:set var="toastType" value="info" />
 </c:if>
 <c:if test="${not empty toastMessage}">
   <div id="toast-data" data-type="${toastType}" style="display:none;"><c:out value="${toastMessage}" /></div>
+</c:if>
+<c:if test="${param.timeout == '1'}">
+  <script>
+    (function () {
+      if (!window.history || !window.history.replaceState) {
+        return;
+      }
+      var url = new URL(window.location.href);
+      url.searchParams.delete('timeout');
+      var query = url.searchParams.toString();
+      window.history.replaceState({}, document.title, url.pathname + (query ? ('?' + query) : ''));
+    })();
+  </script>
 </c:if>
 <div class="layout">
   <section class="visual">
@@ -91,3 +106,6 @@ input:-webkit-autofill:active{
 <%@ include file="shared/Toast.jspf" %>
 </body>
 </html>
+
+
+

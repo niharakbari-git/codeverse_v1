@@ -8,19 +8,19 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 
-@Entity // create table
-@Table(name = "users") // this will assign table name => users
+@Entity
+@Table(name = "users")
 public class UserEntity {
 
-	@Id // primary key
-	@GeneratedValue(strategy = GenerationType.IDENTITY) // auto increment
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Integer userId;
 	private String firstName;
 	private String lastName;
 	private String email;
 	private String password;
 	private LocalDate createdAt;  
-	private String role; //admin , participant , judge
+	private String role;
 	private String gender;
 	private Integer birthYear;
 	private String contactNum; 

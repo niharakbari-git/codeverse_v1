@@ -1,4 +1,4 @@
-<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+﻿<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn"%>
 <html>
 <head>
@@ -811,6 +811,8 @@ to {
 	}
 }
 </style>
+<link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/neo-viva-theme.css?v=20260409a">
+<script defer src="${pageContext.request.contextPath}/assets/js/neo-viva-theme.js?v=20260409a"></script>
 </head>
 <body>
 
@@ -957,18 +959,6 @@ to {
 					</select>
 				</div>
 
-				<div class="filter-group">
-					<span class="filter-label">Eligibility</span> <select
-						id="eligibilityFilter" class="filter-select">
-						<option value="">Everyone</option>
-						<option value="2">Fresher</option>
-						<option value="1">Working Professional</option>
-						<option value="3">College Student</option>
-						<option value="4">School Student</option>
-				
-					</select>
-				</div>
-
 				<div class="divider"></div>
 				<button class="apply-btn" id="resetBtn">Reset Filters</button>
 			</div>
@@ -1012,8 +1002,7 @@ to {
 							<div class="card" data-title="${fn:toLowerCase(h.title)}"
 								data-desc="${fn:toLowerCase(h.description)}"
 								data-type="${h.payment}" data-minteam="${h.minTeamSize}"
-								data-maxteam="${h.maxTeamSize}"
-								data-eligibility="${h.userTypeId}">
+								data-maxteam="${h.maxTeamSize}">
 								<div class="card-top">
 
 									<!-- Icon: rotate through 3 SVG symbols, each with its own colour -->
@@ -1083,7 +1072,7 @@ to {
 								<div class="tags">
 									<span class="tag tag-type">${h.eventType}</span> <span
 										class="tag tag-team">${h.minTeamSize} -
-										${h.maxTeamSize} members</span> <span class="tag tag-eligibility">${h.userTypeId}</span>
+										${h.maxTeamSize} members</span> <span class="tag tag-eligibility">Open to Participants</span>
 								</div>
 
 								<div class="card-footer">
@@ -1132,7 +1121,6 @@ to {
   const cards        = Array.from(document.querySelectorAll('.card'));
   const searchInput  = document.getElementById('searchInput');
   const teamSizeSel  = document.getElementById('teamSizeFilter');
-  const eligSel      = document.getElementById('eligibilityFilter');
   const sortSel      = document.getElementById('sortSelect');
   const resetBtn     = document.getElementById('resetBtn');
   const noResults    = document.getElementById('noResults');
@@ -1147,7 +1135,6 @@ to {
       keyword    : searchInput ? searchInput.value.trim().toLowerCase() : '',
       type       : (document.querySelector('input[name="type"]:checked') || {}).value || '',
       teamSize   : teamSizeSel.value,
-      eligibility: eligSel.value,
       sort       : sortSel.value
     };
   }
@@ -1162,26 +1149,22 @@ to {
       const type   = card.dataset.type        || '';
       const minT   = parseInt(card.dataset.minteam) || 0;
       const maxT   = parseInt(card.dataset.maxteam) || 99;
-      const elig   = card.dataset.eligibility || '';
 
       // --- keyword ---
       const kw = f.keyword;
-      const kwMatch = !kw || title.includes(kw) || desc.includes(kw) || type.toLowerCase().includes(kw) || elig.toLowerCase().includes(kw);
+	const kwMatch = !kw || title.includes(kw) || desc.includes(kw) || type.toLowerCase().includes(kw);
 
       // --- type ---
       const typeMatch = !f.type || type.toUpperCase() === f.type.toUpperCase();
 
-      // --- team size: selected value must fall within min–max range ---
+      // --- team size: selected value must fall within minâ€“max range ---
       let teamMatch = true;
       if (f.teamSize) {
         const sz = parseInt(f.teamSize);
         teamMatch = sz >= minT && sz <= maxT;
       }
 
-      // --- eligibility ---
-      const eligMatch = !f.eligibility || elig.toUpperCase() === f.eligibility.toUpperCase();
-
-      const show = kwMatch && typeMatch && teamMatch && eligMatch;
+	const show = kwMatch && typeMatch && teamMatch;
       card.classList.toggle('hidden', !show);
       if (show) visible.push(card);
     });
@@ -1222,14 +1205,12 @@ to {
   if (searchInput) searchInput.addEventListener('input', applyFilters);
   document.querySelectorAll('input[name="type"]').forEach(r => r.addEventListener('change', applyFilters));
   teamSizeSel.addEventListener('change', applyFilters);
-  eligSel.addEventListener('change', applyFilters);
   sortSel.addEventListener('change', applyFilters);
 
   resetBtn.addEventListener('click', function () {
     if (searchInput) searchInput.value = '';
     document.getElementById('type-all').checked = true;
     teamSizeSel.value = '';
-    eligSel.value = '';
     sortSel.value = 'default';
     applyFilters();
   });
@@ -1240,3 +1221,16 @@ to {
 </script>
 </body>
 </html>
+
+
+
+
+
+
+
+
+
+
+
+
+

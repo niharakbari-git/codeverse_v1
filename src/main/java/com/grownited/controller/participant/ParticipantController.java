@@ -5,10 +5,14 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.multipart.MultipartFile;
 
+import com.grownited.common.AppConstants;
 import com.grownited.entity.HackathonEntity;
 import com.grownited.entity.UserDetailEntity;
 import com.grownited.entity.UserEntity;
+import com.grownited.service.AuthService;
 
 import java.util.Optional;
 
@@ -31,6 +35,9 @@ public class ParticipantController {
 
 	@Autowired
 	UserDetailRepository userDetailRepository;
+
+	@Autowired
+	AuthService authService;
 	
 	@GetMapping("/participant/participant-dashboard")
 	public String participantDashboard(Model model) {
@@ -58,6 +65,21 @@ public class ParticipantController {
 		model.addAttribute("profileUser", currentUser);
 		model.addAttribute("profileUserDetail", opUserDetail.orElse(null));
 		return "participant/Profile";
+	}
+
+	@PostMapping("/participant/profile/change-pfp")
+	public String changeProfilePicture(MultipartFile profilePic, HttpSession session) {
+		UserEntity currentUser = (UserEntity) session.getAttribute(AppConstants.SESSION_USER);
+		if (currentUser == null) {
+			return AppConstants.REDIRECT_LOGIN;
+		}
+
+		AuthService.ProfilePictureUpdateResult result = authService.updateProfilePicture(currentUser.getUserId(), profilePic);
+		if (result.isSuccessful()) {
+			session.setAttribute(AppConstants.SESSION_USER, result.getUpdatedUser());
+			return "redirect:/participant/profile?msg=Profile+picture+updated+successfully&type=success";
+		}
+		return "redirect:/participant/profile?msg=" + result.getMessage().replace(" ", "+") + "&type=error";
 	}
 
 	@GetMapping("/participant/hackathon/{hackathonId}")

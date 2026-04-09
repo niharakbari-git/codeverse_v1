@@ -94,7 +94,7 @@ public class ParticipantTeamService {
             view.setTeam(team);
             boolean isLeader = team.getLeaderUserId() != null && team.getLeaderUserId().equals(currentUserId);
             view.setCanManageMembers(isLeader);
-            view.setRoleInTeam(isLeader ? "Leader" : "Member");
+            view.setRoleInTeam(isLeader ? "Team Leader" : "Team Member");
 
             Optional<HackathonEntity> opHackathon = hackathonRepository.findById(team.getHackathonId());
             view.setHackathonTitle(opHackathon.map(HackathonEntity::getTitle).orElse("Unknown Hackathon"));

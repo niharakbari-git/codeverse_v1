@@ -1,4 +1,4 @@
-<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+﻿<%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <!DOCTYPE html>
 <html>
@@ -19,6 +19,8 @@ input{width:100%;padding:11px 12px;border-radius:10px;border:1px solid #2a2a3d;b
 button,a{text-decoration:none;padding:10px 14px;border-radius:10px;border:1px solid #2a2a3d;background:#13131a;color:#e2e8f0;font-weight:700;cursor:pointer}
 button{background:#7c3aed;border-color:#7c3aed}
 </style>
+<link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/neo-viva-theme.css?v=20260409a">
+<script defer src="${pageContext.request.contextPath}/assets/js/neo-viva-theme.js?v=20260409a"></script>
 </head>
 <body>
 <div class="wrap">
@@ -39,3 +41,16 @@ button{background:#7c3aed;border-color:#7c3aed}
 </div>
 </body>
 </html>
+
+
+
+
+
+
+
+
+
+
+
+
+

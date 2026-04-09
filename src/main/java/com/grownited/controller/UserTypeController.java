@@ -5,6 +5,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 
+import com.grownited.common.AppConstants;
 import com.grownited.entity.UserTypeEntity;
 import com.grownited.repository.UserTypeRepository;
 
@@ -24,7 +25,18 @@ public class UserTypeController {
 	
 	@PostMapping("saveUserType")
 	public String saveUserType(UserTypeEntity userTypeEntity) {
-		userTypeRepository.save(userTypeEntity);
+		String normalizedRole = AppConstants.normalizeRole(userTypeEntity.getUserType());
+		if (!AppConstants.isAllowedRole(normalizedRole)) {
+			return "redirect:/newUserType?error=Only+ADMIN%2C+ORGANIZER%2C+JUDGE+or+PARTICIPANT+is+allowed";
+		}
+
+		boolean alreadyExists = userTypeRepository.findAll().stream()
+				.anyMatch(existing -> normalizedRole.equalsIgnoreCase(existing.getUserType()));
+		if (!alreadyExists) {
+			userTypeEntity.setUserType(normalizedRole);
+			userTypeRepository.save(userTypeEntity);
+		}
+
 		return "redirect:/admin-dashboard";
 	}
 }

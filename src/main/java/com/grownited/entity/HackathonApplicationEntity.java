@@ -23,6 +23,12 @@ public class HackathonApplicationEntity {
     private String paymentStatus;
     private LocalDate appliedAt;
 
+    // Added fields for project submission
+    private String submissionUrl;
+    private String submissionDescription;
+    private String frontendGithubLink;
+    private String backendGithubLink;
+
     public Integer getApplicationId() {
         return applicationId;
     }
@@ -77,5 +83,37 @@ public class HackathonApplicationEntity {
 
     public void setAppliedAt(LocalDate appliedAt) {
         this.appliedAt = appliedAt;
+    }
+
+    public String getSubmissionUrl() {
+        return submissionUrl;
+    }
+
+    public void setSubmissionUrl(String submissionUrl) {
+        this.submissionUrl = submissionUrl;
+    }
+
+    public String getSubmissionDescription() {
+        return submissionDescription;
+    }
+
+    public void setSubmissionDescription(String submissionDescription) {
+        this.submissionDescription = submissionDescription;
+    }
+
+    public String getFrontendGithubLink() {
+        return frontendGithubLink;
+    }
+
+    public void setFrontendGithubLink(String frontendGithubLink) {
+        this.frontendGithubLink = frontendGithubLink;
+    }
+
+    public String getBackendGithubLink() {
+        return backendGithubLink;
+    }
+
+    public void setBackendGithubLink(String backendGithubLink) {
+        this.backendGithubLink = backendGithubLink;
     }
 }

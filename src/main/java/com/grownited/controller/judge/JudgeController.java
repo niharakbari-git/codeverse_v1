@@ -43,6 +43,32 @@ public class JudgeController {
     @Autowired
     JudgeScoreRepository judgeScoreRepository;
 
+    @GetMapping("/judge-dashboard")
+    public String judgeDashboard(HttpSession session, Model model) {
+        UserEntity currentUser = (UserEntity) session.getAttribute("user");
+        if (currentUser == null) {
+            return "redirect:/login";
+        }
+
+        List<JudgeAssignmentEntity> assignments = judgeAssignmentRepository.findByJudgeUserId(currentUser.getUserId());
+        long totalAssigned = assignments.size();
+        
+        List<JudgeScoreEntity> scores = judgeScoreRepository.findByJudgeUserId(currentUser.getUserId());
+        long totalEvaluated = scores.size();
+        
+        long totalApplications = 0;
+        for(JudgeAssignmentEntity assignment : assignments) {
+            totalApplications += hackathonApplicationRepository.findByHackathonId(assignment.getHackathonId()).size();
+        }
+        long totalPending = Math.max(0, totalApplications - totalEvaluated);
+
+        model.addAttribute("totalAssigned", totalAssigned);
+        model.addAttribute("totalEvaluated", totalEvaluated);
+        model.addAttribute("totalPending", totalPending);
+
+        return "judge/JudgeDashboard";
+    }
+
     @GetMapping("/judge/my-assignments")
     public String myAssignments(HttpSession session, Model model) {
         UserEntity currentUser = (UserEntity) session.getAttribute("user");
@@ -111,6 +137,10 @@ public class JudgeController {
                 Optional<JudgeScoreEntity> opScore = judgeScoreRepository.findByApplicationIdAndJudgeUserId(
                         app.getApplicationId(), currentUser.getUserId());
                 view.setGivenScore(opScore.map(JudgeScoreEntity::getScore).orElse(null));
+                view.setIdeaScore(opScore.map(JudgeScoreEntity::getIdeaScore).orElse(null));
+                view.setDesignScore(opScore.map(JudgeScoreEntity::getDesignScore).orElse(null));
+                view.setExecutionScore(opScore.map(JudgeScoreEntity::getExecutionScore).orElse(null));
+                view.setPitchScore(opScore.map(JudgeScoreEntity::getPitchScore).orElse(null));
                 view.setRemarks(opScore.map(JudgeScoreEntity::getRemarks).orElse(""));
                 scorecards.add(view);
             }
@@ -124,7 +154,11 @@ public class JudgeController {
 
     @PostMapping("/judge/submit-score")
     public String submitScore(@RequestParam Integer applicationId, @RequestParam Integer hackathonId,
-            @RequestParam Integer score, @RequestParam(required = false) String remarks, HttpSession session) {
+            @RequestParam Integer ideaScore, 
+            @RequestParam Integer designScore, 
+            @RequestParam Integer executionScore, 
+            @RequestParam Integer pitchScore, 
+            @RequestParam(required = false) String remarks, HttpSession session) {
         UserEntity currentUser = (UserEntity) session.getAttribute("user");
         if (currentUser == null) {
             return "redirect:/login";
@@ -143,14 +177,23 @@ public class JudgeController {
             return "redirect:/judge/scorecards?hackathonId=" + hackathonId;
         }
 
-        int normalizedScore = Math.max(0, Math.min(100, score));
+        int normalizedIdea = Math.max(0, Math.min(25, ideaScore));
+        int normalizedDesign = Math.max(0, Math.min(25, designScore));
+        int normalizedExec = Math.max(0, Math.min(25, executionScore));
+        int normalizedPitch = Math.max(0, Math.min(25, pitchScore));
+        int totalScore = normalizedIdea + normalizedDesign + normalizedExec + normalizedPitch;
+
         JudgeScoreEntity scoreEntity = judgeScoreRepository
                 .findByApplicationIdAndJudgeUserId(applicationId, currentUser.getUserId())
                 .orElseGet(JudgeScoreEntity::new);
         scoreEntity.setApplicationId(applicationId);
         scoreEntity.setHackathonId(hackathonId);
         scoreEntity.setJudgeUserId(currentUser.getUserId());
-        scoreEntity.setScore(normalizedScore);
+        scoreEntity.setIdeaScore(normalizedIdea);
+        scoreEntity.setDesignScore(normalizedDesign);
+        scoreEntity.setExecutionScore(normalizedExec);
+        scoreEntity.setPitchScore(normalizedPitch);
+        scoreEntity.setScore(totalScore);
         scoreEntity.setRemarks(remarks == null ? "" : remarks.trim());
         scoreEntity.setScoredAt(LocalDate.now());
         judgeScoreRepository.save(scoreEntity);
@@ -195,6 +238,10 @@ public class JudgeController {
         private HackathonApplicationEntity application;
         private String participantName;
         private Integer givenScore;
+        private Integer ideaScore;
+        private Integer designScore;
+        private Integer executionScore;
+        private Integer pitchScore;
         private String remarks;
 
         public HackathonApplicationEntity getApplication() {
@@ -220,6 +267,18 @@ public class JudgeController {
         public void setGivenScore(Integer givenScore) {
             this.givenScore = givenScore;
         }
+
+        public Integer getIdeaScore() { return ideaScore; }
+        public void setIdeaScore(Integer ideaScore) { this.ideaScore = ideaScore; }
+
+        public Integer getDesignScore() { return designScore; }
+        public void setDesignScore(Integer designScore) { this.designScore = designScore; }
+
+        public Integer getExecutionScore() { return executionScore; }
+        public void setExecutionScore(Integer executionScore) { this.executionScore = executionScore; }
+
+        public Integer getPitchScore() { return pitchScore; }
+        public void setPitchScore(Integer pitchScore) { this.pitchScore = pitchScore; }
 
         public String getRemarks() {
             return remarks;

@@ -19,63 +19,48 @@ public class JudgeScoreEntity {
     private Integer hackathonId;
     private Integer applicationId;
     private Integer judgeUserId;
-    private Integer score;
+
+    // Detailed scores
+    private Integer ideaScore;
+    private Integer designScore;
+    private Integer executionScore;
+    private Integer pitchScore;
+    
+    private Integer score; // Total
     private String remarks;
     private LocalDate scoredAt;
 
-    public Integer getJudgeScoreId() {
-        return judgeScoreId;
-    }
+    public Integer getJudgeScoreId() { return judgeScoreId; }
+    public void setJudgeScoreId(Integer judgeScoreId) { this.judgeScoreId = judgeScoreId; }
 
-    public void setJudgeScoreId(Integer judgeScoreId) {
-        this.judgeScoreId = judgeScoreId;
-    }
+    public Integer getHackathonId() { return hackathonId; }
+    public void setHackathonId(Integer hackathonId) { this.hackathonId = hackathonId; }
 
-    public Integer getHackathonId() {
-        return hackathonId;
-    }
+    public Integer getApplicationId() { return applicationId; }
+    public void setApplicationId(Integer applicationId) { this.applicationId = applicationId; }
 
-    public void setHackathonId(Integer hackathonId) {
-        this.hackathonId = hackathonId;
-    }
+    public Integer getJudgeUserId() { return judgeUserId; }
+    public void setJudgeUserId(Integer judgeUserId) { this.judgeUserId = judgeUserId; }
 
-    public Integer getApplicationId() {
-        return applicationId;
-    }
+    public Integer getIdeaScore() { return ideaScore; }
+    public void setIdeaScore(Integer ideaScore) { this.ideaScore = ideaScore; }
 
-    public void setApplicationId(Integer applicationId) {
-        this.applicationId = applicationId;
-    }
+    public Integer getDesignScore() { return designScore; }
+    public void setDesignScore(Integer designScore) { this.designScore = designScore; }
 
-    public Integer getJudgeUserId() {
-        return judgeUserId;
-    }
+    public Integer getExecutionScore() { return executionScore; }
+    public void setExecutionScore(Integer executionScore) { this.executionScore = executionScore; }
 
-    public void setJudgeUserId(Integer judgeUserId) {
-        this.judgeUserId = judgeUserId;
-    }
+    public Integer getPitchScore() { return pitchScore; }
+    public void setPitchScore(Integer pitchScore) { this.pitchScore = pitchScore; }
 
-    public Integer getScore() {
-        return score;
-    }
+    public Integer getScore() { return score; }
+    public void setScore(Integer score) { this.score = score; }
 
-    public void setScore(Integer score) {
-        this.score = score;
-    }
+    public String getRemarks() { return remarks; }
+    public void setRemarks(String remarks) { this.remarks = remarks; }
 
-    public String getRemarks() {
-        return remarks;
-    }
-
-    public void setRemarks(String remarks) {
-        this.remarks = remarks;
-    }
-
-    public LocalDate getScoredAt() {
-        return scoredAt;
-    }
-
-    public void setScoredAt(LocalDate scoredAt) {
-        this.scoredAt = scoredAt;
-    }
+    public LocalDate getScoredAt() { return scoredAt; }
+    public void setScoredAt(LocalDate scoredAt) { this.scoredAt = scoredAt; }
 }
+

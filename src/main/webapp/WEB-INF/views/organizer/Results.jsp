@@ -1,4 +1,4 @@
-<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+﻿<%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 <!DOCTYPE html>
@@ -25,6 +25,8 @@ th{font-size:12px;color:#64748b;text-transform:uppercase}
 .empty{padding:16px;color:#64748b}
 @media(max-width:800px){.filter{grid-template-columns:1fr}}
 </style>
+<link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/neo-viva-theme.css?v=20260409a">
+<script defer src="${pageContext.request.contextPath}/assets/js/neo-viva-theme.js?v=20260409a"></script>
 </head>
 <body>
 <div class="wrap">
@@ -82,3 +84,16 @@ th{font-size:12px;color:#64748b;text-transform:uppercase}
 </div>
 </body>
 </html>
+
+
+
+
+
+
+
+
+
+
+
+
+

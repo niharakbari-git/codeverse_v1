@@ -1,4 +1,4 @@
-<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+﻿<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -9,15 +9,15 @@
 <style>
 * { box-sizing: border-box; margin: 0; padding: 0; }
 :root {
-	--bg: #0a1118;
-	--surface: #121c26;
-	--surface2: #1a2633;
-	--border: #294055;
-	--accent: #f97316;
+	--bg: #0a0a0f;
+	--surface: #13131a;
+	--surface2: #1c1c27;
+	--border: #2a2a3d;
+	--accent: #7c3aed;
 	--accent2: #06b6d4;
 	--text: #e2e8f0;
-	--muted: #89a0b3;
-	--glow: rgba(249, 115, 22, 0.35);
+	--muted: #64748b;
+	--glow: rgba(124, 58, 237, 0.35);
 }
 html, body {
 	background: var(--bg) !important;
@@ -70,21 +70,24 @@ body::before {
 	place-items: center;
 }
 .logo-mark { font-family: 'Space Mono', monospace; font-weight: 700; font-size: 13px; letter-spacing: 0.05em; color: #fff; }
-.nav { display: flex; gap: 8px; }
-.nav a {
+.logo-text {
+	font-family: 'Space Mono', monospace;
+	font-weight: 700;
+	font-size: 18px;
+	letter-spacing: 0.06em;
+	text-transform: uppercase;
+	line-height: 1;
+}
+.nav-links { display: flex; gap: 8px; align-items: center; }
+.nav-links a {
 	text-decoration: none;
 	color: var(--muted);
-	padding: 8px 14px;
+	padding: 8px 18px;
 	border-radius: 8px;
 	font-size: 14px;
 	font-weight: 600;
 }
-.nav a:hover { color: var(--text); background: var(--surface2); }
-.nav .btn {
-	background: var(--accent);
-	color: #fff;
-	box-shadow: 0 0 20px var(--glow);
-}
+.nav-links a:hover { color: var(--text); background: var(--surface2); }
 .wrap {
 	position: relative;
 	z-index: 1;
@@ -188,9 +191,11 @@ body::before {
 @media (max-width: 560px) {
 	.cards { grid-template-columns: 1fr; }
 	.quick-grid { grid-template-columns: 1fr; }
-	.nav a { padding: 7px 10px; font-size: 13px; }
+	.nav-links a { padding: 7px 10px; font-size: 13px; }
 }
 </style>
+<link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/neo-viva-theme.css?v=20260409a">
+<script defer src="${pageContext.request.contextPath}/assets/js/neo-viva-theme.js?v=20260409a"></script>
 </head>
 <body>
 	<header class="header">
@@ -198,25 +203,36 @@ body::before {
 			<c:when test="${sessionScope.user.role == 'ADMIN'}">
 				<a class="logo" href="<c:url value='/admin-dashboard' />">
 					<div class="logo-icon"><span class="logo-mark">CV</span></div>
-					CodeVerse
+					<span class="logo-text">CODEVERSE</span>
 				</a>
 			</c:when>
 			<c:when test="${sessionScope.user.role == 'ORGANIZER'}">
 				<a class="logo" href="<c:url value='/organizer-dashboard' />">
 					<div class="logo-icon"><span class="logo-mark">CV</span></div>
-					CodeVerse
+					<span class="logo-text">CODEVERSE</span>
 				</a>
 			</c:when>
 			<c:otherwise>
 				<a class="logo" href="<c:url value='/judge-dashboard' />">
 					<div class="logo-icon"><span class="logo-mark">CV</span></div>
-					CodeVerse
+					<span class="logo-text">CODEVERSE</span>
 				</a>
 			</c:otherwise>
 		</c:choose>
-		<nav class="nav">
+		<nav class="nav-links">
 			<a href="<c:url value='/participant/home' />">Explore</a>
-			<a href="<c:url value='/logout' />" class="btn">Logout</a>
+			<c:choose>
+				<c:when test="${sessionScope.user.role == 'ADMIN'}">
+					<a href="<c:url value='/admin-dashboard' />">Dashboard</a>
+				</c:when>
+				<c:when test="${sessionScope.user.role == 'ORGANIZER'}">
+					<a href="<c:url value='/organizer-dashboard' />">Dashboard</a>
+				</c:when>
+				<c:otherwise>
+					<a href="<c:url value='/judge-dashboard' />">Dashboard</a>
+				</c:otherwise>
+			</c:choose>
+			<a href="<c:url value='/logout' />">Logout</a>
 		</nav>
 	</header>
 
@@ -243,6 +259,7 @@ body::before {
 					<a href="<c:url value='/organizer/judge-assignments' />">Assign Judges</a>
 					<a href="<c:url value='/organizer/applications' />">Applications</a>
 					<a href="<c:url value='/organizer/results' />">Results</a>
+					<a href="<c:url value='/organizer/profile' />">Profile</a>
 					<a href="<c:url value='/charge' />">Payments</a>
 				</c:when>
 				<c:otherwise>
@@ -331,6 +348,10 @@ body::before {
 						<h4>Leaderboard</h4>
 						<p>View ranked results by average judge score.</p>
 					</a>
+					<a class="quick-card" href="<c:url value='/organizer/profile' />">
+						<h4>My Profile</h4>
+						<p>Review organizer identity and contact details.</p>
+					</a>
 					<a class="quick-card" href="<c:url value='/charge' />">
 						<h4>Payments</h4>
 						<p>Use payment module for paid registration checks.</p>
@@ -376,3 +397,15 @@ body::before {
 	</script>
 </body>
 </html>
+
+
+
+
+
+
+
+
+
+
+
+

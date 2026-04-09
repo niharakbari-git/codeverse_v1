@@ -6,77 +6,83 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 
-@Entity // create table
+@Entity
 @Table(name = "user_details")
 public class UserDetailEntity {
 
-	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Integer userDetailId;
-	private Integer userId;//fk
-	private String qualification;
-	private String city;
-	private String state;
-	private String country;
-	private Integer userTypeId; //fk 
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Integer userDetailId;
+    private Integer userId;
+    private String qualification;
+    private String city;
+    private String state;
+    private String country;
+    private String linkedinUrl;
+    private Integer userTypeId;
 
-	public Integer getUserDetailId() {
-		return userDetailId;
-	}
+    public Integer getUserDetailId() {
+        return userDetailId;
+    }
 
-	public void setUserDetailId(Integer userDetailId) {
-		this.userDetailId = userDetailId;
-	}
+    public void setUserDetailId(Integer userDetailId) {
+        this.userDetailId = userDetailId;
+    }
 
-	public Integer getUserId() {
-		return userId;
-	}
+    public Integer getUserId() {
+        return userId;
+    }
 
-	public void setUserId(Integer userId) {
-		this.userId = userId;
-	}
+    public void setUserId(Integer userId) {
+        this.userId = userId;
+    }
 
-	public String getQualification() {
-		return qualification;
-	}
+    public String getQualification() {
+        return qualification;
+    }
 
-	public void setQualification(String qualification) {
-		this.qualification = qualification;
-	}
+    public void setQualification(String qualification) {
+        this.qualification = qualification;
+    }
 
-	public String getCity() {
-		return city;
-	}
+    public String getCity() {
+        return city;
+    }
 
-	public void setCity(String city) {
-		this.city = city;
-	}
+    public void setCity(String city) {
+        this.city = city;
+    }
 
-	public String getState() {
-		return state;
-	}
+    public String getState() {
+        return state;
+    }
 
-	public void setState(String state) {
-		this.state = state;
-	}
+    public void setState(String state) {
+        this.state = state;
+    }
 
-	public String getCountry() {
-		return country;
-	}
+    public String getCountry() {
+        return country;
+    }
 
-	public void setCountry(String country) {
-		this.country = country;
-	}
+    public void setCountry(String country) {
+        this.country = country;
+    }
+    
+    public String getLinkedinUrl() {
+        return linkedinUrl;
+    }
 
-	public Integer getUserTypeId() {
-		return userTypeId;
-	}
+    public void setLinkedinUrl(String linkedinUrl) {
+        this.linkedinUrl = linkedinUrl;
+    }
 
-	public void setUserTypeId(Integer userTypeId) {
-		this.userTypeId = userTypeId;
-	}
+    public Integer getUserTypeId() {
+        return userTypeId;
+    }
 
-	
-	
-	
+    public void setUserTypeId(Integer userTypeId) {
+        this.userTypeId = userTypeId;
+    }
 }
+

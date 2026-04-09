@@ -1,4 +1,4 @@
-<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+﻿<%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 <!DOCTYPE html>
@@ -38,6 +38,8 @@ h1 span{background:linear-gradient(135deg,var(--accent),var(--accent2));-webkit-
 .description{background:var(--surface2);padding:14px;border-radius:10px;border-left:3px solid var(--accent2);font-size:14px;line-height:1.6;margin-bottom:20px}
 .footer{margin-top:20px;display:flex;justify-content:flex-end;gap:8px;flex-wrap:wrap;padding-top:16px;border-top:1px solid var(--border)}
 </style>
+<link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/neo-viva-theme.css?v=20260409a">
+<script defer src="${pageContext.request.contextPath}/assets/js/neo-viva-theme.js?v=20260409a"></script>
 </head>
 <body>
 <div class="wrap">
@@ -76,11 +78,11 @@ h1 span{background:linear-gradient(135deg,var(--accent),var(--accent2));-webkit-
       </div>
       <div class="field">
         <div class="field-label">Location</div>
-        <div class="field-value">${hackathon.location}</div>
+        <div class="field-value">${hackathon.eventType == 'ONLINE' ? 'Online Event' : hackathon.location}</div>
       </div>
       <div class="field">
-        <div class="field-label">User Type ID</div>
-        <div class="field-value">${hackathon.userTypeId}</div>
+        <div class="field-label">Eligibility</div>
+        <div class="field-value">All Participants</div>
       </div>
       <div class="field">
         <div class="field-label">Registration Period</div>
@@ -105,3 +107,16 @@ h1 span{background:linear-gradient(135deg,var(--accent),var(--accent2));-webkit-
 </div>
 </body>
 </html>
+
+
+
+
+
+
+
+
+
+
+
+
+

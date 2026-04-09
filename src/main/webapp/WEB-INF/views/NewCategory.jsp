@@ -1,4 +1,4 @@
-<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+﻿<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -23,6 +23,8 @@ input{width:100%;padding:11px 12px;border-radius:10px;border:1px solid var(--bor
 input:focus{outline:none;border-color:var(--accent2);box-shadow:0 0 0 3px rgba(6,182,212,.14)}
 .footer{margin-top:14px;display:flex;justify-content:flex-end;gap:8px;flex-wrap:wrap}
 </style>
+<link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/neo-viva-theme.css?v=20260409a">
+<script defer src="${pageContext.request.contextPath}/assets/js/neo-viva-theme.js?v=20260409a"></script>
 </head>
 <body>
 <div class="wrap">
@@ -50,3 +52,15 @@ input:focus{outline:none;border-color:var(--accent2);box-shadow:0 0 0 3px rgba(6
 </div>
 </body>
 </html>
+
+
+
+
+
+
+
+
+
+
+
+

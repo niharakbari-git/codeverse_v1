@@ -5,6 +5,7 @@ import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -15,7 +16,9 @@ import com.grownited.dto.ParticipantApplicationView;
 import com.grownited.dto.ParticipantTeamView;
 import com.grownited.entity.HackathonEntity;
 import com.grownited.entity.UserEntity;
+import com.grownited.entity.HackathonApplicationEntity;
 import com.grownited.repository.HackathonRepository;
+import com.grownited.repository.HackathonApplicationRepository;
 import com.grownited.service.ParticipantTeamService;
 import com.grownited.util.SessionUserUtil;
 
@@ -26,6 +29,9 @@ public class ParticipantWorkflowController {
 
     @Autowired
     HackathonRepository hackathonRepository;
+
+    @Autowired
+    HackathonApplicationRepository hackathonApplicationRepository;
 
     @Autowired
     ParticipantTeamService participantTeamService;
@@ -85,5 +91,32 @@ public class ParticipantWorkflowController {
         List<ParticipantApplicationView> appViews = participantTeamService.getMyApplications(currentUser.getUserId());
         model.addAttribute("appViews", appViews);
         return "participant/MyApplications";
+    }
+
+    @PostMapping("/participant/application/submit-work")
+    @Transactional
+    public String submitWork(@RequestParam Integer applicationId, @RequestParam String submissionUrl, @RequestParam String submissionDescription, @RequestParam(required = false) String frontendGithubLink, @RequestParam(required = false) String backendGithubLink, HttpSession session) {
+        UserEntity currentUser = SessionUserUtil.getCurrentUser(session);       
+        if (currentUser == null) {
+            return AppConstants.REDIRECT_LOGIN;
+        }
+
+        Optional<HackathonApplicationEntity> opApp = hackathonApplicationRepository.findById(applicationId);
+        if (opApp.isEmpty()) {
+            return "redirect:/participant/my-applications?msg=Application+not+found&type=error";
+        }
+
+        HackathonApplicationEntity app = opApp.get();
+        if (!currentUser.getUserId().equals(app.getParticipantUserId())) {
+            return "redirect:/participant/my-applications?msg=Unauthorized+application+update&type=error";
+        }
+
+        app.setSubmissionUrl(submissionUrl == null ? null : submissionUrl.trim());
+        app.setSubmissionDescription(submissionDescription == null ? null : submissionDescription.trim());
+        app.setFrontendGithubLink(frontendGithubLink == null || frontendGithubLink.isBlank() ? null : frontendGithubLink.trim());
+        app.setBackendGithubLink(backendGithubLink == null || backendGithubLink.isBlank() ? null : backendGithubLink.trim());
+        hackathonApplicationRepository.save(app);
+        
+        return "redirect:/participant/my-applications?msg=Work+submitted+successfully&type=success";
     }
 }

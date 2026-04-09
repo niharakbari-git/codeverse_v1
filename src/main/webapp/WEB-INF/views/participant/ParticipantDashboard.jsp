@@ -1,4 +1,4 @@
-<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+﻿<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -103,6 +103,8 @@ body::before {
 @media (max-width: 900px) { .cards { grid-template-columns: repeat(2, minmax(160px, 1fr)); } .quick-grid { grid-template-columns: repeat(2, minmax(170px, 1fr)); } .header { padding: 0 14px; } }
 @media (max-width: 560px) { .cards { grid-template-columns: 1fr; } .quick-grid { grid-template-columns: 1fr; } .nav a { padding: 7px 10px; font-size: 13px; } }
 </style>
+<link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/neo-viva-theme.css?v=20260409a">
+<script defer src="${pageContext.request.contextPath}/assets/js/neo-viva-theme.js?v=20260409a"></script>
 </head>
 <body>
 	<header class="header">
@@ -169,3 +171,15 @@ body::before {
 	</main>
 </body>
 </html>
+
+
+
+
+
+
+
+
+
+
+
+

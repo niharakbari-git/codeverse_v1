@@ -1,4 +1,4 @@
-<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+﻿<%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 <!DOCTYPE html>
@@ -18,13 +18,17 @@ body{margin:0;background:#0a0a0f;color:#e2e8f0;font-family:'Syne',sans-serif}
 .card p{margin:0;color:#94a3b8;font-size:13px;line-height:1.6}
 .members{margin:10px 0 8px;padding-left:16px;color:#cbd5e1;font-size:13px}
 .members li{margin-bottom:4px}
-.role{display:inline-block;margin-top:8px;padding:3px 8px;border-radius:999px;border:1px solid #334155;background:#111827;color:#93c5fd;font-size:11px;font-weight:700}
+.role{display:inline-block;margin-top:8px;padding:4px 10px;border-radius:999px;border:1px solid #334155;background:#111827;color:#93c5fd;font-size:11px;font-weight:700;letter-spacing:.03em}
+.role.leader{border-color:rgba(245,158,11,.5);background:rgba(245,158,11,.12);color:#fcd34d}
+.role.member{border-color:rgba(6,182,212,.45);background:rgba(6,182,212,.12);color:#67e8f9}
 .form{display:grid;grid-template-columns:1fr auto;gap:8px;margin-top:10px}
 .input{width:100%;padding:9px 10px;border-radius:10px;border:1px solid #2a2a3d;background:#1c1c27;color:#e2e8f0}
 .submit{padding:9px 12px;border:1px solid #7c3aed;background:#7c3aed;color:#fff;border-radius:10px;font-weight:700;cursor:pointer}
 .empty{padding:16px;color:#64748b;background:#13131a;border:1px solid #2a2a3d;border-radius:14px}
 @media(max-width:560px){.form{grid-template-columns:1fr}}
 </style>
+<link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/neo-viva-theme.css?v=20260409a">
+<script defer src="${pageContext.request.contextPath}/assets/js/neo-viva-theme.js?v=20260409a"></script>
 </head>
 <body>
 <c:if test="${not empty param.msg}">
@@ -50,7 +54,7 @@ body{margin:0;background:#0a0a0f;color:#e2e8f0;font-family:'Syne',sans-serif}
         <h4>${t.team.teamName}</h4>
         <p>Hackathon: ${t.hackathonTitle}</p>
         <p>Members: ${t.memberCount}</p>
-        <span class="role">${t.roleInTeam}</span>
+        <span class="role ${t.canManageMembers ? 'leader' : 'member'}">${t.roleInTeam}</span>
         <fmt:parseDate value="${t.team.createdAt}" pattern="yyyy-MM-dd" var="parsedCreatedAt" type="date" />
         <p>Created: <fmt:formatDate value="${parsedCreatedAt}" pattern="dd/MM/yyyy" /></p>
 
@@ -75,3 +79,16 @@ body{margin:0;background:#0a0a0f;color:#e2e8f0;font-family:'Syne',sans-serif}
 <%@ include file="../shared/Toast.jspf" %>
 </body>
 </html>
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,4 +1,4 @@
-<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+﻿<%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 <!DOCTYPE html>
@@ -7,12 +7,14 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Applications</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
 <style>
-body{margin:0;background:#0a0a0f;color:#e2e8f0;font-family:'Syne',sans-serif}
+body{margin:0;background:radial-gradient(circle at 14% 20%,rgba(6,182,212,.12),transparent 38%),radial-gradient(circle at 88% 78%,rgba(249,115,22,.12),transparent 42%),#0a0a0f;color:#e2e8f0;font-family:'Syne',sans-serif}
 .wrap{max-width:1100px;margin:24px auto;padding:18px}
 .top{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:14px}
 .btn{text-decoration:none;padding:9px 12px;border:1px solid #2a2a3d;background:#13131a;border-radius:10px;color:#e2e8f0;font-weight:700}
 .filter{background:#13131a;border:1px solid #2a2a3d;border-radius:14px;padding:14px;margin-bottom:14px;display:grid;grid-template-columns:1fr auto;gap:10px;align-items:end}
+.note{margin-top:-6px;margin-bottom:12px;color:#94a3b8;font-size:13px}
 label{display:block;font-size:12px;color:#64748b;margin-bottom:6px}
 select,input{width:100%;padding:10px;border-radius:10px;border:1px solid #2a2a3d;background:#1c1c27;color:#e2e8f0}
 button{padding:10px 14px;border:1px solid transparent;background:linear-gradient(135deg,#f97316,#06b6d4);color:#fff;border-radius:10px;font-weight:800;cursor:pointer;box-shadow:0 8px 20px rgba(6,182,212,.18);transition:transform .15s ease,filter .15s ease}
@@ -25,6 +27,8 @@ th{font-size:12px;color:#64748b;text-transform:uppercase}
 .empty{padding:16px;color:#64748b}
 @media(max-width:800px){.filter{grid-template-columns:1fr}.rowform{grid-template-columns:1fr}}
 </style>
+<link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/neo-viva-theme.css?v=20260409a">
+<script defer src="${pageContext.request.contextPath}/assets/js/neo-viva-theme.js?v=20260409a"></script>
 </head>
 <body>
 <c:if test="${not empty param.msg}">
@@ -34,10 +38,12 @@ th{font-size:12px;color:#64748b;text-transform:uppercase}
   <div class="top">
     <h2>Application Management</h2>
     <div>
+      <a class="btn" href="<c:url value='/organizer/profile' />">Profile</a>
       <a class="btn" href="<c:url value='/organizer/results' />">Results</a>
       <a class="btn" href="<c:url value='/organizer-dashboard' />">Dashboard</a>
     </div>
   </div>
+  <p class="note">Flow: APPLIED -> SHORTLISTED -> FINALIST -> WINNER. Use REJECTED when a submission is out of scope.</p>
 
   <form class="filter" action="<c:url value='/organizer/applications' />" method="get">
     <div>
@@ -106,3 +112,4 @@ th{font-size:12px;color:#64748b;text-transform:uppercase}
 <%@ include file="../shared/Toast.jspf" %>
 </body>
 </html>
+

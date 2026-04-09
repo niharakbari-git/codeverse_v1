@@ -35,7 +35,7 @@ public class SessionController {
     }
 
     @PostMapping("/authenticate")
-    public String authenticate(String email, String password, Model model, HttpSession session, HttpServletRequest request) {
+    public String authenticate(String email, String password, Model model, HttpServletRequest request) {
         AuthService.AuthResult authResult = authService.authenticate(email, password);
         if (!authResult.isAuthenticated()) {
             model.addAttribute("error", authResult.getErrorMessage());
@@ -61,8 +61,32 @@ public class SessionController {
             return "ForgetPassword";
         }
 
-        model.addAttribute("success", "Reset link request received. Please contact admin to reset your password.");
+        model.addAttribute("success", "Reset link sent to your registered email address.");
         return "ForgetPassword";
+    }
+
+    @GetMapping("/resetpassword")
+    public String openResetPassword(String email, String token, Model model) {
+        model.addAttribute("email", email);
+        model.addAttribute("token", token);
+        if (email == null || email.isBlank() || token == null || token.isBlank()) {
+            model.addAttribute("error", "Reset link is invalid.");
+        }
+        return "ResetPassword";
+    }
+
+    @PostMapping("/updatePassword")
+    public String updatePassword(String email, String token, String password, String confirmPassword, Model model) {
+        String errorMessage = authService.resetPassword(email, token, password, confirmPassword);
+        if (errorMessage != null) {
+            model.addAttribute("error", errorMessage);
+            model.addAttribute("email", email);
+            model.addAttribute("token", token);
+            return "ResetPassword";
+        }
+
+        model.addAttribute("success", "Password updated successfully. Please log in with the new password.");
+        return "Login";
     }
 
     @PostMapping("/register")
@@ -75,6 +99,7 @@ public class SessionController {
             return "Signup";
         }
 
+        model.addAttribute("success", registrationResult.getSuccessMessage());
         return "Login";
     }
 

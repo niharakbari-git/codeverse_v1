@@ -1,4 +1,4 @@
-<%@ page contentType="text/html;charset=UTF-8" language="java"%>
+﻿<%@ page contentType="text/html;charset=UTF-8" language="java"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt"%>
 
@@ -73,15 +73,20 @@ th { font-size: 12px; text-transform: uppercase; letter-spacing: 0.9px; color: v
 </style>
 <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
 
+<link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/neo-viva-theme.css?v=20260409a">
+<script defer src="${pageContext.request.contextPath}/assets/js/neo-viva-theme.js?v=20260409a"></script>
 </head>
 
 <body>
+	<c:if test="${not empty param.msg}">
+		<div id="toast-data" data-type="${param.type == 'success' ? 'success' : 'error'}" style="display:none;"><c:out value="${param.msg}" /></div>
+	</c:if>
 	<div class="wrap">
 		<div class="topbar">
 			<h1 class="title"><span>User</span> Directory</h1>
 			<div class="actions">
 				<a href="<c:url value='/admin-dashboard' />" class="btn">Dashboard</a>
-				<a href="<c:url value='/signup' />" class="btn primary">Add User</a>
+				<a href="<c:url value='/admin/user/new' />" class="btn primary">Add User</a>
 				<a href="<c:url value='/logout' />" class="btn">Logout</a>
 			</div>
 		</div>
@@ -139,5 +144,19 @@ th { font-size: 12px; text-transform: uppercase; letter-spacing: 0.9px; color: v
 			</table>
 		</div>
 	</div>
+	<%@ include file="shared/Toast.jspf" %>
 </body>
 </html>
+
+
+
+
+
+
+
+
+
+
+
+
+

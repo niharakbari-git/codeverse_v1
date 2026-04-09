@@ -1,4 +1,4 @@
-<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+﻿<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt"%>
 <!DOCTYPE html>
@@ -36,13 +36,22 @@ th{font-size:12px;text-transform:uppercase;letter-spacing:.8px;color:var(--muted
 .row-actions .danger{border-color:#ef4444;color:#fca5a5}
 .empty{padding:16px;color:var(--muted);text-align:center}
 </style>
+<link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/neo-viva-theme.css?v=20260409a">
+<script defer src="${pageContext.request.contextPath}/assets/js/neo-viva-theme.js?v=20260409a"></script>
 </head>
 <body>
 <div class="wrap">
   <div class="top">
     <h1 class="title"><span>Hackathon</span> List</h1>
     <div class="actions">
-      <a class="btn" href="<c:url value='/admin-dashboard' />">Dashboard</a>
+      <c:choose>
+        <c:when test="${sessionScope.user.role == 'ORGANIZER'}">
+          <a class="btn" href="<c:url value='/organizer-dashboard' />">Dashboard</a>
+        </c:when>
+        <c:otherwise>
+          <a class="btn" href="<c:url value='/admin-dashboard' />">Dashboard</a>
+        </c:otherwise>
+      </c:choose>
       <a class="btn primary" href="<c:url value='/newHackathon' />">Create Hackathon</a>
       <a class="btn" href="<c:url value='/logout' />">Logout</a>
     </div>
@@ -111,3 +120,15 @@ th{font-size:12px;text-transform:uppercase;letter-spacing:.8px;color:var(--muted
 </div>
 </body>
 </html>
+
+
+
+
+
+
+
+
+
+
+
+
