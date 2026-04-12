@@ -28,6 +28,7 @@ th{font-size:12px;text-transform:uppercase;letter-spacing:.8px;color:var(--muted
 .status-upcoming{background:rgba(6,182,212,.16);color:#67e8f9}
 .status-ongoing{background:rgba(34,197,94,.16);color:#4ade80}
 .status-completed{background:rgba(148,163,184,.2);color:#cbd5e1}
+.status-expired{background:rgba(148,163,184,.2);color:#cbd5e1}
 .pay-free{background:rgba(34,197,94,.16);color:#4ade80}
 .pay-paid{background:rgba(239,68,68,.16);color:#fca5a5}
 .row-actions{display:flex;gap:6px;flex-wrap:wrap}
@@ -86,7 +87,7 @@ th{font-size:12px;text-transform:uppercase;letter-spacing:.8px;color:var(--muted
                   <c:choose>
                     <c:when test="${h.status == 'UPCOMING'}"><span class="badge status-upcoming">UPCOMING</span></c:when>
                     <c:when test="${h.status == 'ONGOING'}"><span class="badge status-ongoing">ONGOING</span></c:when>
-                    <c:otherwise><span class="badge status-completed">COMPLETED</span></c:otherwise>
+                    <c:otherwise><span class="badge status-expired">EXPIRED</span></c:otherwise>
                   </c:choose>
                 </td>
                 <td>${h.eventType}</td>

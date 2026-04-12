@@ -120,6 +120,36 @@ body::before {
 	background: var(--surface2);
 }
 
+.toast {
+	position: fixed;
+	top: 76px;
+	right: 18px;
+	z-index: 200;
+	max-width: 360px;
+	padding: 12px 14px;
+	border-radius: 12px;
+	border: 1px solid var(--border);
+	background: rgba(19, 19, 26, 0.96);
+	backdrop-filter: blur(16px);
+	box-shadow: 0 16px 34px rgba(0, 0, 0, 0.28);
+	font-size: 13px;
+	font-weight: 700;
+	line-height: 1.4;
+	animation: toastIn 0.28s ease-out;
+}
+.toast.success {
+	border-color: rgba(34, 197, 94, 0.45);
+	color: #86efac;
+}
+.toast.error {
+	border-color: rgba(248, 113, 113, 0.45);
+	color: #fecaca;
+}
+@keyframes toastIn {
+	from { opacity: 0; transform: translateY(-10px); }
+	to { opacity: 1; transform: translateY(0); }
+}
+
 .nav-links a.btn-primary {
 	background: var(--accent);
 	color: white;
@@ -612,6 +642,12 @@ to {
 	border: 1px solid rgba(245, 158, 11, 0.3);
 }
 
+.status-expired {
+	background: rgba(148, 163, 184, 0.16);
+	color: #cbd5e1;
+	border: 1px solid rgba(148, 163, 184, 0.3);
+}
+
 .status-dot {
 	width: 6px;
 	height: 6px;
@@ -815,6 +851,9 @@ to {
 <script defer src="${pageContext.request.contextPath}/assets/js/neo-viva-theme.js?v=20260409a"></script>
 </head>
 <body>
+	<c:if test="${not empty param.msg}">
+		<div class="toast ${param.type == 'success' ? 'success' : 'error'}">${param.msg}</div>
+	</c:if>
 
 	<!-- HEADER -->
 	<header class="header">
@@ -1060,6 +1099,12 @@ to {
 										<c:when test="${h.status == 'UPCOMING'}">
 											<span class="card-status status-soon"> <span
 												class="status-dot"></span>SOON
+											</span>
+										</c:when>
+
+										<c:when test="${h.status == 'COMPLETED'}">
+											<span class="card-status status-expired"> <span
+												class="status-dot"></span>EXPIRED
 											</span>
 										</c:when>
 									</c:choose>

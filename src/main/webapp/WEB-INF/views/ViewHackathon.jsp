@@ -33,6 +33,7 @@ h1 span{background:linear-gradient(135deg,var(--accent),var(--accent2));-webkit-
 .badge.upcoming{background:rgba(59,130,246,.15);color:#93c5fd}
 .badge.ongoing{background:rgba(34,197,94,.15);color:#86efac}
 .badge.completed{background:rgba(107,114,128,.15);color:#d1d5db}
+.badge.expired{background:rgba(107,114,128,.15);color:#d1d5db}
 .badge.free{background:rgba(34,197,94,.15);color:#86efac}
 .badge.paid{background:rgba(249,115,22,.15);color:#fed7aa}
 .description{background:var(--surface2);padding:14px;border-radius:10px;border-left:3px solid var(--accent2);font-size:14px;line-height:1.6;margin-bottom:20px}
@@ -59,7 +60,7 @@ h1 span{background:linear-gradient(135deg,var(--accent),var(--accent2));-webkit-
       <div class="field">
         <div class="field-label">Status</div>
         <div class="field-value">
-          <span class="badge ${hackathon.status == 'UPCOMING' ? 'upcoming' : hackathon.status == 'ONGOING' ? 'ongoing' : 'completed'}">${hackathon.status}</span>
+          <span class="badge ${hackathon.status == 'UPCOMING' ? 'upcoming' : hackathon.status == 'ONGOING' ? 'ongoing' : 'expired'}">${hackathon.status == 'COMPLETED' ? 'EXPIRED' : hackathon.status}</span>
         </div>
       </div>
       <div class="field">
@@ -78,7 +79,13 @@ h1 span{background:linear-gradient(135deg,var(--accent),var(--accent2));-webkit-
       </div>
       <div class="field">
         <div class="field-label">Location</div>
-        <div class="field-value">${hackathon.eventType == 'ONLINE' ? 'Online Event' : hackathon.location}</div>
+        <div class="field-value">
+          <c:choose>
+            <c:when test="${not empty hackathon.location}">${hackathon.location}</c:when>
+            <c:when test="${hackathon.eventType == 'ONLINE'}">Online</c:when>
+            <c:otherwise>Not specified</c:otherwise>
+          </c:choose>
+        </div>
       </div>
       <div class="field">
         <div class="field-label">Eligibility</div>

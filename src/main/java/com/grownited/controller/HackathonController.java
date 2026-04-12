@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -14,6 +15,7 @@ import com.grownited.common.AppConstants;
 import com.grownited.entity.HackathonEntity;
 import com.grownited.entity.UserEntity;
 import com.grownited.repository.HackathonRepository;
+import com.grownited.repository.UserDetailRepository;
 import com.grownited.util.SessionUserUtil;
 
 import jakarta.servlet.http.HttpSession;
@@ -24,6 +26,9 @@ public class HackathonController {
 
 	@Autowired
 	HackathonRepository hackathonRepository;
+
+	@Autowired
+	UserDetailRepository userDetailRepository;
 	
 	@GetMapping("newHackathon")
 	public String newHackathon(Model model, HttpSession session) {
@@ -55,6 +60,7 @@ public class HackathonController {
 					return "redirect:/listHackathon?msg=You+can+edit+only+your+hackathons&type=error";
 				}
 				hackathonEntity.setUserId(existingHackathon.get().getUserId());
+				hackathonEntity.setUserTypeId(existingHackathon.get().getUserTypeId());
 			} else {
 				return "redirect:/listHackathon?msg=Hackathon+not+found&type=error";
 			}
@@ -64,9 +70,17 @@ public class HackathonController {
 			hackathonEntity.setUserId(currentLogInUser.getUserId());
 		}
 
-		hackathonEntity.setUserTypeId(null);
+		if (hackathonEntity.getUserTypeId() == null) {
+			hackathonEntity.setUserTypeId(userDetailRepository.findByUserId(currentLogInUser.getUserId())
+					.map(detail -> detail.getUserTypeId())
+					.orElse(null));
+		}
 
-		hackathonRepository.save(hackathonEntity);
+		try {
+			hackathonRepository.save(hackathonEntity);
+		} catch (DataIntegrityViolationException ex) {
+			return "redirect:/newHackathon?msg=Unable+to+save+hackathon.+Please+check+all+required+fields&type=error";
+		}
 		return "redirect:/listHackathon";//do not open jsp , open another url -> listHackathon
 	}
 

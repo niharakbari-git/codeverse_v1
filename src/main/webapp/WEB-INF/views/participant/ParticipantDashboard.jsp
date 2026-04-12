@@ -97,6 +97,14 @@ body::before {
 }
 .quick-card h4 { font-size: 15px; margin-bottom: 6px; }
 .quick-card p { font-size: 12px; color: var(--muted); }
+.quick-grid .quick-card[href*='/logout'] {
+	background: var(--surface) !important;
+	border: 1px solid var(--border) !important;
+	color: var(--text) !important;
+}
+.quick-grid .quick-card[href*='/logout'] p {
+	color: var(--muted) !important;
+}
 .card { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 20px; }
 .card p { color: var(--muted); font-size: 13px; margin-bottom: 8px; }
 .card h3 { font-family: 'Space Mono', monospace; font-size: 32px; background: linear-gradient(135deg, var(--accent2), var(--accent)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }

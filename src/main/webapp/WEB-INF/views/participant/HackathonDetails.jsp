@@ -48,6 +48,7 @@ body::before {
 .actions { margin-top: 14px; display: flex; gap: 8px; flex-wrap: wrap; }
 .btn.primary { background: #7c3aed; border-color: #7c3aed; color: #fff; }
 .btn.ok { background: rgba(34,197,94,.16); border-color: rgba(34,197,94,.35); color: #86efac; }
+.btn.disabled { background: rgba(148,163,184,.14); border-color: rgba(148,163,184,.28); color: #cbd5e1; cursor: not-allowed; }
 @media (max-width: 680px) { .grid { grid-template-columns: 1fr; } }
 </style>
 <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/neo-viva-theme.css?v=20260409a">
@@ -88,6 +89,10 @@ body::before {
 				<c:when test="${hasApplied}">
 					<span class="btn ok">Already Applied</span>
 					<a class="btn" href="<c:url value='/participant/my-applications' />">View My Applications</a>
+				</c:when>
+				<c:when test="${hackathon.status == 'COMPLETED'}">
+					<span class="btn disabled">Expired</span>
+					<a class="btn" href="<c:url value='/participant/home?msg=This+hackathon+is+expired+and+cannot+be+applied+to&type=error' />">Back to Explore</a>
 				</c:when>
 				<c:otherwise>
 					<a class="btn primary" href="<c:url value='/participant/team/new?hackathonId=${hackathon.hackathonId}' />">Apply With Team</a>

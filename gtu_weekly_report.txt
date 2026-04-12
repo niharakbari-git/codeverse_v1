@@ -17,6 +17,7 @@ Week-3:
 * schema creation in mysql
 * sample data insertion
 
+
 Week-4:
 * project structure setup
 * database connection integration

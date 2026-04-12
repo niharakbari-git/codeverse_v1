@@ -48,7 +48,13 @@ public class ParticipantTeamService {
 
         Optional<HackathonEntity> opHackathon = hackathonRepository.findById(hackathonId);
         if (opHackathon.isEmpty()) {
-            return "redirect:/participant/home";
+            return "redirect:/participant/home?msg=Hackathon+not+found&type=error";
+        }
+
+        HackathonEntity hackathon = opHackathon.get();
+        if ("COMPLETED".equalsIgnoreCase(hackathon.getStatus())
+                || (hackathon.getRegistrationEndDate() != null && hackathon.getRegistrationEndDate().isBefore(LocalDate.now()))) {
+            return "redirect:/participant/home?msg=This+hackathon+is+expired+and+cannot+be+applied+to&type=error";
         }
 
         TeamEntity team = new TeamEntity();

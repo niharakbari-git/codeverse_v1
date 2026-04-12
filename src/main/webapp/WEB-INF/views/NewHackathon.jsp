@@ -25,6 +25,9 @@ label{font-size:12px;color:var(--muted)}
 input,select,textarea{width:100%;padding:11px 12px;border-radius:10px;border:1px solid var(--border);background:var(--surface2);color:var(--text);font-size:14px}
 input:focus,select:focus,textarea:focus{outline:none;border-color:var(--accent2);box-shadow:0 0 0 3px rgba(6,182,212,.14)}
 .footer{margin-top:14px;display:flex;justify-content:flex-end;gap:10px;flex-wrap:wrap}
+.flash{margin:12px 0;padding:11px 12px;border-radius:10px;border:1px solid var(--border);font-size:13px}
+.flash.error{background:rgba(220,38,38,.12);border-color:rgba(248,113,113,.45);color:#fecaca}
+.flash.success{background:rgba(16,185,129,.12);border-color:rgba(110,231,183,.45);color:#bbf7d0}
 @media(max-width:760px){.grid{grid-template-columns:1fr}.footer{justify-content:stretch}.footer .btn{width:100%;text-align:center}}
 </style>
 <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/neo-viva-theme.css?v=20260409a">
@@ -52,6 +55,10 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:var(--accent2)
       </c:choose>
     </div>
   </div>
+
+  <c:if test="${not empty param.msg}">
+    <div class="flash ${param.type == 'success' ? 'success' : 'error'}">${param.msg}</div>
+  </c:if>
 
   <form class="card" action="saveHackathon" method="post">
     <input type="hidden" name="_csrf" value="${_csrfToken}">
