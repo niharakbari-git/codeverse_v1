@@ -35,11 +35,17 @@ public class OrganizerApplicationService {
     @Autowired
     private UserRepository userRepository;
 
+    @Autowired
+    private AuditLogService auditLogService;
+
+    @Autowired
+    private NotificationService notificationService;
+
     public List<HackathonEntity> getManageableHackathons(UserEntity currentUser) {
         if (AppConstants.ROLE_ADMIN.equalsIgnoreCase(currentUser.getRole())) {
-            return hackathonRepository.findAll();
+            return hackathonRepository.findAllByOrderByHackathonIdDesc();
         }
-        return hackathonRepository.findByUserId(currentUser.getUserId());
+        return hackathonRepository.findByUserIdOrderByHackathonIdDesc(currentUser.getUserId());
     }
 
     public List<OrganizerApplicationManageView> getApplicationViews(Integer hackathonId, UserEntity currentUser) {
@@ -96,6 +102,7 @@ public class OrganizerApplicationService {
                     + "&msg=Invalid+status+transition&type=error");
         }
 
+        String oldStatus = app.getStatus();
         app.setStatus(normalizedStatus);
 
         if ("FREE".equalsIgnoreCase(hackathon.getPayment())) {
@@ -109,6 +116,8 @@ public class OrganizerApplicationService {
             app.setPaymentStatus(normalizedPaymentStatus);
         }
         hackathonApplicationRepository.save(app);
+        auditLogService.logStatusChange(app.getApplicationId(), oldStatus, normalizedStatus, currentUser.getUserId());
+        notificationService.notifyApplicationStatusChange(app, normalizedStatus);
 
         return UpdateApplicationResult.success("redirect:/organizer/applications?hackathonId=" + app.getHackathonId()
                 + "&msg=Application+updated+successfully&type=success");

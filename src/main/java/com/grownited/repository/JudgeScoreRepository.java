@@ -17,5 +17,9 @@ public interface JudgeScoreRepository extends JpaRepository<JudgeScoreEntity, In
 
     List<JudgeScoreEntity> findByApplicationId(Integer applicationId);
 
+    void deleteByJudgeUserId(Integer judgeUserId);
+
+    void deleteByApplicationId(Integer applicationId);
+
     Optional<JudgeScoreEntity> findByApplicationIdAndJudgeUserId(Integer applicationId, Integer judgeUserId);
 }

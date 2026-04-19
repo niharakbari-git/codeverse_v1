@@ -1,6 +1,7 @@
 package com.grownited.service;
 
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -19,12 +20,16 @@ import com.grownited.entity.TeamMemberEntity;
 import com.grownited.entity.UserEntity;
 import com.grownited.repository.HackathonApplicationRepository;
 import com.grownited.repository.HackathonRepository;
+import com.grownited.repository.SubmissionVersionRepository;
 import com.grownited.repository.TeamMemberRepository;
 import com.grownited.repository.TeamRepository;
 import com.grownited.repository.UserRepository;
+import com.grownited.util.HackathonStatusUtil;
 
 @Service
 public class ParticipantTeamService {
+
+    private static final DateTimeFormatter DISPLAY_DATE_FORMAT = DateTimeFormatter.ofPattern("dd-MM-yyyy");
 
     @Autowired
     private TeamRepository teamRepository;
@@ -41,7 +46,13 @@ public class ParticipantTeamService {
     @Autowired
     private UserRepository userRepository;
 
+    @Autowired
+    private SubmissionVersionRepository submissionVersionRepository;
+
     public String createTeamAndApply(Integer hackathonId, String teamName, UserEntity currentUser) {
+        if (currentUser == null) {
+            return "redirect:/login";
+        }
         if (hackathonApplicationRepository.existsByHackathonIdAndParticipantUserId(hackathonId, currentUser.getUserId())) {
             return "redirect:/participant/my-applications";
         }
@@ -52,8 +63,20 @@ public class ParticipantTeamService {
         }
 
         HackathonEntity hackathon = opHackathon.get();
-        if ("COMPLETED".equalsIgnoreCase(hackathon.getStatus())
-                || (hackathon.getRegistrationEndDate() != null && hackathon.getRegistrationEndDate().isBefore(LocalDate.now()))) {
+        LocalDate today = LocalDate.now();
+        
+        // Check if registration hasn't started yet
+        if (hackathon.getRegistrationStartDate() != null && today.isBefore(hackathon.getRegistrationStartDate())) {
+            return "redirect:/participant/home?msg=Registration+opens+on+" + formatDate(hackathon.getRegistrationStartDate()) + "&type=error";
+        }
+        
+        // Check if registration is closed
+        if (hackathon.getRegistrationEndDate() != null && today.isAfter(hackathon.getRegistrationEndDate())) {
+            return "redirect:/participant/home?msg=Registration+closed+on+" + formatDate(hackathon.getRegistrationEndDate()) + "&type=error";
+        }
+        
+        // Check if hackathon is expired (submission deadline or event ended)
+        if (HackathonStatusUtil.isExpired(hackathon, today)) {
             return "redirect:/participant/home?msg=This+hackathon+is+expired+and+cannot+be+applied+to&type=error";
         }
 
@@ -78,7 +101,11 @@ public class ParticipantTeamService {
         app.setAppliedAt(LocalDate.now());
         hackathonApplicationRepository.save(app);
 
-        return "redirect:/participant/my-applications";
+        return "redirect:/participant/my-applications?msg=Application+submitted+successfully&type=success";
+    }
+
+    private String formatDate(LocalDate date) {
+        return date == null ? "" : date.format(DISPLAY_DATE_FORMAT);
     }
 
     public List<ParticipantTeamView> getMyTeams(Integer currentUserId) {
@@ -101,6 +128,10 @@ public class ParticipantTeamService {
             boolean isLeader = team.getLeaderUserId() != null && team.getLeaderUserId().equals(currentUserId);
             view.setCanManageMembers(isLeader);
             view.setRoleInTeam(isLeader ? "Team Leader" : "Team Member");
+
+            view.setLeaderName(userRepository.findById(team.getLeaderUserId())
+                .map(user -> user.getFirstName() + " " + user.getLastName())
+                .orElse("Unknown Leader"));
 
             Optional<HackathonEntity> opHackathon = hackathonRepository.findById(team.getHackathonId());
             view.setHackathonTitle(opHackathon.map(HackathonEntity::getTitle).orElse("Unknown Hackathon"));
@@ -167,6 +198,10 @@ public class ParticipantTeamService {
 
             Optional<HackathonEntity> opHackathon = hackathonRepository.findById(app.getHackathonId());
             view.setHackathonTitle(opHackathon.map(HackathonEntity::getTitle).orElse("Unknown Hackathon"));
+            view.setEntryFeeAmount(opHackathon.map(HackathonEntity::getEntryFeeAmount).orElse(0));
+                view.setSubmissionDeadline(opHackathon.map(h -> h.getSubmissionDeadline() != null ? h.getSubmissionDeadline()
+                    : h.getRegistrationEndDate()).orElse(null));
+                view.setSubmissionVersionCount(submissionVersionRepository.countByApplicationId(app.getApplicationId()));
 
             Optional<TeamEntity> opTeam = teamRepository.findById(app.getTeamId());
             view.setTeamName(opTeam.map(TeamEntity::getTeamName).orElse("N/A"));

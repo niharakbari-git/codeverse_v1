@@ -30,6 +30,8 @@ public class AuthFilter implements Filter {
 	private static final Set<String> PUBLIC_ENDPOINTS = Set.of(
 			"/login",
 			"/signup",
+			"/organizer-onboarding",
+			"/organizer-onboarding/request",
 			"/forgetpassword",
 			"/resetpassword",
 			"/authenticate",
@@ -112,9 +114,12 @@ public class AuthFilter implements Filter {
 	private boolean isGovernanceRoute(String uri) {
 		return uri.endsWith("/admin-dashboard") || uri.endsWith("/newCategory") || uri.endsWith("/saveCategory")
 				|| uri.endsWith("/listCategory") || uri.endsWith("/editCategory") || uri.endsWith("/deleteCategory")
-				|| uri.endsWith("/listUser") || uri.endsWith("/viewUser")
+				|| uri.endsWith("/listUser") || uri.endsWith("/admin/user-list") || uri.endsWith("/viewUser")
 				|| uri.endsWith("/editUser") || uri.endsWith("/updateUser") || uri.endsWith("/deleteUser")
 				|| uri.endsWith("/admin/user/new") || uri.endsWith("/admin/user/save")
+				|| uri.endsWith("/admin/organizer-requests")
+				|| uri.endsWith("/admin/organizer-requests/approve")
+				|| uri.endsWith("/admin/organizer-requests/reject")
 				|| uri.endsWith("/newUserType") || uri.endsWith("/saveUserType");
 	}
 
@@ -134,6 +139,6 @@ public class AuthFilter implements Filter {
 			return false;
 		}
 		// Participant-only actions
-		return uri.contains("/participant/") || uri.endsWith("/charge");
+		return uri.contains("/participant/");
 	}
 }

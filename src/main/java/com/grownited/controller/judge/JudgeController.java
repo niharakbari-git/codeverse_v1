@@ -2,6 +2,7 @@ package com.grownited.controller.judge;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 
@@ -22,6 +23,8 @@ import com.grownited.repository.HackathonRepository;
 import com.grownited.repository.JudgeAssignmentRepository;
 import com.grownited.repository.JudgeScoreRepository;
 import com.grownited.repository.UserRepository;
+import com.grownited.service.AuditLogService;
+import com.grownited.service.NotificationService;
 
 import jakarta.servlet.http.HttpSession;
 
@@ -43,6 +46,12 @@ public class JudgeController {
     @Autowired
     JudgeScoreRepository judgeScoreRepository;
 
+    @Autowired
+    AuditLogService auditLogService;
+
+    @Autowired
+    NotificationService notificationService;
+
     @GetMapping("/judge-dashboard")
     public String judgeDashboard(HttpSession session, Model model) {
         UserEntity currentUser = (UserEntity) session.getAttribute("user");
@@ -51,22 +60,63 @@ public class JudgeController {
         }
 
         List<JudgeAssignmentEntity> assignments = judgeAssignmentRepository.findByJudgeUserId(currentUser.getUserId());
+        assignments.sort(Comparator.comparing(JudgeAssignmentEntity::getJudgeAssignmentId, Comparator.nullsLast(Comparator.naturalOrder())).reversed());
         long totalAssigned = assignments.size();
-        
+
         List<JudgeScoreEntity> scores = judgeScoreRepository.findByJudgeUserId(currentUser.getUserId());
         long totalEvaluated = scores.size();
+
+        long totalPendingAll = 0;
         
-        long totalApplications = 0;
-        for(JudgeAssignmentEntity assignment : assignments) {
-            totalApplications += hackathonApplicationRepository.findByHackathonId(assignment.getHackathonId()).size();
+        List<JudgeTaskView> tasks = new ArrayList<>();
+
+        for (JudgeAssignmentEntity assignment : assignments) {
+            Optional<HackathonEntity> opHackathon = hackathonRepository.findById(assignment.getHackathonId());
+            if (opHackathon.isEmpty()) continue;
+            HackathonEntity h = opHackathon.get();
+
+            List<HackathonApplicationEntity> apps = hackathonApplicationRepository.findByHackathonId(h.getHackathonId());
+            long subs = apps.size();
+            long evalCount = scores.stream().filter(s -> h.getHackathonId().equals(s.getHackathonId())).count();
+            long pnd = Math.max(0, subs - evalCount);
+            totalPendingAll += pnd;
+
+            JudgeTaskView task = new JudgeTaskView();
+            task.setHackathonId(h.getHackathonId());
+            task.setHackathonTitle(h.getTitle());
+            task.setTotalSubmissions(subs);
+            task.setEvaluated(evalCount);
+            task.setPending(pnd);
+            tasks.add(task);
         }
-        long totalPending = Math.max(0, totalApplications - totalEvaluated);
+
+        tasks.sort((left, right) -> right.getHackathonId().compareTo(left.getHackathonId()));
 
         model.addAttribute("totalAssigned", totalAssigned);
         model.addAttribute("totalEvaluated", totalEvaluated);
-        model.addAttribute("totalPending", totalPending);
+        model.addAttribute("totalPending", totalPendingAll);
+        model.addAttribute("judgeTasks", tasks);
 
         return "judge/JudgeDashboard";
+    }
+
+    public static class JudgeTaskView {
+        private Integer hackathonId;
+        private String hackathonTitle;
+        private Long totalSubmissions;
+        private Long evaluated;
+        private Long pending;
+
+        public Integer getHackathonId() { return hackathonId; }
+        public void setHackathonId(Integer hackathonId) { this.hackathonId = hackathonId; }
+        public String getHackathonTitle() { return hackathonTitle; }
+        public void setHackathonTitle(String hackathonTitle) { this.hackathonTitle = hackathonTitle; }
+        public Long getTotalSubmissions() { return totalSubmissions; }
+        public void setTotalSubmissions(Long totalSubmissions) { this.totalSubmissions = totalSubmissions; }
+        public Long getEvaluated() { return evaluated; }
+        public void setEvaluated(Long evaluated) { this.evaluated = evaluated; }
+        public Long getPending() { return pending; }
+        public void setPending(Long pending) { this.pending = pending; }
     }
 
     @GetMapping("/judge/my-assignments")
@@ -77,6 +127,7 @@ public class JudgeController {
         }
 
         List<JudgeAssignmentEntity> assignments = judgeAssignmentRepository.findByJudgeUserId(currentUser.getUserId());
+        assignments.sort(Comparator.comparing(JudgeAssignmentEntity::getJudgeAssignmentId, Comparator.nullsLast(Comparator.naturalOrder())).reversed());
         List<JudgeAssignmentView> views = new ArrayList<>();
         for (JudgeAssignmentEntity assignment : assignments) {
             JudgeAssignmentView view = new JudgeAssignmentView();
@@ -105,10 +156,13 @@ public class JudgeController {
         session.removeAttribute("judgeFlowMsgType");
 
         List<JudgeAssignmentEntity> assignments = judgeAssignmentRepository.findByJudgeUserId(currentUser.getUserId());
+        assignments.sort(Comparator.comparing(JudgeAssignmentEntity::getJudgeAssignmentId, Comparator.nullsLast(Comparator.naturalOrder())).reversed());
         List<HackathonEntity> assignedHackathons = new ArrayList<>();
         for (JudgeAssignmentEntity a : assignments) {
             hackathonRepository.findById(a.getHackathonId()).ifPresent(assignedHackathons::add);
         }
+
+        assignedHackathons.sort((left, right) -> right.getHackathonId().compareTo(left.getHackathonId()));
 
         if (hackathonId == null && !assignedHackathons.isEmpty()) {
             hackathonId = assignedHackathons.get(0).getHackathonId();
@@ -186,6 +240,7 @@ public class JudgeController {
         JudgeScoreEntity scoreEntity = judgeScoreRepository
                 .findByApplicationIdAndJudgeUserId(applicationId, currentUser.getUserId())
                 .orElseGet(JudgeScoreEntity::new);
+        Integer oldScore = scoreEntity.getScore();
         scoreEntity.setApplicationId(applicationId);
         scoreEntity.setHackathonId(hackathonId);
         scoreEntity.setJudgeUserId(currentUser.getUserId());
@@ -197,6 +252,8 @@ public class JudgeController {
         scoreEntity.setRemarks(remarks == null ? "" : remarks.trim());
         scoreEntity.setScoredAt(LocalDate.now());
         judgeScoreRepository.save(scoreEntity);
+        auditLogService.logScoreChange(scoreEntity.getJudgeScoreId(), oldScore, totalScore, currentUser.getUserId());
+        hackathonRepository.findById(hackathonId).ifPresent(h -> notificationService.notifyScoreRecorded(currentUser.getUserId(), applicationId, h.getTitle()));
 
         session.setAttribute("judgeFlowMsg", "Score submitted successfully.");
         session.setAttribute("judgeFlowMsgType", "success");

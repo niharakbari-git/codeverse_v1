@@ -19,6 +19,7 @@ import com.grownited.entity.HackathonEntity;
 import com.grownited.entity.HackathonApplicationEntity;
 import com.grownited.entity.JudgeAssignmentEntity;
 import com.grownited.entity.JudgeScoreEntity;
+import com.grownited.entity.UserDetailEntity;
 import com.grownited.entity.UserEntity;
 import com.grownited.repository.HackathonApplicationRepository;
 import com.grownited.repository.HackathonRepository;
@@ -27,6 +28,8 @@ import com.grownited.repository.JudgeScoreRepository;
 import com.grownited.repository.UserDetailRepository;
 import com.grownited.repository.UserRepository;
 import com.grownited.service.AuthService;
+import com.grownited.service.AuditLogService;
+import com.grownited.service.NotificationService;
 import com.grownited.service.OrganizerApplicationService;
 import com.grownited.util.SessionUserUtil;
 
@@ -59,6 +62,12 @@ public class OrganizerController {
     @Autowired
     AuthService authService;
 
+    @Autowired
+    AuditLogService auditLogService;
+
+    @Autowired
+    NotificationService notificationService;
+
     @GetMapping("/organizer/judge-assignments")
     public String judgeAssignments(HttpSession session, Model model) {
         UserEntity currentUser = SessionUserUtil.getCurrentUser(session);
@@ -68,9 +77,9 @@ public class OrganizerController {
 
         List<HackathonEntity> myHackathons;
         if (AppConstants.ROLE_ADMIN.equalsIgnoreCase(currentUser.getRole())) {
-            myHackathons = hackathonRepository.findAll();
+            myHackathons = hackathonRepository.findAllByOrderByHackathonIdDesc();
         } else {
-            myHackathons = hackathonRepository.findByUserId(currentUser.getUserId());
+            myHackathons = hackathonRepository.findByUserIdOrderByHackathonIdDesc(currentUser.getUserId());
         }
 
         List<UserEntity> judges = userRepository.findByRole("JUDGE");
@@ -128,6 +137,9 @@ public class OrganizerController {
         assignment.setAssignedByUserId(currentUser.getUserId());
         assignment.setAssignedAt(LocalDate.now());
         judgeAssignmentRepository.save(assignment);
+        auditLogService.logAssignmentChange(assignment.getJudgeAssignmentId(), "CREATE", currentUser.getUserId(),
+            "Judge=" + judgeUserId + ", Hackathon=" + hackathonId);
+        notificationService.notifyJudgeAssignment(judgeUserId, hackathonId, hackathon.getTitle());
 
         return "redirect:/organizer/judge-assignments?msg=Judge+assigned+successfully&type=success";
     }
@@ -174,8 +186,8 @@ public class OrganizerController {
         }
 
         List<HackathonEntity> myHackathons = AppConstants.ROLE_ADMIN.equalsIgnoreCase(currentUser.getRole())
-                ? hackathonRepository.findAll()
-                : hackathonRepository.findByUserId(currentUser.getUserId());
+            ? hackathonRepository.findAllByOrderByHackathonIdDesc()
+            : hackathonRepository.findByUserIdOrderByHackathonIdDesc(currentUser.getUserId());
 
         if (hackathonId == null && !myHackathons.isEmpty()) {
             hackathonId = myHackathons.get(0).getHackathonId();
@@ -230,6 +242,100 @@ public class OrganizerController {
             return "redirect:/organizer/profile?msg=Profile+picture+updated+successfully&type=success";
         }
         return "redirect:/organizer/profile?msg=" + result.getMessage().replace(" ", "+") + "&type=error";
+    }
+
+    @PostMapping("/organizer/profile/remove-pfp")
+    public String removeOrganizerProfilePicture(HttpSession session) {
+        UserEntity currentUser = SessionUserUtil.getCurrentUser(session);
+        if (currentUser == null) {
+            return AppConstants.REDIRECT_LOGIN;
+        }
+
+        AuthService.ProfilePictureUpdateResult result = authService.removeProfilePicture(currentUser.getUserId());
+        if (result.isSuccessful()) {
+            session.setAttribute(AppConstants.SESSION_USER, result.getUpdatedUser());
+            return "redirect:/organizer/profile?msg=Profile+picture+removed+successfully&type=success";
+        }
+        return "redirect:/organizer/profile?msg=" + result.getMessage().replace(" ", "+") + "&type=error";
+    }
+
+    @PostMapping("/organizer/profile/change-password")
+    public String changePassword(String currentPassword, String newPassword, String confirmPassword, HttpSession session) {
+        UserEntity currentUser = SessionUserUtil.getCurrentUser(session);
+        if (currentUser == null) {
+            return AppConstants.REDIRECT_LOGIN;
+        }
+
+        String error = authService.changePassword(currentUser.getUserId(), currentPassword, newPassword, confirmPassword);
+        if (error == null) {
+            return "redirect:/organizer/profile?msg=Password+changed+successfully&type=success";
+        }
+        return "redirect:/organizer/profile?msg=" + error.replace(" ", "+") + "&type=error";
+    }
+
+    @PostMapping("/organizer/profile/update-details")
+    public String updateOrganizerProfileDetails(String firstName, String lastName, String email, String gender, String birthYear,
+            String contactNum, String qualification, String city, String state, String country,
+            String linkedinUrl, HttpSession session) {
+        UserEntity currentUser = SessionUserUtil.getCurrentUser(session);
+        if (currentUser == null) {
+            return AppConstants.REDIRECT_LOGIN;
+        }
+
+        String normalizedEmail = trimToNull(email);
+        if (normalizedEmail == null) {
+            return "redirect:/organizer/profile?msg=Email+is+required&type=error";
+        }
+
+        Optional<UserEntity> existingUser = userRepository.findByEmail(normalizedEmail);
+        if (existingUser.isPresent() && !existingUser.get().getUserId().equals(currentUser.getUserId())) {
+            return "redirect:/organizer/profile?msg=Email+already+exists.+Use+another+email&type=error";
+        }
+
+        currentUser.setFirstName(trimToNull(firstName));
+        currentUser.setLastName(trimToNull(lastName));
+        currentUser.setEmail(normalizedEmail);
+        currentUser.setGender(trimToNull(gender));
+        currentUser.setBirthYear(parseBirthYear(birthYear));
+
+        currentUser.setContactNum(trimToNull(contactNum));
+        userRepository.save(currentUser);
+
+        UserDetailEntity userDetail = userDetailRepository.findByUserId(currentUser.getUserId()).orElseGet(() -> {
+            UserDetailEntity created = new UserDetailEntity();
+            created.setUserId(currentUser.getUserId());
+            return created;
+        });
+
+        userDetail.setQualification(trimToNull(qualification));
+        userDetail.setCity(trimToNull(city));
+        userDetail.setState(trimToNull(state));
+        userDetail.setCountry(trimToNull(country));
+        userDetail.setLinkedinUrl(trimToNull(linkedinUrl));
+        userDetailRepository.save(userDetail);
+
+        session.setAttribute(AppConstants.SESSION_USER, currentUser);
+        return "redirect:/organizer/profile?msg=Profile+updated+successfully&type=success";
+    }
+
+    private String trimToNull(String value) {
+        if (value == null) {
+            return null;
+        }
+        String trimmed = value.trim();
+        return trimmed.isEmpty() ? null : trimmed;
+    }
+
+    private Integer parseBirthYear(String value) {
+        String trimmed = trimToNull(value);
+        if (trimmed == null) {
+            return null;
+        }
+        try {
+            return Integer.parseInt(trimmed);
+        } catch (NumberFormatException ex) {
+            return null;
+        }
     }
 
     public static class AssignmentView {

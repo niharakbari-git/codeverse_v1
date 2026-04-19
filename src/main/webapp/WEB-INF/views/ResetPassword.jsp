@@ -1,4 +1,4 @@
-﻿<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <!DOCTYPE html>
 <html lang="en">
@@ -6,53 +6,51 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Reset Password | CodeVerse</title>
-<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=Syne:wght@700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/neo-viva-theme.css?v=20260415b">
+<script defer src="${pageContext.request.contextPath}/assets/js/neo-viva-theme.js?v=20260415b"></script>
 <style>
-*{box-sizing:border-box;margin:0;padding:0}
-:root{--bg:#08121a;--surface:#121f2b;--border:#2a4358;--text:#eaf2f9;--muted:#8ca5b9;--accent:#1f6feb;--accent2:#06b6d4}
-body{font-family:'Syne',sans-serif;background:radial-gradient(circle at 18% 18%, rgba(31,111,235,.18), transparent 40%),radial-gradient(circle at 90% 78%, rgba(6,182,212,.18), transparent 38%),var(--bg);color:var(--text);min-height:100vh;display:grid;place-items:center;padding:18px}
-.card{width:min(460px,100%);background:rgba(18,31,43,.95);border:1px solid var(--border);border-radius:18px;padding:26px;box-shadow:0 18px 50px rgba(0,0,0,.28)}
-.brand{font-family:'Space Mono',monospace;font-weight:700;letter-spacing:.06em;font-size:20px;margin-bottom:8px}
-h2{font-size:30px}
-.sub{margin-top:6px;color:var(--muted);font-size:14px}
-.field{margin-top:16px}
-label{display:block;font-size:13px;color:var(--muted);margin-bottom:6px}
-input{width:100%;padding:12px 13px;border-radius:11px;border:1px solid var(--border);background:#101a24;color:var(--text);font-size:14px}
-input:focus{outline:none;border-color:var(--accent2);box-shadow:0 0 0 3px rgba(6,182,212,.16)}
-button{margin-top:14px;width:100%;padding:12px;border:none;border-radius:11px;background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;font-weight:800;cursor:pointer}
-.row{margin-top:12px;text-align:center}
-.row a{color:#9ad8e3;text-decoration:none;font-weight:700}
+.wrap{min-height:100vh;display:grid;place-items:center;padding:16px}
+.card{width:min(500px,100%);padding:22px}
+.card h1{font-size:clamp(30px,5vw,44px)}
+.sub{margin-top:8px;color:#5e6673}
+.field{margin-top:14px}
+.field label{display:block;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px}
+.actions{margin-top:14px;display:grid;gap:8px}
+.actions a{text-align:center}
 </style>
-<link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/neo-viva-theme.css?v=20260409a">
-<script defer src="${pageContext.request.contextPath}/assets/js/neo-viva-theme.js?v=20260409a"></script>
 </head>
 <body>
-    <c:set var="toastMessage" value="${empty error ? success : error}" />
-    <c:set var="toastType" value="${empty error ? 'success' : 'error'}" />
-    <c:if test="${not empty toastMessage}">
-        <div id="toast-data" data-type="${toastType}" style="display:none;"><c:out value="${toastMessage}" /></div>
-    </c:if>
-    <div class="card">
-        <div class="brand">CODEVERSE</div>
-        <h2>Reset Password</h2>
-        <p class="sub">Create a new password for your account.</p>
-
-        <form action="updatePassword" method="post" autocomplete="off">
-            <input type="hidden" name="_csrf" value="${_csrfToken}">
-            <input type="hidden" name="email" value="${email}">
-            <input type="hidden" name="token" value="${token}">
-            <div class="field">
-                <label for="password">New Password</label>
-                <input type="password" name="password" id="password" placeholder="Enter new password" required>
-            </div>
-            <div class="field">
-                <label for="confirmPassword">Confirm Password</label>
-                <input type="password" name="confirmPassword" id="confirmPassword" placeholder="Confirm new password" required>
-            </div>
-            <button type="submit">Update Password</button>
-            <div class="row"><a href="login">Back to Login</a></div>
-        </form>
-    </div>
+<c:set var="toastMessage" value="${empty error ? success : error}" />
+<c:set var="toastType" value="${empty error ? 'success' : 'error'}" />
+<c:if test="${not empty toastMessage}">
+  <div id="toast-data" data-type="${toastType}" style="display:none;"><c:out value="${toastMessage}" /></div>
+</c:if>
+<div class="wrap">
+  <div class="neo-panel card" data-reveal>
+    <div class="neo-badge">CodeVerse Account</div>
+    <h1 class="neo-title">Reset Password</h1>
+    <p class="sub">Create a new password for your account.</p>
+    <form action="updatePassword" method="post" autocomplete="on">
+      <input type="hidden" name="_csrf" value="${_csrfToken}">
+      <input type="hidden" name="email" value="${email}">
+      <input type="hidden" name="token" value="${token}">
+      <div class="field">
+        <label for="password">New Password</label>
+        <input type="password" name="password" id="password" placeholder="Enter new password" autocomplete="new-password" required>
+      </div>
+      <div class="field">
+        <label for="confirmPassword">Confirm Password</label>
+        <input type="password" name="confirmPassword" id="confirmPassword" placeholder="Confirm new password" autocomplete="new-password" required>
+      </div>
+      <div class="actions">
+        <button type="submit">Update Password</button>
+        <a class="btn" href="login">Back to Login</a>
+      </div>
+    </form>
+  </div>
+</div>
 <%@ include file="shared/Toast.jspf" %>
 </body>
 </html>
+

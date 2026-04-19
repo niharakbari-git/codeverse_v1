@@ -1,411 +1,233 @@
-﻿<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Dashboard</title>
-<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=Syne:wght@700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/neo-viva-theme.css?v=20260415b">
+<script defer src="${pageContext.request.contextPath}/assets/js/neo-viva-theme.js?v=20260415b"></script>
 <style>
-* { box-sizing: border-box; margin: 0; padding: 0; }
-:root {
-	--bg: #0a0a0f;
-	--surface: #13131a;
-	--surface2: #1c1c27;
-	--border: #2a2a3d;
-	--accent: #7c3aed;
-	--accent2: #06b6d4;
-	--text: #e2e8f0;
-	--muted: #64748b;
-	--glow: rgba(124, 58, 237, 0.35);
-}
-html, body {
-	background: var(--bg) !important;
-	color: var(--text);
-}
-body {
-	font-family: 'Syne', sans-serif;
-	background: var(--bg);
-	color: var(--text);
-	min-height: 100vh;
-}
-body::before {
-	content: '';
-	position: fixed;
-	inset: 0;
-	background-image: linear-gradient(rgba(124, 58, 237, 0.04) 1px, transparent 1px), linear-gradient(90deg, rgba(124, 58, 237, 0.04) 1px, transparent 1px);
-	background-image: linear-gradient(rgba(6, 182, 212, 0.05) 1px, transparent 1px), linear-gradient(90deg, rgba(249, 115, 22, 0.05) 1px, transparent 1px);
-	background-size: 40px 40px;
-	pointer-events: none;
-	z-index: 0;
-}
-.header {
-	position: sticky;
-	top: 0;
-	z-index: 20;
-	height: 64px;
-	padding: 0 28px;
-	border-bottom: 1px solid var(--border);
-	background: rgba(10, 10, 15, 0.88);
-	backdrop-filter: blur(20px);
-	display: flex;
-	justify-content: space-between;
-	align-items: center;
-}
-.logo {
-	display: flex;
-	gap: 10px;
-	align-items: center;
-	color: var(--text);
-	text-decoration: none;
-	font-family: 'Space Mono', monospace;
-	font-weight: 700;
-}
-.logo-icon {
-	width: 34px;
-	height: 34px;
-	border-radius: 8px;
-	background: linear-gradient(135deg, var(--accent), var(--accent2));
-	display: grid;
-	place-items: center;
-}
-.logo-mark { font-family: 'Space Mono', monospace; font-weight: 700; font-size: 13px; letter-spacing: 0.05em; color: #fff; }
-.logo-text {
-	font-family: 'Space Mono', monospace;
-	font-weight: 700;
-	font-size: 18px;
-	letter-spacing: 0.06em;
-	text-transform: uppercase;
-	line-height: 1;
-}
-.nav-links { display: flex; gap: 8px; align-items: center; }
-.nav-links a {
-	text-decoration: none;
-	color: var(--muted);
-	padding: 8px 18px;
-	border-radius: 8px;
-	font-size: 14px;
-	font-weight: 600;
-}
-.nav-links a:hover { color: var(--text); background: var(--surface2); }
-.wrap {
-	position: relative;
-	z-index: 1;
-	max-width: 1200px;
-	margin: 0 auto;
-	padding: 34px 22px 60px;
-}
-.title {
-	font-size: clamp(28px, 5vw, 44px);
-	line-height: 1.1;
-	font-weight: 800;
-	letter-spacing: -1px;
-}
-.title span {
-	background: linear-gradient(135deg, var(--accent), var(--accent2));
-	-webkit-background-clip: text;
-	-webkit-text-fill-color: transparent;
-}
-.subtitle { margin-top: 8px; color: var(--muted); }
-.actions {
-	margin-top: 22px;
-	display: flex;
-	gap: 10px;
-	flex-wrap: wrap;
-}
-.actions a {
-	text-decoration: none;
-	padding: 10px 14px;
-	border-radius: 10px;
-	border: 1px solid var(--border);
-	background: var(--surface);
-	color: var(--text);
-	font-size: 14px;
-	font-weight: 600;
-}
-.cards {
-	margin-top: 28px;
-	display: grid;
-	grid-template-columns: repeat(4, minmax(160px, 1fr));
-	gap: 16px;
-}
-.quick-grid {
-	margin-top: 22px;
-	display: grid;
-	grid-template-columns: repeat(3, minmax(180px, 1fr));
-	gap: 12px;
-}
-.quick-card {
-	text-decoration: none;
-	background: var(--surface);
-	border: 1px solid var(--border);
-	border-radius: 12px;
-	padding: 14px;
-	color: var(--text);
-	transition: border-color 0.2s, transform 0.2s;
-}
-.quick-card:hover {
-	border-color: var(--accent);
-	transform: translateY(-2px);
-}
-.quick-card h4 {
-	font-size: 15px;
-	margin-bottom: 6px;
-}
-.quick-card p {
-	font-size: 12px;
-	color: var(--muted);
-}
-.card {
-	background: var(--surface);
-	border: 1px solid var(--border);
-	border-radius: 14px;
-	padding: 20px;
-}
-.card p { color: var(--muted); font-size: 13px; margin-bottom: 8px; }
-.card h3 {
-	font-family: 'Space Mono', monospace;
-	font-size: 32px;
-	background: linear-gradient(135deg, var(--accent2), var(--accent));
-	-webkit-background-clip: text;
-	-webkit-text-fill-color: transparent;
-}
-.chart {
-	margin-top: 18px;
-	background: var(--surface);
-	border: 1px solid var(--border);
-	border-radius: 14px;
-	padding: 16px;
-}
-.chart h3 { font-size: 17px; margin-bottom: 10px; }
-.bar-row { display: grid; grid-template-columns: 120px 1fr 60px; gap: 10px; align-items: center; margin: 8px 0; }
-.bar-row label { color: var(--muted); font-size: 12px; }
-.track { height: 10px; border-radius: 999px; background: #0e1720; border: 1px solid var(--border); overflow: hidden; }
-.fill { height: 100%; width: 0; border-radius: inherit; background: linear-gradient(90deg, var(--accent), var(--accent2)); transition: width .5s ease; }
-.bar-row span { font-family: 'Space Mono', monospace; font-size: 12px; color: #c8d8e8; text-align: right; }
-@media (max-width: 900px) {
-	.cards { grid-template-columns: repeat(2, minmax(160px, 1fr)); }
-	.quick-grid { grid-template-columns: repeat(2, minmax(170px, 1fr)); }
-	.header { padding: 0 14px; }
-}
-@media (max-width: 560px) {
-	.cards { grid-template-columns: 1fr; }
-	.quick-grid { grid-template-columns: 1fr; }
-	.nav-links a { padding: 7px 10px; font-size: 13px; }
-}
+.header{position:sticky;top:0;z-index:100;height:64px;display:flex;align-items:center;justify-content:space-between;gap:10px;padding:0 24px;background:rgba(247,244,236,.92);backdrop-filter:blur(8px);border-bottom:1px solid #d7dce5}
+.logo{display:flex;align-items:center;gap:10px;text-decoration:none;color:#1f2329}
+.logo-icon{width:34px;height:34px;border-radius:10px;display:grid;place-items:center;background:#1f2937;color:#fff;font-weight:700}
+.logo-text{font-family:'Space Grotesk',sans-serif;font-size:16px;font-weight:700;letter-spacing:.04em}
+.nav-links{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.nav-links a{text-decoration:none;border:1px solid #d7dce5;border-radius:10px;background:#fff;color:#1f2329;font-size:13px;font-weight:700;padding:8px 12px}
+.nav-links a:hover{background:#f5f7fb}
+.nav-links a.active{background:#1f2329;color:#fff;border-color:#1f2329}
+
+.page{display:grid;grid-template-columns:260px 1fr;gap:12px;min-height:calc(100vh - 64px);padding:16px;max-width:1320px;margin:0 auto}
+.side{padding:14px}
+.side h2{font-size:30px}
+.side .links{display:grid;gap:8px;margin-top:10px}
+.side .links a{padding:10px;border:2px solid #1f2329;border-radius:12px;text-decoration:none;background:#fff}
+.main{display:grid;gap:12px}
+.hero{padding:16px;background:#1f2937;color:#fff}
+.hero h1{font-size:clamp(34px,5vw,58px)}
+.dual{display:grid;grid-template-columns:1fr;gap:12px}
+.panel{padding:14px}
+.metric-link{display:block;text-decoration:none;color:inherit;transition:transform .18s ease,box-shadow .18s ease}
+.metric-link:hover{transform:translateY(-2px)}
+.metric-link.active{background:#1f2329;color:#fff}
+.bars{display:grid;gap:10px;margin-top:10px}
+.row{display:grid;grid-template-columns:120px 1fr 52px;gap:8px;align-items:center}
+.track{height:14px;border:2px solid #1f2329;border-radius:99px;background:#fff}
+.fill{height:100%;width:0;border-radius:99px;background:#0f766e;transition:width .45s ease}
+
+.snapshot{padding:14px}
+.snapshot-head{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
+.snapshot-head h3{font-size:28px}
+.snapshot-head .sub{font-size:13px;color:#5e6673}
+.snapshot-table{margin-top:10px;overflow:auto}
+.status-pill{display:inline-flex;padding:4px 8px;border:2px solid #1f2329;border-radius:999px;background:#fff;font-size:11px;font-weight:700;text-transform:uppercase}
+.snapshot-empty{padding:16px;text-align:center;font-weight:700}
+@media(max-width:1060px){.dual{grid-template-columns:1fr}}
+@media(max-width:860px){.header{height:auto;padding:12px;align-items:flex-start;flex-direction:column}.page{grid-template-columns:1fr}}
 </style>
-<link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/neo-viva-theme.css?v=20260409a">
-<script defer src="${pageContext.request.contextPath}/assets/js/neo-viva-theme.js?v=20260409a"></script>
 </head>
 <body>
-	<header class="header">
-		<c:choose>
-			<c:when test="${sessionScope.user.role == 'ADMIN'}">
-				<a class="logo" href="<c:url value='/admin-dashboard' />">
-					<div class="logo-icon"><span class="logo-mark">CV</span></div>
-					<span class="logo-text">CODEVERSE</span>
-				</a>
-			</c:when>
-			<c:when test="${sessionScope.user.role == 'ORGANIZER'}">
-				<a class="logo" href="<c:url value='/organizer-dashboard' />">
-					<div class="logo-icon"><span class="logo-mark">CV</span></div>
-					<span class="logo-text">CODEVERSE</span>
-				</a>
-			</c:when>
-			<c:otherwise>
-				<a class="logo" href="<c:url value='/judge-dashboard' />">
-					<div class="logo-icon"><span class="logo-mark">CV</span></div>
-					<span class="logo-text">CODEVERSE</span>
-				</a>
-			</c:otherwise>
-		</c:choose>
-		<nav class="nav-links">
-			<a href="<c:url value='/participant/home' />">Explore</a>
-			<c:choose>
-				<c:when test="${sessionScope.user.role == 'ADMIN'}">
-					<a href="<c:url value='/admin-dashboard' />">Dashboard</a>
-				</c:when>
-				<c:when test="${sessionScope.user.role == 'ORGANIZER'}">
-					<a href="<c:url value='/organizer-dashboard' />">Dashboard</a>
-				</c:when>
-				<c:otherwise>
-					<a href="<c:url value='/judge-dashboard' />">Dashboard</a>
-				</c:otherwise>
-			</c:choose>
-			<a href="<c:url value='/logout' />">Logout</a>
-		</nav>
-	</header>
+<header class="header">
+  <a class="logo" href="<c:url value='/participant/home' />">
+    <div class="logo-icon">CV</div>
+    <span class="logo-text">CODEVERSE</span>
+  </a>
+  <nav class="nav-links">
+    <a href="<c:url value='/participant/home' />">Explore</a>
+    <c:choose>
+      <c:when test="${sessionScope.user.role == 'ADMIN'}"><a class="active" href="<c:url value='/admin-dashboard' />">Dashboard</a></c:when>
+      <c:when test="${sessionScope.user.role == 'ORGANIZER'}"><a class="active" href="<c:url value='/organizer-dashboard' />">Dashboard</a></c:when>
+      <c:otherwise><a class="active" href="<c:url value='/judge-dashboard' />">Dashboard</a></c:otherwise>
+    </c:choose>
+    <a href="<c:url value='/logout' />">Logout</a>
+  </nav>
+</header>
 
-	<main class="wrap">
-		<h1 class="title">
-			<c:choose>
-				<c:when test="${sessionScope.user.role == 'ORGANIZER'}">Organizer <span>Dashboard</span></c:when>
-				<c:when test="${sessionScope.user.role == 'JUDGE'}">Judge <span>Dashboard</span></c:when>
-				<c:otherwise>Admin <span>Dashboard</span></c:otherwise>
-			</c:choose>
-		</h1>
-		<p class="subtitle">Welcome ${sessionScope.user.firstName}. Platform metrics are shown below.</p>
+<div class="neo-shell page">
+  <aside class="neo-panel side" data-reveal>
+    <div class="neo-badge">Role Features</div>
+    <h2 class="neo-title">Control</h2>
+    <div class="links">
+      <c:choose>
+        <c:when test="${sessionScope.user.role == 'ADMIN'}">
+          <a href="<c:url value='/admin/user-list' />">User Directory</a>
+          <a href="<c:url value='/admin/organizer-requests' />">Organizer Requests</a>
+          <a href="<c:url value='/listHackathon' />">Hackathons</a>
+          <a href="<c:url value='/listCategory' />">Categories</a>
+          <a href="<c:url value='/newHackathon' />">Create Hackathon</a>
+          <a href="<c:url value='/charge' />">Open Payments</a>
+        </c:when>
+        <c:when test="${sessionScope.user.role == 'ORGANIZER'}">
+          <a href="<c:url value='/newHackathon' />">Create Hackathon</a>
+          <a href="<c:url value='/listHackathon' />">My Hackathons</a>
+          <a href="<c:url value='/organizer/judge-assignments' />">Assign Judges</a>
+          <a href="<c:url value='/organizer/applications' />">Applications</a>
+          <a href="<c:url value='/organizer/results' />">Results</a>
+          <a href="<c:url value='/organizer/profile' />">Profile</a>
+        </c:when>
+        <c:otherwise>
+          <a href="<c:url value='/judge/my-assignments' />">My Assignments</a>
+          <a href="<c:url value='/judge/scorecards' />">Scorecards</a>
+          <a href="<c:url value='/participant/home' />">Explore Events</a>
+        </c:otherwise>
+      </c:choose>
+    </div>
+  </aside>
 
-		<div class="actions">
-			<c:choose>
-				<c:when test="${sessionScope.user.role == 'ADMIN'}">
-					<a href="<c:url value='/listUser' />">Manage Users</a>
-					<a href="<c:url value='/listHackathon' />">Manage Hackathons</a>
-					<a href="<c:url value='/listCategory' />">Manage Categories</a>
-				</c:when>
-				<c:when test="${sessionScope.user.role == 'ORGANIZER'}">
-					<a href="<c:url value='/newHackathon' />">Create Hackathon</a>
-					<a href="<c:url value='/listHackathon' />">Manage Hackathons</a>
-					<a href="<c:url value='/organizer/judge-assignments' />">Assign Judges</a>
-					<a href="<c:url value='/organizer/applications' />">Applications</a>
-					<a href="<c:url value='/organizer/results' />">Results</a>
-					<a href="<c:url value='/organizer/profile' />">Profile</a>
-					<a href="<c:url value='/charge' />">Payments</a>
-				</c:when>
-				<c:otherwise>
-					<a href="<c:url value='/judge/my-assignments' />">My Assignments</a>
-					<a href="<c:url value='/judge/scorecards' />">Scorecards</a>
-					<a href="<c:url value='/participant/home' />">Explore Events</a>
-				</c:otherwise>
-			</c:choose>
-		</div>
+  <main class="main">
+    <section class="neo-panel hero" data-reveal>
+      <h1 class="neo-title">
+        <c:choose>
+          <c:when test="${sessionScope.user.role == 'ORGANIZER'}">Organizer Hub</c:when>
+          <c:when test="${sessionScope.user.role == 'JUDGE'}">Judge Hub</c:when>
+          <c:otherwise>Admin Hub</c:otherwise>
+        </c:choose>
+      </h1>
+      <p class="neo-sub" style="color:#fff">${sessionScope.user.firstName}, monitor events and team activity in one command surface.</p>
+      <div style="margin-top:10px"><a class="btn" style="background:#fff;color:#1f2329" href="<c:url value='/charge' />">Open Payments</a></div>
+    </section>
 
-		<section class="cards">
-			<article class="card">
-				<p>Total Hackathons</p>
-				<h3>${totalHackathon}</h3>
-			</article>
-			<article class="card">
-				<p>Upcoming</p>
-				<h3>${totalUpcoming}</h3>
-			</article>
-			<article class="card">
-				<p>Completed</p>
-				<h3>${totalCompleted}</h3>
-			</article>
-			<article class="card">
-				<p>Participants</p>
-				<h3>${totalParticipant}</h3>
-			</article>
-		</section>
+    <section class="neo-metric-grid" data-reveal>
+      <c:choose>
+        <c:when test="${sessionScope.user.role == 'ADMIN'}">
+          <a class="neo-metric metric-link ${selectedStatus == 'ALL' ? 'active' : ''}" data-status="ALL" href="<c:url value='/admin-dashboard?status=ALL' />"><div class="k">Total Hackathons</div><div class="v">${totalHackathon}</div></a>
+          <a class="neo-metric metric-link ${selectedStatus == 'UPCOMING' ? 'active' : ''}" data-status="UPCOMING" href="<c:url value='/admin-dashboard?status=UPCOMING' />"><div class="k">Upcoming</div><div class="v">${totalUpcoming}</div></a>
+          <a class="neo-metric metric-link ${selectedStatus == 'ONGOING' ? 'active' : ''}" data-status="ONGOING" href="<c:url value='/admin-dashboard?status=ONGOING' />"><div class="k">Ongoing</div><div class="v">${totalOngoing}</div></a>
+          <a class="neo-metric metric-link ${selectedStatus == 'COMPLETED' ? 'active' : ''}" data-status="COMPLETED" href="<c:url value='/admin-dashboard?status=COMPLETED' />"><div class="k">Completed</div><div class="v">${totalCompleted}</div></a>
+        </c:when>
+        <c:otherwise>
+          <a class="neo-metric metric-link ${selectedStatus == 'ALL' ? 'active' : ''}" data-status="ALL" href="<c:url value='/organizer-dashboard?status=ALL' />"><div class="k">Total Hackathons</div><div class="v">${totalHackathon}</div></a>
+          <a class="neo-metric metric-link ${selectedStatus == 'UPCOMING' ? 'active' : ''}" data-status="UPCOMING" href="<c:url value='/organizer-dashboard?status=UPCOMING' />"><div class="k">Upcoming</div><div class="v">${totalUpcoming}</div></a>
+          <a class="neo-metric metric-link ${selectedStatus == 'ONGOING' ? 'active' : ''}" data-status="ONGOING" href="<c:url value='/organizer-dashboard?status=ONGOING' />"><div class="k">Ongoing</div><div class="v">${totalOngoing}</div></a>
+          <a class="neo-metric metric-link ${selectedStatus == 'COMPLETED' ? 'active' : ''}" data-status="COMPLETED" href="<c:url value='/organizer-dashboard?status=COMPLETED' />"><div class="k">Completed</div><div class="v">${totalCompleted}</div></a>
+        </c:otherwise>
+      </c:choose>
+      <c:choose>
+        <c:when test="${sessionScope.user.role == 'ADMIN'}">
+          <a class="neo-metric metric-link" href="<c:url value='/admin/user-list?role=PARTICIPANT' />"><div class="k">Participants</div><div class="v">${totalParticipant}</div></a>
+        </c:when>
+        <c:otherwise>
+          <a class="neo-metric metric-link" href="<c:url value='/organizer/applications' />"><div class="k">Participants</div><div class="v">${totalParticipant}</div></a>
+        </c:otherwise>
+      </c:choose>
+    </section>
 
-		<c:if test="${sessionScope.user.role == 'ADMIN'}">
-			<section class="chart" data-total="${totalHackathon}" data-upcoming="${totalUpcoming}" data-completed="${totalCompleted}" data-participant="${totalParticipant}">
-				<h3>Platform Pulse</h3>
-				<div class="bar-row"><label>Hackathons</label><div class="track"><div class="fill" data-key="total"></div></div><span>${totalHackathon}</span></div>
-				<div class="bar-row"><label>Upcoming</label><div class="track"><div class="fill" data-key="upcoming"></div></div><span>${totalUpcoming}</span></div>
-				<div class="bar-row"><label>Completed</label><div class="track"><div class="fill" data-key="completed"></div></div><span>${totalCompleted}</span></div>
-				<div class="bar-row"><label>Participants</label><div class="track"><div class="fill" data-key="participant"></div></div><span>${totalParticipant}</span></div>
-			</section>
-		</c:if>
+    <section class="neo-panel snapshot" data-reveal>
+      <div class="snapshot-head">
+        <div>
+          <h3 class="neo-title">Hackathon Snapshot</h3>
+          <div class="sub" id="snapshotSub">Showing ${dashboardHackathonCount} entries for status: ${selectedStatus}</div>
+        </div>
+        <a class="btn" href="<c:url value='/listHackathon' />">Open Full List</a>
+      </div>
+      <div class="snapshot-table">
+        <table>
+          <thead>
+            <tr>
+              <th>Title</th>
+              <th>Registration End</th>
+              <th>Status</th>
+              <th>Payment</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            <c:forEach items="${allDashboardHackathons}" var="h">
+              <tr class="snapshot-row" data-status="${h.displayStatus}">
+                <td><c:out value="${h.title}"/></td>
+                <td><c:out value="${h.registrationEndDate}"/></td>
+                <td><span class="status-pill"><c:out value="${h.displayStatus}"/></span></td>
+                <td><c:out value="${h.payment}"/></td>
+                <td><a class="btn" href="<c:url value='/viewHackathon?hackathonId=${h.hackathonId}' />">View</a></td>
+              </tr>
+            </c:forEach>
+            <tr id="snapshotEmpty" style="display:none;"><td colspan="5" class="snapshot-empty">No hackathons found for this filter.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
 
-		<section class="quick-grid">
-			<c:choose>
-				<c:when test="${sessionScope.user.role == 'ADMIN'}">
-					<a class="quick-card" href="<c:url value='/listUser' />">
-						<h4>User Directory</h4>
-						<p>View, edit, and manage platform users.</p>
-					</a>
-					<a class="quick-card" href="<c:url value='/newCategory' />">
-						<h4>Create Category</h4>
-						<p>Add new tracks like AI, Web3, and Cloud.</p>
-					</a>
-					<a class="quick-card" href="<c:url value='/listCategory' />">
-						<h4>Category List</h4>
-						<p>Review all categories and update taxonomy.</p>
-					</a>
-					<a class="quick-card" href="<c:url value='/newHackathon' />">
-						<h4>Create Hackathon</h4>
-						<p>Publish a new event with team and date rules.</p>
-					</a>
-					<a class="quick-card" href="<c:url value='/listHackathon' />">
-						<h4>Hackathon List</h4>
-						<p>Manage existing events and organizer content.</p>
-					</a>
-					<a class="quick-card" href="<c:url value='/charge' />">
-						<h4>Payments</h4>
-						<p>Open payment module and test transactions.</p>
-					</a>
-				</c:when>
-				<c:when test="${sessionScope.user.role == 'ORGANIZER'}">
-					<a class="quick-card" href="<c:url value='/newHackathon' />">
-						<h4>Create Hackathon</h4>
-						<p>Post a new challenge with registration details.</p>
-					</a>
-					<a class="quick-card" href="<c:url value='/listHackathon' />">
-						<h4>My Hackathons</h4>
-						<p>Edit, view, and track listed events.</p>
-					</a>
-					<a class="quick-card" href="<c:url value='/organizer/judge-assignments' />">
-						<h4>Assign Judges</h4>
-						<p>Map judges to hackathons for evaluation.</p>
-					</a>
-					<a class="quick-card" href="<c:url value='/organizer/applications' />">
-						<h4>Applications</h4>
-						<p>Accept, shortlist, and track payment state.</p>
-					</a>
-					<a class="quick-card" href="<c:url value='/organizer/results' />">
-						<h4>Leaderboard</h4>
-						<p>View ranked results by average judge score.</p>
-					</a>
-					<a class="quick-card" href="<c:url value='/organizer/profile' />">
-						<h4>My Profile</h4>
-						<p>Review organizer identity and contact details.</p>
-					</a>
-					<a class="quick-card" href="<c:url value='/charge' />">
-						<h4>Payments</h4>
-						<p>Use payment module for paid registration checks.</p>
-					</a>
-				</c:when>
-				<c:otherwise>
-					<a class="quick-card" href="<c:url value='/judge/my-assignments' />">
-						<h4>My Assignments</h4>
-						<p>See all hackathons assigned for judging.</p>
-					</a>
-					<a class="quick-card" href="<c:url value='/judge/scorecards' />">
-						<h4>Scorecards</h4>
-						<p>Score applications and submit remarks.</p>
-					</a>
-					<a class="quick-card" href="<c:url value='/participant/home' />">
-						<h4>Explore Hackathons</h4>
-						<p>Browse all active and upcoming listings.</p>
-					</a>
-					<a class="quick-card" href="<c:url value='/charge' />">
-						<h4>Payments</h4>
-						<p>Access payment workflow for testing.</p>
-					</a>
-				</c:otherwise>
-			</c:choose>
-		</section>
-	</main>
-	<script>
-	(function(){
-		var chart = document.querySelector('.chart');
-		if(!chart){ return; }
-		var values = {
-			total: Number(chart.dataset.total || 0),
-			upcoming: Number(chart.dataset.upcoming || 0),
-			completed: Number(chart.dataset.completed || 0),
-			participant: Number(chart.dataset.participant || 0)
-		};
-		var max = Math.max(values.total, values.upcoming, values.completed, values.participant, 1);
-		chart.querySelectorAll('.fill').forEach(function(el){
-			var v = values[el.dataset.key] || 0;
-			el.style.width = Math.max(8, Math.round((v / max) * 100)) + '%';
-		});
-	})();
-	</script>
+    <section class="dual">
+      <article class="neo-panel panel chart" data-total="${totalHackathon}" data-upcoming="${totalUpcoming}" data-ongoing="${totalOngoing}" data-completed="${totalCompleted}" data-participant="${totalParticipant}" data-reveal>
+        <h3 class="neo-title" style="font-size:30px">Performance</h3>
+        <div class="bars">
+          <div class="row"><label>Hackathons</label><div class="track"><div class="fill" data-key="total"></div></div><span>${totalHackathon}</span></div>
+          <div class="row"><label>Upcoming</label><div class="track"><div class="fill" data-key="upcoming"></div></div><span>${totalUpcoming}</span></div>
+          <div class="row"><label>Ongoing</label><div class="track"><div class="fill" data-key="ongoing"></div></div><span>${totalOngoing}</span></div>
+          <div class="row"><label>Completed</label><div class="track"><div class="fill" data-key="completed"></div></div><span>${totalCompleted}</span></div>
+          <div class="row"><label>Participants</label><div class="track"><div class="fill" data-key="participant"></div></div><span>${totalParticipant}</span></div>
+        </div>
+      </article>
+
+    </section>
+  </main>
+</div>
+<script>
+(function(){
+  var chart = document.querySelector('.chart');
+  if(!chart){ return; }
+  var values = {
+    total: Number(chart.dataset.total || 0),
+    upcoming: Number(chart.dataset.upcoming || 0),
+    ongoing: Number(chart.dataset.ongoing || 0),
+    completed: Number(chart.dataset.completed || 0),
+    participant: Number(chart.dataset.participant || 0)
+  };
+  var max = Math.max(values.total, values.upcoming, values.ongoing, values.completed, values.participant, 1);
+  chart.querySelectorAll('.fill').forEach(function(el){
+    var v = values[el.dataset.key] || 0;
+    el.style.width = Math.max(8, Math.round((v / max) * 100)) + '%';
+  });
+
+  var activeStatus = (new URLSearchParams(window.location.search).get('status') || '${selectedStatus}' || 'ALL').toUpperCase();
+  var rows = Array.prototype.slice.call(document.querySelectorAll('.snapshot-row'));
+  var sub = document.getElementById('snapshotSub');
+  var emptyRow = document.getElementById('snapshotEmpty');
+  var metrics = Array.prototype.slice.call(document.querySelectorAll('.metric-link[data-status]'));
+
+  function applyStatus(status){
+    var visible = 0;
+    rows.forEach(function(row){
+      var rowStatus = (row.getAttribute('data-status') || '').toUpperCase();
+      var show = status === 'ALL' || rowStatus === status;
+      row.style.display = show ? '' : 'none';
+      if(show){ visible++; }
+    });
+    if (emptyRow) {
+      emptyRow.style.display = visible === 0 ? '' : 'none';
+    }
+    if (sub) {
+      sub.textContent = 'Showing ' + visible + ' entries for status: ' + status;
+    }
+    metrics.forEach(function(metric){
+      metric.classList.toggle('active', (metric.dataset.status || '').toUpperCase() === status);
+    });
+  }
+
+  applyStatus(activeStatus);
+})();
+</script>
+<%@ include file="shared/Toast.jspf" %>
 </body>
 </html>
-
-
-
-
-
-
-
-
-
-
-
-

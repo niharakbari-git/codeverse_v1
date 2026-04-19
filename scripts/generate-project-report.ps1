@@ -217,10 +217,10 @@ $documents["CHAPTER 1 INTRODUCTION(1-5).docx"] = Join-Lines @(
     "- Payment handling for paid hackathons",
     "",
     "1.2.3 Problems in Existing System",
-    "- Manual spreadsheets and email chains",
-    "- Delayed status updates",
-    "- Non-standard evaluation process",
-    "- Difficulty in audit and reporting",
+    "- Heavy dependence on manual spreadsheets and long email chains for coordination",
+    "- Delayed status updates due to fragmented communication across multiple channels",
+    "- Non-standard evaluation process with inconsistent scoring criteria across judges",
+    "- Difficulty in audit and reporting because records are scattered and hard to trace",
     "",
     "1.2.4 Main Modules",
     "- Authentication Module",
@@ -685,12 +685,12 @@ $documents["CHAPTER 11 CONCLUSION AND FUTURE ENHANCEMENT(76-78).docx"] = Join-Li
     "secure session handling, database normalization, and modular development.",
     "",
     "11.2 Future Enhancement",
-    "- Add real-time notifications using WebSocket",
-    "- Add advanced analytics dashboards",
-    "- Add file upload versioning for submissions",
-    "- Integrate plagiarism checks for code submissions",
-    "- Add REST API and mobile app support",
-    "- Add automated test suite and CI pipeline"
+    "- Add real-time notifications using WebSocket for instant workflow and status alerts",
+    "- Add advanced analytics dashboards with role-based metrics and trend visualization",
+    "- Add file upload versioning for submissions to preserve change history and traceability",
+    "- Integrate plagiarism checks for code submissions to improve fairness and originality validation",
+    "- Add REST API and mobile app support for cross-platform accessibility and integration",
+    "- Add an automated test suite and CI pipeline for reliable quality checks and faster releases"
 )
 
 $documents["CHAPTER 12 BIBLIOGRAPHY(79-81).docx"] = Join-Lines @(

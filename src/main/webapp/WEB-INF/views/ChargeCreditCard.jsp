@@ -1,170 +1,69 @@
-﻿<%@ page language="java" contentType="text/html; charset=UTF-8"
-    pageEncoding="UTF-8"%>
-<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Charge Card</title>
+<title>Charge Credit Card | CodeVerse</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=Syne:wght@700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/neo-viva-theme.css?v=20260415b">
+<script defer src="${pageContext.request.contextPath}/assets/js/neo-viva-theme.js?v=20260415b"></script>
 <style>
-* {
-    box-sizing: border-box;
-}
-
-body {
-    margin: 0;
-    font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-    background: radial-gradient(circle at top left, #1f2937, #111827 45%, #0b1220);
-    color: #e5e7eb;
-    min-height: 100vh;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 24px;
-}
-
-.card {
-    width: 100%;
-    max-width: 460px;
-    background: rgba(17, 24, 39, 0.9);
-    border: 1px solid rgba(148, 163, 184, 0.22);
-    border-radius: 16px;
-    padding: 28px;
-    box-shadow: 0 18px 45px rgba(0, 0, 0, 0.35);
-}
-
-.title {
-    margin: 0 0 6px;
-    font-size: 24px;
-    font-weight: 700;
-}
-
-.subtitle {
-    margin: 0 0 22px;
-    color: #94a3b8;
-    font-size: 14px;
-}
-
-.field {
-    margin-bottom: 14px;
-}
-
-.field label {
-    display: block;
-    margin-bottom: 6px;
-    font-size: 13px;
-    color: #cbd5e1;
-    font-weight: 600;
-}
-
-.input {
-    width: 100%;
-    border: 1px solid rgba(148, 163, 184, 0.3);
-    border-radius: 10px;
-    background: rgba(15, 23, 42, 0.7);
-    color: #f8fafc;
-    padding: 11px 12px;
-    font-size: 14px;
-    outline: none;
-    transition: border-color 0.2s, box-shadow 0.2s;
-}
-
-.input:focus {
-    border-color: #60a5fa;
-    box-shadow: 0 0 0 3px rgba(96, 165, 250, 0.22);
-}
-
-.grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 12px;
-}
-
-.btn {
-    width: 100%;
-    margin-top: 8px;
-    border: none;
-    border-radius: 10px;
-    background: linear-gradient(135deg, #2563eb, #1d4ed8);
-    color: white;
-    font-size: 15px;
-    font-weight: 700;
-    padding: 12px;
-    cursor: pointer;
-    transition: transform 0.2s, box-shadow 0.2s;
-}
-
-.btn:hover {
-    transform: translateY(-1px);
-    box-shadow: 0 8px 20px rgba(37, 99, 235, 0.35);
-}
-
-@media (max-width: 480px) {
-    .card {
-        padding: 22px;
-    }
-
-    .grid {
-        grid-template-columns: 1fr;
-    }
-}
+.wrap{min-height:100vh;display:grid;place-items:center;padding:16px}
+.card{width:min(620px,100%);padding:24px}
+.card h1{font-size:clamp(30px,5vw,44px)}
+.field{margin-top:12px}
+.field label{display:block;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px}
+.grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+@media(max-width:760px){.grid{grid-template-columns:1fr}}
+.actions{margin-top:14px;display:flex;gap:8px;flex-wrap:wrap}
 </style>
-<link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/neo-viva-theme.css?v=20260409a">
-<script defer src="${pageContext.request.contextPath}/assets/js/neo-viva-theme.js?v=20260409a"></script>
 </head>
 <body>
-    <c:if test="${not empty message}">
-        <div id="toast-data" data-type="${status == 'success' ? 'success' : 'error'}" style="display:none;"><c:out value="${message}" /></div>
-    </c:if>
-	<div class="card">
-		<h1 class="title">Card Payment</h1>
-		<p class="subtitle">Enter card details to continue.</p>
-
-		<form action="<c:url value='/charge' />" method="post" autocomplete="off">
-            <input type="hidden" name="_csrf" value="${_csrfToken}">
-			<div class="field">
-				<label for="amount">Amount</label>
-				<input class="input" id="amount" type="number" min="1" step="0.01" name="amount" placeholder="e.g. 499.00" required>
-			</div>
-
-			<div class="field">
-				<label for="cardNumber">Card Number</label>
-				<input class="input" id="cardNumber" type="text" name="cardNumber" inputmode="numeric" maxlength="19" placeholder="1234 5678 9012 3456" required>
-			</div>
-
-			<div class="grid">
-				<div class="field">
-					<label for="expMonth">Expiry Month</label>
-					<input class="input" id="expMonth" type="text" name="expMonth" maxlength="2" placeholder="MM" required>
-				</div>
-				<div class="field">
-					<label for="expYear">Expiry Year</label>
-					<input class="input" id="expYear" type="text" name="expYear" maxlength="4" placeholder="YYYY" required>
-				</div>
-			</div>
-
-			<div class="field">
-				<label for="cvv">CVV</label>
-				<input class="input" id="cvv" type="password" name="cvv" maxlength="4" inputmode="numeric" placeholder="123" required>
-			</div>
-
-			<button class="btn" type="submit">Pay Now</button>
-		</form>
-	</div>
-        <%@ include file="shared/Toast.jspf" %>
-
+<c:set var="toastMessage" value="${not empty error ? error : (not empty success ? success : (not empty message ? message : ''))}" />
+<c:set var="toastType" value="${not empty error ? 'error' : 'success'}" />
+<c:if test="${not empty toastMessage}">
+  <div id="toast-data" data-type="${toastType}" style="display:none;"><c:out value="${toastMessage}" /></div>
+</c:if>
+<div class="wrap">
+  <div class="neo-panel card" data-reveal>
+    <div class="neo-badge">CodeVerse Payments</div>
+    <h1 class="neo-title">Charge Credit Card</h1>
+    <p style="margin-top:8px;color:#5e6673;font-weight:600">${fixedFeeLabel}</p>
+    <form action="${pageContext.request.contextPath}/charge" method="post">
+      <input type="hidden" name="_csrf" value="${_csrf.token}" />
+      <div class="field">
+        <label for="amount">Application Fee (fixed)</label>
+        <input type="number" name="amount" id="amount" value="${amount}" min="1" step="0.01" readonly required>
+      </div>
+      <div class="field">
+        <label for="cardNumber">Card Number</label>
+        <input type="text" name="cardNumber" id="cardNumber" maxlength="16" required>
+      </div>
+      <div class="grid">
+        <div class="field">
+          <label for="expMonth">Expiry Month</label>
+          <input type="number" name="expMonth" id="expMonth" min="1" max="12" required>
+        </div>
+        <div class="field">
+          <label for="expYear">Expiry Year</label>
+          <input type="number" name="expYear" id="expYear" min="2024" required>
+        </div>
+        <div class="field">
+          <label for="cvv">CVV</label>
+          <input type="password" name="cvv" id="cvv" maxlength="4" required>
+        </div>
+      </div>
+      <p style="margin-top:10px;color:#5e6673;font-size:13px">This fee is charged once per team application, not per team member.</p>
+      <div class="actions">
+        <button type="submit">Submit Payment</button>
+        <a class="btn" href="<c:url value='${empty cancelPath ? "/participant/participant-dashboard" : cancelPath}' />">Cancel</a>
+      </div>
+    </form>
+  </div>
+</div>
+<%@ include file="shared/Toast.jspf" %>
 </body>
 </html>
-
-
-
-
-
-
-
-
-
-
-
 

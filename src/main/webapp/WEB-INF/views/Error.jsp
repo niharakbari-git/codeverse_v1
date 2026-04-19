@@ -1,39 +1,37 @@
-﻿<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Something went wrong</title>
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-<link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/neo-viva-theme.css?v=20260409a">
-<script defer src="${pageContext.request.contextPath}/assets/js/neo-viva-theme.js?v=20260409a"></script>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=Syne:wght@700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/neo-viva-theme.css?v=20260415b">
+<script defer src="${pageContext.request.contextPath}/assets/js/neo-viva-theme.js?v=20260415b"></script>
+<style>
+.wrap{min-height:100vh;display:grid;place-items:center;padding:16px}
+.card{width:min(560px,100%);padding:24px;text-align:center}
+.card h1{font-size:clamp(30px,5vw,48px)}
+.card p{margin-top:10px;color:#5e6673;line-height:1.6}
+.actions{margin-top:14px;display:flex;justify-content:center;gap:8px;flex-wrap:wrap}
+</style>
 </head>
-<body class="bg-light">
-    <div class="container py-5">
-        <div class="row justify-content-center">
-            <div class="col-md-8 col-lg-6">
-                <div class="card shadow-sm border-0">
-                    <div class="card-body p-4">
-                        <h3 class="mb-3">Oops! Something went wrong.</h3>
-                        <p class="text-muted mb-4">${empty errorMessage ? 'Unexpected error occurred. Please try again.' : errorMessage}</p>
-                        <a href="login" class="btn btn-primary">Back to login</a>
-                    </div>
-                </div>
-            </div>
-        </div>
+<body>
+<div class="wrap">
+  <div class="neo-panel card" data-reveal>
+    <div class="neo-badge">CodeVerse System</div>
+    <h1 class="neo-title">Oops</h1>
+    <p>${empty errorMessage ? 'Unexpected error occurred. Please try again.' : errorMessage}</p>
+    <c:if test="${not empty correlationId}">
+      <p>Support reference: ${correlationId}</p>
+    </c:if>
+    <div class="actions">
+      <a class="btn" href="login">Back to Login</a>
     </div>
+  </div>
+</div>
+<%@ include file="shared/Toast.jspf" %>
 </body>
 </html>
-
-
-
-
-
-
-
-
-
-
-
-
 

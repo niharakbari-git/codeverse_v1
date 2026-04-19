@@ -8,12 +8,28 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.grownited.common.AppConstants;
+import com.grownited.entity.HackathonApplicationEntity;
+import com.grownited.entity.HackathonEntity;
+import com.grownited.entity.OrganizerOnboardingRequestEntity;
+import com.grownited.entity.TeamEntity;
 import com.grownited.entity.UserDetailEntity;
 import com.grownited.entity.UserEntity;
+import com.grownited.repository.HackathonApplicationRepository;
+import com.grownited.repository.HackathonRepository;
+import com.grownited.repository.JudgeAssignmentRepository;
+import com.grownited.repository.JudgeScoreRepository;
+import com.grownited.repository.NotificationLogRepository;
+import com.grownited.repository.OrganizerOnboardingRequestRepository;
+import com.grownited.repository.PaymentTransactionRepository;
+import com.grownited.repository.SubmissionVersionRepository;
+import com.grownited.repository.TeamMemberRepository;
+import com.grownited.repository.TeamRepository;
 import com.grownited.repository.UserDetailRepository;
 import com.grownited.repository.UserRepository;
 import com.grownited.repository.UserTypeRepository;
@@ -33,12 +49,58 @@ public class UserController {
 	@Autowired
 	PasswordEncoder passwordEncoder;
 
-	@GetMapping("listUser")
-	public String listUser(Model model) {
+	@Autowired
+	HackathonRepository hackathonRepository;
 
-		List<UserEntity> allUser = userRepository.findAll();
+	@Autowired
+	HackathonApplicationRepository hackathonApplicationRepository;
+
+	@Autowired
+	TeamRepository teamRepository;
+
+	@Autowired
+	TeamMemberRepository teamMemberRepository;
+
+	@Autowired
+	JudgeAssignmentRepository judgeAssignmentRepository;
+
+	@Autowired
+	JudgeScoreRepository judgeScoreRepository;
+
+	@Autowired
+	NotificationLogRepository notificationLogRepository;
+
+	@Autowired
+	PaymentTransactionRepository paymentTransactionRepository;
+
+	@Autowired
+	SubmissionVersionRepository submissionVersionRepository;
+
+	@Autowired
+	OrganizerOnboardingRequestRepository organizerOnboardingRequestRepository;
+
+	@GetMapping({"listUser", "/listUser"})
+	public String listUser(@org.springframework.web.bind.annotation.RequestParam(required = false) String role,
+			Model model) {
+
+		String normalizedRole = normalizeRoleFilter(role);
+		List<UserEntity> allUser = normalizedRole == null ? userRepository.findAllByOrderByUserIdDesc()
+				: userRepository.findByRoleOrderByUserIdDesc(normalizedRole);
+		model.addAttribute("users", allUser);
 		model.addAttribute("userList", allUser);
+		model.addAttribute("selectedRole", normalizedRole == null ? "ALL" : normalizedRole);
+		model.addAttribute("totalUserCount", userRepository.count());
+		model.addAttribute("adminCount", userRepository.countByRole(AppConstants.ROLE_ADMIN));
+		model.addAttribute("organizerCount", userRepository.countByRole(AppConstants.ROLE_ORGANIZER));
+		model.addAttribute("judgeCount", userRepository.countByRole(AppConstants.ROLE_JUDGE));
+		model.addAttribute("participantCount", userRepository.countByRole(AppConstants.ROLE_PARTICIPANT));
 		return "ListUser";
+	}
+
+	@GetMapping({"admin/user-list", "/admin/user-list"})
+	public String adminUserList(@org.springframework.web.bind.annotation.RequestParam(required = false) String role,
+			Model model) {
+		return listUser(role, model);
 	}
 
 	@GetMapping("admin/user/new")
@@ -95,7 +157,7 @@ public class UserController {
 		return "redirect:/listUser?msg=User+created+successfully&type=success";
 	}
 
-	@GetMapping("viewUser")
+	@GetMapping({"viewUser", "/viewUser", "admin/viewUser", "/admin/viewUser"})
 	public String viewUser(Integer userId, Model model) {
 		// read userId
 		// select * from users where userId = rock?
@@ -120,7 +182,7 @@ public class UserController {
 
 	}
 
-	@GetMapping("editUser")
+	@GetMapping({"editUser", "/editUser", "admin/editUser", "/admin/editUser"})
 	public String editUser(Integer userId, Model model) {
 		Optional<UserEntity> opUser = userRepository.findById(userId);
 		if (opUser.isEmpty()) {
@@ -190,15 +252,113 @@ public class UserController {
 		return fallbackRole;
 	}
 
-	@GetMapping("deleteUser")
-	public String deleteUser(Integer userId) {
+	private String normalizeRoleFilter(String role) {
+		if (role == null || role.isBlank() || "ALL".equalsIgnoreCase(role)) {
+			return null;
+		}
+
+		String normalized = role.trim().toUpperCase();
+		if (AppConstants.ROLE_ADMIN.equals(normalized)
+				|| AppConstants.ROLE_PARTICIPANT.equals(normalized)
+				|| AppConstants.ROLE_ORGANIZER.equals(normalized)
+				|| AppConstants.ROLE_JUDGE.equals(normalized)) {
+			return normalized;
+		}
+		return null;
+	}
+
+	@GetMapping({"deleteUser", "/deleteUser", "admin/deleteUser", "/admin/deleteUser"})
+	@Transactional
+	public String deleteUser(Integer userId, RedirectAttributes redirectAttributes) {
 		if (userId == null) {
 			return "redirect:/listUser";
 		}
 
-		userDetailRepository.deleteByUserId(userId);
-		userRepository.deleteById(userId);
+		Optional<UserEntity> existingUser = userRepository.findById(userId);
+		if (existingUser.isEmpty()) {
+			redirectAttributes.addAttribute("msg", "User not found.");
+			redirectAttributes.addAttribute("type", "error");
+			return "redirect:/listUser";
+		}
+
+		UserEntity user = existingUser.get();
+		try {
+			removeUserDependencies(user);
+			userRepository.deleteById(userId);
+			redirectAttributes.addAttribute("msg", "User deleted permanently.");
+			redirectAttributes.addAttribute("type", "success");
+		} catch (Exception ex) {
+			redirectAttributes.addAttribute("msg", "Unable to delete user completely. " + ex.getMessage());
+			redirectAttributes.addAttribute("type", "error");
+		}
 		return "redirect:/listUser";
+	}
+
+	private void removeUserDependencies(UserEntity user) {
+		Integer userId = user.getUserId();
+
+		notificationLogRepository.deleteByUserId(userId);
+		teamMemberRepository.deleteByUserId(userId);
+
+		deleteApplications(hackathonApplicationRepository.findByParticipantUserId(userId));
+
+		for (TeamEntity team : teamRepository.findByLeaderUserId(userId)) {
+			deleteTeamWithApplications(team.getTeamId());
+		}
+
+		for (HackathonEntity hackathon : hackathonRepository.findByUserId(userId)) {
+			deleteHackathonWithDependencies(hackathon.getHackathonId());
+		}
+
+		judgeScoreRepository.deleteByJudgeUserId(userId);
+		judgeAssignmentRepository.deleteByJudgeUserId(userId);
+
+		organizerOnboardingRequestRepository.findByApprovedUserId(userId)
+				.ifPresent(organizerOnboardingRequestRepository::delete);
+
+		if (user.getEmail() != null && !user.getEmail().isBlank()) {
+			organizerOnboardingRequestRepository.findByEmailIgnoreCase(user.getEmail())
+					.ifPresent(organizerOnboardingRequestRepository::delete);
+		}
+
+		List<OrganizerOnboardingRequestEntity> reviewedByUser = organizerOnboardingRequestRepository
+				.findByReviewedByUserId(userId);
+		for (OrganizerOnboardingRequestEntity request : reviewedByUser) {
+			request.setReviewedByUserId(null);
+		}
+		if (!reviewedByUser.isEmpty()) {
+			organizerOnboardingRequestRepository.saveAll(reviewedByUser);
+		}
+
+		userDetailRepository.deleteByUserId(userId);
+	}
+
+	private void deleteHackathonWithDependencies(Integer hackathonId) {
+		judgeAssignmentRepository.deleteByHackathonId(hackathonId);
+
+		deleteApplications(hackathonApplicationRepository.findByHackathonId(hackathonId));
+
+		for (TeamEntity team : teamRepository.findByHackathonId(hackathonId)) {
+			deleteTeamWithApplications(team.getTeamId());
+		}
+
+		hackathonRepository.deleteById(hackathonId);
+	}
+
+	private void deleteTeamWithApplications(Integer teamId) {
+		deleteApplications(hackathonApplicationRepository.findByTeamId(teamId));
+		teamMemberRepository.deleteByTeamId(teamId);
+		teamRepository.deleteById(teamId);
+	}
+
+	private void deleteApplications(List<HackathonApplicationEntity> applications) {
+		for (HackathonApplicationEntity application : applications) {
+			Integer applicationId = application.getApplicationId();
+			submissionVersionRepository.deleteByApplicationId(applicationId);
+			paymentTransactionRepository.deleteByApplicationId(applicationId);
+			judgeScoreRepository.deleteByApplicationId(applicationId);
+			hackathonApplicationRepository.deleteById(applicationId);
+		}
 	}
 
 }

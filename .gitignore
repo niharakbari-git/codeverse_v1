@@ -17,7 +17,7 @@ logs/
 # Environment and secrets
 .env
 .env.*
-application-local.properties
+**/application-local.properties
 
 # OS files
 .DS_Store
@@ -35,6 +35,19 @@ Thumbs.db
 
 # IDE - VS Code
 .vscode/
+
+# Eclipse workspace metadata
+.metadata/
+
+# Non-essential project artifacts for portfolio/recruiter view
+docs/
+Samples/
+Report/
+Report - Copy/
+csrf_cookies.txt
+register_resp.html
+signup_tmp.html
+gtu_weekly_report.txt
 
 # Temporary files
 *.tmp

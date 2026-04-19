@@ -1,5 +1,6 @@
 package com.grownited.controller;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -16,6 +17,8 @@ import com.grownited.entity.HackathonEntity;
 import com.grownited.entity.UserEntity;
 import com.grownited.repository.HackathonRepository;
 import com.grownited.repository.UserDetailRepository;
+import com.grownited.service.HackathonValidationService;
+import com.grownited.util.HackathonStatusUtil;
 import com.grownited.util.SessionUserUtil;
 
 import jakarta.servlet.http.HttpSession;
@@ -29,12 +32,22 @@ public class HackathonController {
 
 	@Autowired
 	UserDetailRepository userDetailRepository;
+
+	@Autowired
+	HackathonValidationService hackathonValidationService;
+
+	@Autowired
+	com.grownited.service.OrganizerOnboardingService organizerOnboardingService;
 	
 	@GetMapping("newHackathon")
 	public String newHackathon(Model model, HttpSession session) {
 		UserEntity currentUser = SessionUserUtil.getCurrentUser(session);
 		if (currentUser == null) {
 			return AppConstants.REDIRECT_LOGIN;
+		}
+		if (AppConstants.ROLE_ORGANIZER.equalsIgnoreCase(currentUser.getRole())
+				&& !organizerOnboardingService.isApprovedOrganizer(currentUser.getUserId())) {
+			return "redirect:/organizer-dashboard?msg=Your+organizer+account+is+not+approved+yet.+Please+wait+for+admin+approval.&type=error";
 		}
 		model.addAttribute("hackathon", new HackathonEntity());
 		return "NewHackathon";
@@ -46,12 +59,20 @@ public class HackathonController {
 		if (currentLogInUser == null) {
 			return AppConstants.REDIRECT_LOGIN;
 		}
+		if (AppConstants.ROLE_ORGANIZER.equalsIgnoreCase(currentLogInUser.getRole())
+				&& !organizerOnboardingService.isApprovedOrganizer(currentLogInUser.getUserId())) {
+			return "redirect:/organizer-dashboard?msg=Your+organizer+account+is+not+approved+yet.+Please+wait+for+admin+approval.&type=error";
+		}
 
 		if (!isValidHackathonInput(hackathonEntity)) {
 			return "redirect:/newHackathon?msg=Please+check+hackathon+details&type=error";
 		}
 
 		normalizeHackathonFields(hackathonEntity);
+		if (hackathonEntity.getGracePeriodHours() == null || hackathonEntity.getGracePeriodHours() < 0) {
+			hackathonEntity.setGracePeriodHours(0);
+		}
+		normalizeEntryFeeAmount(hackathonEntity);
 
 		if (hackathonEntity.getHackathonId() != null) {
 			Optional<HackathonEntity> existingHackathon = hackathonRepository.findById(hackathonEntity.getHackathonId());
@@ -85,19 +106,41 @@ public class HackathonController {
 	}
 
 	@GetMapping("listHackathon")
-	public String listHackathon(Model model, HttpSession session) {
+	public String listHackathon(@org.springframework.web.bind.annotation.RequestParam(required = false) String status,
+			@org.springframework.web.bind.annotation.RequestParam(required = false) String payment, Model model,
+			HttpSession session) {
 		UserEntity currentUser = SessionUserUtil.getCurrentUser(session);
 		if (currentUser == null) {
 			return AppConstants.REDIRECT_LOGIN;
 		}
 
-		List<HackathonEntity> allHackthon;
+		List<HackathonEntity> allHackathons;
 		if (AppConstants.ROLE_ORGANIZER.equalsIgnoreCase(currentUser.getRole())) {
-			allHackthon = hackathonRepository.findByUserId(currentUser.getUserId());
+			allHackathons = hackathonRepository.findByUserIdOrderByHackathonIdDesc(currentUser.getUserId());
 		} else {
-			allHackthon =  hackathonRepository.findAll();
+			allHackathons =  hackathonRepository.findAllByOrderByHackathonIdDesc();
 		}
-		model.addAttribute("allHackthon",allHackthon);
+
+		decorateStatuses(allHackathons);
+		String normalizedStatus = normalizeFilter(status);
+		String normalizedPayment = normalizeFilter(payment);
+		List<HackathonEntity> filteredHackathons = allHackathons.stream()
+				.filter(h -> matchesStatusFilter(h, normalizedStatus))
+				.filter(h -> matchesPaymentFilter(h, normalizedPayment))
+				.toList();
+
+		long totalCount = allHackathons.size();
+		long upcomingCount = countByStatus(allHackathons, "UPCOMING");
+		long ongoingCount = countByStatus(allHackathons, "ONGOING");
+		long completedCount = countByStatus(allHackathons, "COMPLETED");
+
+		model.addAttribute("hackathons", filteredHackathons);
+		model.addAttribute("totalCount", totalCount);
+		model.addAttribute("upcomingCount", upcomingCount);
+		model.addAttribute("ongoingCount", ongoingCount);
+		model.addAttribute("completedCount", completedCount);
+		model.addAttribute("selectedStatus", normalizedStatus == null ? "ALL" : normalizedStatus);
+		model.addAttribute("selectedPayment", normalizedPayment == null ? "ALL" : normalizedPayment);
 		return "ListHackathon";
 	}
 	
@@ -178,6 +221,13 @@ public class HackathonController {
 		hackathonEntity.setStatus(normalizeValue(hackathonEntity.getStatus()));
 		hackathonEntity.setEventType(normalizeValue(hackathonEntity.getEventType()));
 		hackathonEntity.setPayment(normalizeValue(hackathonEntity.getPayment()));
+		normalizeEntryFeeAmount(hackathonEntity);
+		hackathonEntity.setProblemTitle(trimValue(hackathonEntity.getProblemTitle()));
+		hackathonEntity.setProblemStatement(trimValue(hackathonEntity.getProblemStatement()));
+		hackathonEntity.setProblemConstraints(trimValue(hackathonEntity.getProblemConstraints()));
+		hackathonEntity.setProblemDeliverables(trimValue(hackathonEntity.getProblemDeliverables()));
+		hackathonEntity.setEvaluationCriteria(trimValue(hackathonEntity.getEvaluationCriteria()));
+		hackathonEntity.setSubmissionChecklist(trimValue(hackathonEntity.getSubmissionChecklist()));
 
 		if ("ONLINE".equals(hackathonEntity.getEventType())) {
 			hackathonEntity.setLocation("Online");
@@ -190,11 +240,54 @@ public class HackathonController {
 		return value == null ? null : value.trim().toUpperCase();
 	}
 
+	private String trimValue(String value) {
+		return value == null ? null : value.trim();
+	}
+
+	private void decorateStatuses(List<HackathonEntity> hackathons) {
+		LocalDate today = LocalDate.now();
+		for (HackathonEntity hackathon : hackathons) {
+			hackathon.setDisplayStatus(HackathonStatusUtil.resolveStatus(hackathon, today));
+		}
+	}
+
+	private long countByStatus(List<HackathonEntity> hackathons, String status) {
+		return hackathons.stream().filter(h -> status.equalsIgnoreCase(h.getDisplayStatus())).count();
+	}
+
+	private String normalizeFilter(String value) {
+		if (value == null || value.isBlank() || "ALL".equalsIgnoreCase(value)) {
+			return null;
+		}
+		String normalized = value.trim().toUpperCase();
+		if ("LIVE".equals(normalized)) {
+			return "ONGOING";
+		}
+		return normalized;
+	}
+
+	private boolean matchesStatusFilter(HackathonEntity hackathon, String status) {
+		if (status == null) {
+			return true;
+		}
+		return status.equalsIgnoreCase(hackathon.getDisplayStatus());
+	}
+
+	private boolean matchesPaymentFilter(HackathonEntity hackathon, String payment) {
+		if (payment == null) {
+			return true;
+		}
+		return payment.equalsIgnoreCase(trimValue(hackathon.getPayment()));
+	}
+
 	private boolean isValidHackathonInput(HackathonEntity hackathonEntity) {
 		if (hackathonEntity == null) {
 			return false;
 		}
 		if (hackathonEntity.getTitle() == null || hackathonEntity.getTitle().isBlank()) {
+			return false;
+		}
+		if (hackathonEntity.getDescription() == null || hackathonEntity.getDescription().isBlank()) {
 			return false;
 		}
 		if (hackathonEntity.getMinTeamSize() == null || hackathonEntity.getMaxTeamSize() == null
@@ -204,6 +297,14 @@ public class HackathonController {
 		}
 		if (hackathonEntity.getRegistrationStartDate() == null || hackathonEntity.getRegistrationEndDate() == null
 				|| hackathonEntity.getRegistrationStartDate().isAfter(hackathonEntity.getRegistrationEndDate())) {
+			return false;
+		}
+		if (hackathonEntity.getEventStartDate() != null && hackathonEntity.getEventEndDate() != null
+				&& hackathonEntity.getEventStartDate().isAfter(hackathonEntity.getEventEndDate())) {
+			return false;
+		}
+		if (hackathonEntity.getSubmissionDeadline() != null
+				&& hackathonEntity.getSubmissionDeadline().isBefore(hackathonEntity.getRegistrationEndDate())) {
 			return false;
 		}
 
@@ -217,7 +318,32 @@ public class HackathonController {
 			return false;
 		}
 
-		return true;
+		String payment = normalizeValue(hackathonEntity.getPayment());
+		if ("PAID".equals(payment) && (hackathonEntity.getEntryFeeAmount() == null || hackathonEntity.getEntryFeeAmount() <= 0)) {
+			return false;
+		}
+
+		if (hackathonEntity.getProblemTitle() == null || hackathonEntity.getProblemTitle().isBlank()
+				|| hackathonEntity.getProblemStatement() == null || hackathonEntity.getProblemStatement().isBlank()
+				|| hackathonEntity.getProblemDeliverables() == null || hackathonEntity.getProblemDeliverables().isBlank()) {
+			return false;
+		}
+
+		return hackathonValidationService.isValid(hackathonEntity);
+	}
+
+	private void normalizeEntryFeeAmount(HackathonEntity hackathonEntity) {
+		if (hackathonEntity == null) {
+			return;
+		}
+		String payment = normalizeValue(hackathonEntity.getPayment());
+		if ("FREE".equals(payment)) {
+			hackathonEntity.setEntryFeeAmount(0);
+			return;
+		}
+		if (hackathonEntity.getEntryFeeAmount() == null || hackathonEntity.getEntryFeeAmount() <= 0) {
+			hackathonEntity.setEntryFeeAmount((int) Math.round(AppConstants.HACKATHON_ENTRY_FEE_AMOUNT));
+		}
 	}
 	
 	

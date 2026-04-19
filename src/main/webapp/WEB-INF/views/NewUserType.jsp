@@ -1,89 +1,57 @@
-﻿<%@ page language="java" contentType="text/html; charset=UTF-8"
-    pageEncoding="UTF-8"%>
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Add New User Type</title>
-
-<!-- Bootstrap CSS -->
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Add New User Type | CodeVerse</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=Syne:wght@700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/neo-viva-theme.css?v=20260415b">
+<script defer src="${pageContext.request.contextPath}/assets/js/neo-viva-theme.js?v=20260415b"></script>
 <style>
-    body {
-        background-color: #f8f9fa;
-    }
-    .card {
-        margin-top: 80px;
-        border-radius: 12px;
-    }
+.wrap{min-height:100vh;display:grid;place-items:center;padding:16px}
+.card{width:min(520px,100%);padding:24px}
+.card h1{font-size:clamp(28px,4.6vw,40px)}
+.field{margin-top:12px}
+.field label{display:block;font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;margin-bottom:6px}
+.actions{margin-top:14px;display:grid;gap:8px}
+.actions a{text-align:center}
 </style>
-<link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/neo-viva-theme.css?v=20260409a">
-<script defer src="${pageContext.request.contextPath}/assets/js/neo-viva-theme.js?v=20260409a"></script>
 </head>
-
 <body>
-
-<div class="container">
-    <div class="row justify-content-center">
-        <div class="col-md-6 col-lg-5">
-            <div class="card shadow">
-                <div class="card-body p-4">
-                    <h4 class="text-center mb-4">Add New User Type</h4>
-
-                    <% String error = request.getParameter("error"); %>
-                    <% if (error != null && !error.isBlank()) { %>
-                        <div class="alert alert-danger" role="alert"><%= error %></div>
-                    <% } %>
-
-                    <form action="saveUserType" method="post">
-                        <input type="hidden" name="_csrf" value="${_csrfToken}" />
-                        
-                        <!-- User Type -->
-                        <div class="mb-3">
-                            <label class="form-label">User Type</label>
-                            <select name="userType" class="form-select" required>
-                                <option value="">Select role</option>
-                                <option value="PARTICIPANT">PARTICIPANT</option>
-                                <option value="JUDGE">JUDGE</option>
-                                <option value="ORGANIZER">ORGANIZER</option>
-                                <option value="ADMIN">ADMIN</option>
-                            </select>
-                        </div>
-
-                        <!-- Buttons -->
-                        <div class="d-grid gap-2">
-                            <button type="submit" class="btn btn-primary">
-                                Save User Type
-                            </button>
-                            <a href="admin-dashboard" class="btn btn-secondary">
-                                Cancel
-                            </a>
-                        </div>
-
-                    </form>
-
-                </div>
-            </div>
-        </div>
-    </div>
+<c:if test="${not empty param.error}">
+  <div id="toast-data" data-type="error" style="display:none;"><c:out value="${param.error}" /></div>
+</c:if>
+<div class="wrap">
+  <div class="neo-panel card" data-reveal>
+    <div class="neo-badge">Admin - User Types</div>
+    <h1 class="neo-title">Add New User Type</h1>
+    <form action="saveUserType" method="post">
+      <input type="hidden" name="_csrf" value="${_csrfToken}" />
+      <div class="field">
+        <label>User Type</label>
+        <select name="userType" required>
+          <option value="">Select role</option>
+          <option value="PARTICIPANT">PARTICIPANT</option>
+          <option value="JUDGE">JUDGE</option>
+          <option value="ORGANIZER">ORGANIZER</option>
+          <option value="ADMIN">ADMIN</option>
+        </select>
+      </div>
+      <div class="actions">
+        <button type="submit">Save User Type</button>
+        <c:choose>
+          <c:when test="${sessionScope.user.role == 'ADMIN'}"><a class="btn" href="<c:url value='/admin-dashboard' />">Cancel</a></c:when>
+          <c:when test="${sessionScope.user.role == 'ORGANIZER'}"><a class="btn" href="<c:url value='/organizer-dashboard' />">Cancel</a></c:when>
+          <c:when test="${sessionScope.user.role == 'JUDGE'}"><a class="btn" href="<c:url value='/judge-dashboard' />">Cancel</a></c:when>
+          <c:otherwise><a class="btn" href="<c:url value='/participant/participant-dashboard' />">Cancel</a></c:otherwise>
+        </c:choose>
+      </div>
+    </form>
+  </div>
 </div>
-
-<!-- Bootstrap JS -->
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-
+<%@ include file="shared/Toast.jspf" %>
 </body>
 </html>
-
-
-
-
-
-
-
-
-
-
-
-
 

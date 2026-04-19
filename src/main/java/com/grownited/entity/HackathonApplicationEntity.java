@@ -28,6 +28,8 @@ public class HackathonApplicationEntity {
     private String submissionDescription;
     private String frontendGithubLink;
     private String backendGithubLink;
+    private String submissionAttachmentUrl;
+    private String submissionAttachmentName;
 
     public Integer getApplicationId() {
         return applicationId;
@@ -115,5 +117,21 @@ public class HackathonApplicationEntity {
 
     public void setBackendGithubLink(String backendGithubLink) {
         this.backendGithubLink = backendGithubLink;
+    }
+
+    public String getSubmissionAttachmentUrl() {
+        return submissionAttachmentUrl;
+    }
+
+    public void setSubmissionAttachmentUrl(String submissionAttachmentUrl) {
+        this.submissionAttachmentUrl = submissionAttachmentUrl;
+    }
+
+    public String getSubmissionAttachmentName() {
+        return submissionAttachmentName;
+    }
+
+    public void setSubmissionAttachmentName(String submissionAttachmentName) {
+        this.submissionAttachmentName = submissionAttachmentName;
     }
 }

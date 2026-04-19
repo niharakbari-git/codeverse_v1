@@ -14,5 +14,9 @@ public interface HackathonApplicationRepository extends JpaRepository<HackathonA
 
     List<HackathonApplicationEntity> findByHackathonId(Integer hackathonId);
 
+    List<HackathonApplicationEntity> findByTeamId(Integer teamId);
+
+    long countByHackathonId(Integer hackathonId);
+
     boolean existsByHackathonIdAndParticipantUserId(Integer hackathonId, Integer participantUserId);
 }

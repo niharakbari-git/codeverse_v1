@@ -62,6 +62,9 @@ public class AuthService {
         }
 
         UserEntity user = op.get();
+        if (user.getActive() != null && !user.getActive()) {
+            return AuthResult.failure("Account is inactive. Please contact admin.");
+        }
         if (!passwordEncoder.matches(password, user.getPassword())) {
             return AuthResult.failure("Invalid Credentials");
         }
@@ -218,6 +221,47 @@ public class AuthService {
             return "Cloudinary auth failed (401). Fix cloud_name/api_key/api_secret in application-local.properties and restart app.";
         }
         return "Cloudinary upload failed. Verify cloud_name/api_key/api_secret in application-local.properties and restart app.";
+    }
+
+    public ProfilePictureUpdateResult removeProfilePicture(Integer userId) {
+        if (userId == null) {
+            return ProfilePictureUpdateResult.failure("User session is invalid. Please login again.");
+        }
+
+        Optional<UserEntity> opUser = userRepository.findById(userId);
+        if (opUser.isEmpty()) {
+            return ProfilePictureUpdateResult.failure("User not found. Please login again.");
+        }
+
+        try {
+            UserEntity user = opUser.get();
+            user.setProfilePicURL(null);
+            userRepository.save(user);
+            return ProfilePictureUpdateResult.success(user, "Profile picture removed successfully.");
+        } catch (Exception e) {
+            logger.error("Profile picture removal failed for userId {}", userId, e);
+            return ProfilePictureUpdateResult.failure("Failed to remove profile picture.");
+        }
+    }
+
+    public String changePassword(Integer userId, String oldPassword, String newPassword, String confirmPassword) {
+        if (userId == null) return "User session is invalid. Please login again.";
+        if (oldPassword == null || oldPassword.isBlank()) return "Please enter your current password.";
+        if (newPassword == null || newPassword.isBlank()) return "Please enter a new password.";
+        if (!newPassword.equals(confirmPassword)) return "New passwords do not match.";
+        if (newPassword.length() < 6) return "New password must be at least 6 characters long.";
+        
+        Optional<UserEntity> opUser = userRepository.findById(userId);
+        if (opUser.isEmpty()) return "User not found. Please login again.";
+        
+        UserEntity user = opUser.get();
+        if (!passwordEncoder.matches(oldPassword, user.getPassword())) {
+            return "Current password is incorrect.";
+        }
+        
+        user.setPassword(passwordEncoder.encode(newPassword));
+        userRepository.save(user);
+        return null; // Successfully changed
     }
 
     private String flattenExceptionMessage(Throwable throwable) {

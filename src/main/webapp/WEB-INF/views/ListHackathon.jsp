@@ -1,114 +1,100 @@
-﻿<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
-<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
-<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="utf-8">
+<meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Hackathon List</title>
-<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
+<title>Hackathon Ops</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=Syne:wght@700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/neo-viva-theme.css?v=20260415b">
+<script defer src="${pageContext.request.contextPath}/assets/js/neo-viva-theme.js?v=20260415b"></script>
 <style>
-*{box-sizing:border-box;margin:0;padding:0}
-:root{--bg:#0a0f16;--surface:#131c27;--surface2:#1c2734;--border:#2a3d52;--text:#e2e8f0;--muted:#8ca0b3;--accent:#f97316;--accent2:#06b6d4}
-body{font-family:'Syne',sans-serif;background:radial-gradient(circle at 12% 16%,rgba(6,182,212,.14),transparent 35%),radial-gradient(circle at 85% 82%,rgba(249,115,22,.14),transparent 40%),var(--bg);color:var(--text);min-height:100vh}
-.wrap{max-width:1260px;margin:28px auto;padding:0 18px 28px}
-.top{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:14px}
-.title{font-size:clamp(24px,4vw,36px);font-weight:800;letter-spacing:-.6px}
-.title span{background:linear-gradient(135deg,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
-.actions{display:flex;gap:8px;flex-wrap:wrap}
-.btn{display:inline-block;text-decoration:none;padding:9px 12px;border:1px solid var(--border);border-radius:10px;background:var(--surface);color:var(--text);font-weight:700;font-size:13px}
-.btn.primary{border:none;background:linear-gradient(135deg,var(--accent),var(--accent2));box-shadow:0 10px 24px rgba(6,182,212,.16)}
-.panel{border:1px solid var(--border);border-radius:14px;background:var(--surface);overflow:auto}
-table{width:100%;border-collapse:collapse;min-width:1020px}
-thead{background:var(--surface2)}
-th,td{padding:12px 10px;border-bottom:1px solid var(--border);text-align:left;font-size:14px;vertical-align:top}
-th{font-size:12px;text-transform:uppercase;letter-spacing:.8px;color:var(--muted)}
-.badge{display:inline-block;padding:4px 8px;border-radius:999px;font-size:11px;font-weight:700}
-.status-upcoming{background:rgba(6,182,212,.16);color:#67e8f9}
-.status-ongoing{background:rgba(34,197,94,.16);color:#4ade80}
-.status-completed{background:rgba(148,163,184,.2);color:#cbd5e1}
-.status-expired{background:rgba(148,163,184,.2);color:#cbd5e1}
-.pay-free{background:rgba(34,197,94,.16);color:#4ade80}
-.pay-paid{background:rgba(239,68,68,.16);color:#fca5a5}
-.row-actions{display:flex;gap:6px;flex-wrap:wrap}
-.row-actions .btn{padding:6px 9px;font-size:12px}
-.row-actions .warn{border-color:#f59e0b;color:#fbbf24}
-.row-actions .danger{border-color:#ef4444;color:#fca5a5}
-.empty{padding:16px;color:var(--muted);text-align:center}
+.wrap{padding:16px;display:grid;gap:12px}
+.hero{padding:14px;display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;background:#1f2937;color:#fff}
+.hero h1{font-size:clamp(34px,5vw,52px)}
+.hero p{margin-top:6px;color:#fff4ef}
+.hero .actions{display:flex;gap:8px;flex-wrap:wrap}
+.hero .actions a{padding:9px 10px;border:2px solid #1f2329;border-radius:12px;background:#fff;color:#1f2329;text-decoration:none;font-weight:700}
+.board{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
+.metric{padding:12px;border:2px solid #1f2329;border-radius:14px;background:#fff;display:block;text-decoration:none;color:inherit;transition:transform .18s ease,box-shadow .18s ease}
+.metric:hover{transform:translateY(-2px)}
+.metric.active{background:#1f2329;color:#fff}
+.metric .k{font-size:11px;text-transform:uppercase;color:inherit;opacity:.72;font-weight:700}
+.metric .v{font-size:34px;font-family:"Syne",sans-serif;line-height:1;margin-top:4px}
+.table-card{overflow:auto;padding:10px}
+.status{display:inline-flex;padding:4px 8px;border:2px solid #1f2329;border-radius:999px;background:#fff;font-size:11px;font-weight:700;text-transform:uppercase}
+.ops{display:flex;gap:6px;flex-wrap:wrap}
+.ops a{padding:6px 8px;border:2px solid #1f2329;border-radius:10px;text-decoration:none;font-weight:700;font-size:11px;color:#1f2329;background:#fff}
+.empty{text-align:center;padding:16px;font-weight:700}
+@media(max-width:1050px){.board{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:760px){.board{grid-template-columns:1fr}}
 </style>
-<link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/neo-viva-theme.css?v=20260409a">
-<script defer src="${pageContext.request.contextPath}/assets/js/neo-viva-theme.js?v=20260409a"></script>
 </head>
 <body>
-<div class="wrap">
-  <div class="top">
-    <h1 class="title"><span>Hackathon</span> List</h1>
-    <div class="actions">
-      <c:choose>
-        <c:when test="${sessionScope.user.role == 'ORGANIZER'}">
-          <a class="btn" href="<c:url value='/organizer-dashboard' />">Dashboard</a>
-        </c:when>
-        <c:otherwise>
-          <a class="btn" href="<c:url value='/admin-dashboard' />">Dashboard</a>
-        </c:otherwise>
-      </c:choose>
-      <a class="btn primary" href="<c:url value='/newHackathon' />">Create Hackathon</a>
-      <a class="btn" href="<c:url value='/logout' />">Logout</a>
+<div class="neo-shell wrap">
+  <section class="neo-panel hero" data-reveal>
+    <div>
+      <h1 class="neo-title">Hackathon Ops</h1>
+      <p>Control scheduling, participation windows, and status transitions from one board.</p>
     </div>
-  </div>
+    <div class="actions">
+      <a href="<c:url value='/newHackathon' />">Create</a>
+      <c:choose>
+        <c:when test="${sessionScope.user.role == 'ADMIN'}"><a href="<c:url value='/admin-dashboard' />">Dashboard</a></c:when>
+        <c:when test="${sessionScope.user.role == 'ORGANIZER'}"><a href="<c:url value='/organizer-dashboard' />">Dashboard</a></c:when>
+        <c:when test="${sessionScope.user.role == 'JUDGE'}"><a href="<c:url value='/judge-dashboard' />">Dashboard</a></c:when>
+        <c:otherwise><a href="<c:url value='/participant/participant-dashboard' />">Dashboard</a></c:otherwise>
+      </c:choose>
+    </div>
+  </section>
 
-  <div class="panel">
+  <section class="board" data-reveal>
+    <a class="metric ${selectedStatus == 'ALL' ? 'active' : ''}" href="<c:url value='/listHackathon' />"><div class="k">Total</div><div class="v">${totalCount}</div></a>
+    <a class="metric ${selectedStatus == 'UPCOMING' ? 'active' : ''}" href="<c:url value='/listHackathon?status=UPCOMING' />"><div class="k">Upcoming</div><div class="v">${upcomingCount}</div></a>
+    <a class="metric ${selectedStatus == 'ONGOING' ? 'active' : ''}" href="<c:url value='/listHackathon?status=ONGOING' />"><div class="k">Ongoing</div><div class="v">${ongoingCount}</div></a>
+    <a class="metric ${selectedStatus == 'COMPLETED' ? 'active' : ''}" href="<c:url value='/listHackathon?status=COMPLETED' />"><div class="k">Completed</div><div class="v">${completedCount}</div></a>
+  </section>
+
+  <section class="neo-panel table-card" data-reveal>
     <table>
       <thead>
         <tr>
-          <th>#</th>
           <th>Title</th>
+          <th>Registration Start</th>
+          <th>Registration End</th>
           <th>Status</th>
-          <th>Event</th>
           <th>Payment</th>
-          <th>Team Size</th>
-          <th>Location</th>
-          <th>Registration</th>
+          <th>Application Fee</th>
+          <th>Organizer ID</th>
           <th>Actions</th>
         </tr>
       </thead>
       <tbody>
         <c:choose>
-          <c:when test="${empty allHackthon}">
-            <tr><td colspan="9" class="empty">No hackathons found.</td></tr>
+          <c:when test="${empty hackathons}">
+            <tr><td class="empty" colspan="8">No hackathons available.</td></tr>
           </c:when>
           <c:otherwise>
-            <c:forEach var="h" items="${allHackthon}" varStatus="i">
+            <c:forEach items="${hackathons}" var="h">
               <tr>
-                <td>${i.count}</td>
-                <td>${h.title}</td>
+                <td><c:out value="${h.title}"/></td>
+                <td><fmt:parseDate value="${h.registrationStartDate}" pattern="yyyy-MM-dd" var="listRegStart" type="date" /><fmt:formatDate value="${listRegStart}" pattern="dd-MM-yyyy" /></td>
+                <td><fmt:parseDate value="${h.registrationEndDate}" pattern="yyyy-MM-dd" var="listRegEnd" type="date" /><fmt:formatDate value="${listRegEnd}" pattern="dd-MM-yyyy" /></td>
+                <td><span class="status"><c:out value="${empty h.displayStatus ? h.status : h.displayStatus}"/></span></td>
+                <td><c:out value="${h.payment}"/></td>
                 <td>
                   <c:choose>
-                    <c:when test="${h.status == 'UPCOMING'}"><span class="badge status-upcoming">UPCOMING</span></c:when>
-                    <c:when test="${h.status == 'ONGOING'}"><span class="badge status-ongoing">ONGOING</span></c:when>
-                    <c:otherwise><span class="badge status-expired">EXPIRED</span></c:otherwise>
+                    <c:when test="${h.payment == 'FREE'}">Free</c:when>
+                    <c:otherwise>Rs. ${empty h.entryFeeAmount ? 199 : h.entryFeeAmount}</c:otherwise>
                   </c:choose>
                 </td>
-                <td>${h.eventType}</td>
+                <td><c:out value="${h.userId}"/></td>
                 <td>
-                  <c:choose>
-                    <c:when test="${h.payment == 'FREE'}"><span class="badge pay-free">FREE</span></c:when>
-                    <c:otherwise><span class="badge pay-paid">PAID</span></c:otherwise>
-                  </c:choose>
-                </td>
-                <td>${h.minTeamSize} - ${h.maxTeamSize}</td>
-                <td>${h.location}</td>
-                <td>
-                    <fmt:parseDate value="${h.registrationStartDate}" pattern="yyyy-MM-dd" var="parsedRegStart" type="date" />
-                    <fmt:parseDate value="${h.registrationEndDate}" pattern="yyyy-MM-dd" var="parsedRegEnd" type="date" />
-                    <fmt:formatDate value="${parsedRegStart}" pattern="dd/MM/yyyy" /> to <fmt:formatDate value="${parsedRegEnd}" pattern="dd/MM/yyyy" />
-                </td>
-                <td>
-                  <div class="row-actions">
-                    <a class="btn" href="<c:url value='/viewHackathon?hackathonId=${h.hackathonId}' />">View</a>
-                    <a class="btn warn" href="<c:url value='/editHackathon?hackathonId=${h.hackathonId}' />">Edit</a>
-                    <a class="btn danger" href="<c:url value='/deleteHackathon?hackathonId=${h.hackathonId}' />" onclick="return confirm('Are you sure you want to delete this hackathon?');">Delete</a>
+                  <div class="ops">
+                    <a href="viewHackathon?hackathonId=${h.hackathonId}">View</a>
+                    <a href="editHackathon?hackathonId=${h.hackathonId}">Edit</a>
+                    <a href="deleteHackathon?hackathonId=${h.hackathonId}" onclick="return confirm('Delete this hackathon?');">Delete</a>
                   </div>
                 </td>
               </tr>
@@ -117,19 +103,10 @@ th{font-size:12px;text-transform:uppercase;letter-spacing:.8px;color:var(--muted
         </c:choose>
       </tbody>
     </table>
-  </div>
+  </section>
 </div>
+<%@ include file="shared/Toast.jspf" %>
 </body>
 </html>
-
-
-
-
-
-
-
-
-
-
 
 

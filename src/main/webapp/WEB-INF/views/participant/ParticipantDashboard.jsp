@@ -1,193 +1,151 @@
-﻿<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Participant Dashboard</title>
-<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=Syne:wght@700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/neo-viva-theme.css?v=20260415b">
+<script defer src="${pageContext.request.contextPath}/assets/js/neo-viva-theme.js?v=20260415b"></script>
 <style>
-* { box-sizing: border-box; margin: 0; padding: 0; }
-:root {
-	--bg: #0a0a0f;
-	--surface: #13131a;
-	--surface2: #1c1c27;
-	--border: #2a2a3d;
-	--accent: #7c3aed;
-	--accent2: #06b6d4;
-	--text: #e2e8f0;
-	--muted: #64748b;
-	--glow: rgba(124, 58, 237, 0.35);
-}
-body { font-family: 'Syne', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
-body::before {
-	content: '';
-	position: fixed;
-	inset: 0;
-	background-image: linear-gradient(rgba(124, 58, 237, 0.04) 1px, transparent 1px), linear-gradient(90deg, rgba(124, 58, 237, 0.04) 1px, transparent 1px);
-	background-size: 40px 40px;
-	pointer-events: none;
-	z-index: 0;
-}
-.header {
-	position: sticky;
-	top: 0;
-	z-index: 20;
-	height: 64px;
-	padding: 0 28px;
-	border-bottom: 1px solid var(--border);
-	background: rgba(10, 10, 15, 0.88);
-	backdrop-filter: blur(20px);
-	display: flex;
-	justify-content: space-between;
-	align-items: center;
-}
-.logo {
-	display: flex;
-	gap: 10px;
-	align-items: center;
-	color: var(--text);
-	text-decoration: none;
-	font-family: 'Space Mono', monospace;
-	font-weight: 700;
-}
-.logo-icon {
-	width: 34px;
-	height: 34px;
-	border-radius: 8px;
-	background: linear-gradient(135deg, var(--accent), var(--accent2));
-	display: grid;
-	place-items: center;
-}
-.logo-mark { font-family: 'Space Mono', monospace; font-weight: 700; font-size: 13px; letter-spacing: 0.05em; color: #fff; }
-.nav { display: flex; gap: 8px; }
-.nav a {
-	text-decoration: none;
-	color: var(--muted);
-	padding: 8px 14px;
-	border-radius: 8px;
-	font-size: 14px;
-	font-weight: 600;
-}
-.nav a:hover { color: var(--text); background: var(--surface2); }
-.nav .btn { background: var(--accent); color: #fff; box-shadow: 0 0 20px var(--glow); }
-.wrap { position: relative; z-index: 1; max-width: 1200px; margin: 0 auto; padding: 34px 22px 60px; }
-.title { font-size: clamp(28px, 5vw, 44px); line-height: 1.1; font-weight: 800; letter-spacing: -1px; }
-.title span { background: linear-gradient(135deg, var(--accent), var(--accent2)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-.subtitle { margin-top: 8px; color: var(--muted); }
-.cards { margin-top: 28px; display: grid; grid-template-columns: repeat(4, minmax(160px, 1fr)); gap: 16px; }
-.quick-grid {
-	margin-top: 22px;
-	display: grid;
-	grid-template-columns: repeat(3, minmax(180px, 1fr));
-	gap: 12px;
-}
-.quick-card {
-	text-decoration: none;
-	background: var(--surface);
-	border: 1px solid var(--border);
-	border-radius: 12px;
-	padding: 14px;
-	color: var(--text);
-	transition: border-color 0.2s, transform 0.2s;
-}
-.quick-card:hover {
-	border-color: var(--accent);
-	transform: translateY(-2px);
-}
-.quick-card h4 { font-size: 15px; margin-bottom: 6px; }
-.quick-card p { font-size: 12px; color: var(--muted); }
-.quick-grid .quick-card[href*='/logout'] {
-	background: var(--surface) !important;
-	border: 1px solid var(--border) !important;
-	color: var(--text) !important;
-}
-.quick-grid .quick-card[href*='/logout'] p {
-	color: var(--muted) !important;
-}
-.card { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 20px; }
-.card p { color: var(--muted); font-size: 13px; margin-bottom: 8px; }
-.card h3 { font-family: 'Space Mono', monospace; font-size: 32px; background: linear-gradient(135deg, var(--accent2), var(--accent)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-@media (max-width: 900px) { .cards { grid-template-columns: repeat(2, minmax(160px, 1fr)); } .quick-grid { grid-template-columns: repeat(2, minmax(170px, 1fr)); } .header { padding: 0 14px; } }
-@media (max-width: 560px) { .cards { grid-template-columns: 1fr; } .quick-grid { grid-template-columns: 1fr; } .nav a { padding: 7px 10px; font-size: 13px; } }
+.header{position:sticky;top:0;z-index:100;height:64px;display:flex;align-items:center;justify-content:space-between;gap:10px;padding:0 24px;background:rgba(247,244,236,.92);backdrop-filter:blur(8px);border-bottom:1px solid #d7dce5}
+.logo{display:flex;align-items:center;gap:10px;text-decoration:none;color:#1f2329}
+.logo-icon{width:34px;height:34px;border-radius:10px;display:grid;place-items:center;background:#1f2937;color:#fff;font-weight:700}
+.logo-text{font-family:'Space Grotesk',sans-serif;font-size:16px;font-weight:700;letter-spacing:.04em}
+.nav-links{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.nav-links a{text-decoration:none;border:1px solid #d7dce5;border-radius:10px;background:#fff;color:#1f2329;font-size:13px;font-weight:700;padding:8px 12px}
+.nav-links a:hover{background:#f5f7fb}
+.nav-links a.active{background:#1f2329;color:#fff;border-color:#1f2329}
+
+.page{display:grid;grid-template-columns:260px 1fr;gap:12px;min-height:calc(100vh - 64px);padding:16px;max-width:1320px;margin:0 auto}
+.side{padding:14px}
+.side h2{font-size:30px}
+.side .links{display:grid;gap:8px;margin-top:10px}
+.side .links a{padding:10px;border:2px solid #1f2329;border-radius:12px;text-decoration:none;background:#fff}
+.main{display:grid;gap:12px}
+.hero{padding:16px;background:#1f2937;color:#fff}
+.hero h1{font-size:clamp(34px,5vw,56px)}
+.hero p{margin-top:8px;color:#fff4ef}
+.metric-grid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:12px}
+.metric{padding:12px;border:2px solid #1f2329;border-radius:14px;background:#fff;display:block;text-decoration:none;color:inherit;transition:transform .18s ease,box-shadow .18s ease}
+.metric:hover{transform:translateY(-2px)}
+.metric.active{background:#eef4ff;color:#1f2329;border-color:#9fb4d9;box-shadow:0 6px 14px rgba(31,41,55,.08)}
+.metric .k{font-size:11px;text-transform:uppercase;color:inherit;opacity:.72;font-weight:700}
+.metric .v{font-size:34px;font-family:"Syne",sans-serif;line-height:1;margin-top:4px}
+.app-metrics{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin-bottom:14px}
+.app-metric{padding:12px;border:2px solid #1f2329;border-radius:14px;background:#fff;transition:transform .18s ease,box-shadow .18s ease}
+.app-metric:hover{transform:translateY(-2px);box-shadow:0 6px 14px rgba(31,41,55,.08)}
+.app-metric-label{font-size:11px;text-transform:uppercase;color:#5e6673;font-weight:700;letter-spacing:.05em}
+.app-metric-value{font-size:28px;font-family:"Syne",sans-serif;font-weight:800;line-height:1;margin-top:4px}
+.app-metric-status{font-size:11px;margin-top:6px;font-weight:500}
+.status-applied{color:#0f766e}
+.status-approved{color:#1f2937}
+.status-submitted{color:#0369a1}
+.status-scored{color:#059669}
+.workspace{padding:14px}
+.workspace h3{font-size:30px}
+.workspace-grid{display:grid;grid-template-columns:1.1fr .9fr;gap:10px;margin-top:10px}
+.workspace-card{padding:12px;border:2px solid #1f2329;border-radius:12px;background:#fff}
+.workspace-card h4{margin:0 0 8px;font-size:22px}
+.workspace-list{margin:0;padding-left:18px;display:grid;gap:6px;color:#1f2329}
+.workspace-list li{line-height:1.4}
+.workspace-hint{margin-top:8px;font-size:13px;color:#5e6673;line-height:1.45}
+.workspace-actions{display:grid;gap:8px;margin-top:10px}
+.workspace-actions a{display:block;padding:11px 12px;border:2px solid #1f2329;border-radius:12px;text-decoration:none;background:#fff}
+.workspace-actions a strong{display:block}
+.workspace-actions a small{display:block;margin-top:3px;color:#5e6673}
+@media(max-width:1100px){.metric-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.app-metrics{grid-template-columns:1fr}.workspace-grid{grid-template-columns:1fr}}
+@media(max-width:860px){.header{height:auto;padding:12px;align-items:flex-start;flex-direction:column}.page{grid-template-columns:1fr}.metric-grid{grid-template-columns:1fr}}
 </style>
-<link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/neo-viva-theme.css?v=20260409a">
-<script defer src="${pageContext.request.contextPath}/assets/js/neo-viva-theme.js?v=20260409a"></script>
 </head>
 <body>
-	<header class="header">
-		<a class="logo" href="<c:url value='/participant/home' />">
-			<div class="logo-icon"><span class="logo-mark">CV</span></div>
-			CodeVerse
-		</a>
-		<nav class="nav">
-			<a href="<c:url value='/participant/home' />">Explore</a>
-			<a href="<c:url value='/participant/profile' />">Profile</a>
-			<a href="<c:url value='/logout' />" class="btn">Logout</a>
-		</nav>
-	</header>
+<header class="header">
+  <a class="logo" href="<c:url value='/participant/home' />">
+    <div class="logo-icon">CV</div>
+    <span class="logo-text">CODEVERSE</span>
+  </a>
+  <nav class="nav-links">
+    <a href="<c:url value='/participant/home' />">Explore</a>
+    <a class="active" href="<c:url value='/participant/participant-dashboard' />">Dashboard</a>
+    <a href="<c:url value='/logout' />">Logout</a>
+  </nav>
+</header>
 
-	<main class="wrap">
-		<h1 class="title">Participant <span>Dashboard</span></h1>
-		<p class="subtitle">Welcome ${sessionScope.user.firstName}. Here is a quick snapshot of available opportunities.</p>
+<div class="neo-shell page">
+  <aside class="neo-panel side" data-reveal>
+    <div class="neo-badge">Participant Features</div>
+    <h2 class="neo-title">Workspace</h2>
+    <div class="links">
+      <a href="<c:url value='/participant/home' />">Explore Hackathons</a>
+      <a href="<c:url value='/participant/my-applications' />">My Applications</a>
+      <a href="<c:url value='/participant/my-teams' />">My Teams</a>
+      <a href="<c:url value='/participant/profile' />">Profile</a>
+      <a href="<c:url value='/charge' />">Open Payments</a>
+    </div>
+  </aside>
 
-		<section class="cards">
-			<article class="card">
-				<p>Total Hackathons</p>
-				<h3>${totalHackathons}</h3>
-			</article>
-			<article class="card">
-				<p>Live Hackathons</p>
-				<h3>${liveHackathons}</h3>
-			</article>
-			<article class="card">
-				<p>Free Events</p>
-				<h3>${freeHackathons}</h3>
-			</article>
-			<article class="card">
-				<p>Paid Events</p>
-				<h3>${paidHackathons}</h3>
-			</article>
-		</section>
+  <main class="main">
+    <section class="neo-panel hero" data-reveal>
+      <h1 class="neo-title">Participant Dashboard</h1>
+      <p>Welcome ${sessionScope.user.firstName}. Track available hackathons and your participation journey.</p>
+    </section>
 
-		<section class="quick-grid">
-			<a class="quick-card" href="<c:url value='/participant/home' />">
-				<h4>Explore Hackathons</h4>
-				<p>Browse and filter all active opportunities.</p>
-			</a>
-			<a class="quick-card" href="<c:url value='/participant/my-applications' />">
-				<h4>My Applications</h4>
-				<p>Track status, payment, and applied events.</p>
-			</a>
-			<a class="quick-card" href="<c:url value='/participant/my-teams' />">
-				<h4>My Teams</h4>
-				<p>View team roster and linked hackathons.</p>
-			</a>
-			<a class="quick-card" href="<c:url value='/participant/profile' />">
-				<h4>My Profile</h4>
-				<p>See your account and personal details.</p>
-			</a>
-			<a class="quick-card" href="<c:url value='/charge' />">
-				<h4>Open Payments</h4>
-				<p>Test registration payment flow quickly.</p>
-			</a>
-			<a class="quick-card" href="<c:url value='/logout' />">
-				<h4>Logout</h4>
-				<p>End current session safely.</p>
-			</a>
-		</section>
-	</main>
+    <section class="metric-grid" data-reveal>
+      <a class="metric ${selectedView == 'ALL' ? 'active' : ''}" href="<c:url value='/participant/home?view=all' />"><div class="k">Total Hackathons</div><div class="v">${totalHackathons}</div></a>
+      <a class="metric ${selectedView == 'LIVE' ? 'active' : ''}" href="<c:url value='/participant/home?view=live' />"><div class="k">Live Hackathons</div><div class="v">${liveHackathons}</div></a>
+      <a class="metric ${selectedView == 'UPCOMING' ? 'active' : ''}" href="<c:url value='/participant/home?view=upcoming' />"><div class="k">Upcoming Hackathons</div><div class="v">${upcomingHackathons}</div></a>
+      <a class="metric ${selectedView == 'FREE' ? 'active' : ''}" href="<c:url value='/participant/home?view=free' />"><div class="k">Free Events</div><div class="v">${freeHackathons}</div></a>
+      <a class="metric ${selectedView == 'PAID' ? 'active' : ''}" href="<c:url value='/participant/home?view=paid' />"><div class="k">Paid Events</div><div class="v">${paidHackathons}</div></a>
+    </section>
+
+    <section class="neo-panel workspace" data-reveal>
+      <h3 class="neo-title">Application Status</h3>
+      <div class="app-metrics">
+        <div class="app-metric">
+          <div class="app-metric-label">Applied</div>
+          <div class="app-metric-value">${applicationStats.applied != null ? applicationStats.applied : 0}</div>
+          <div class="app-metric-status status-applied">Awaiting Decision</div>
+        </div>
+        <div class="app-metric">
+          <div class="app-metric-label">Approved</div>
+          <div class="app-metric-value">${applicationStats.approved != null ? applicationStats.approved : 0}</div>
+          <div class="app-metric-status status-approved">Ready to Submit</div>
+        </div>
+        <div class="app-metric">
+          <div class="app-metric-label">Submitted</div>
+          <div class="app-metric-value">${applicationStats.submitted != null ? applicationStats.submitted : 0}</div>
+          <div class="app-metric-status status-submitted">Under Review</div>
+        </div>
+      </div>
+    </section>
+
+    <section class="neo-panel workspace" data-reveal>
+      <h3 class="neo-title">Participant Workspace</h3>
+      <div class="workspace-grid">
+        <article class="workspace-card">
+          <h4>What To Do Next</h4>
+          <ol class="workspace-list">
+            <li>Explore hackathons that match your preferred team size and entry type.</li>
+            <li>Submit applications and keep payment status completed.</li>
+            <li>Manage team members and update your profile before final submission.</li>
+          </ol>
+          <p class="workspace-hint">Use the left panel for navigation and this area as your day-to-day action guide.</p>
+        </article>
+        <article class="workspace-card">
+          <h4>Quick Start</h4>
+          <div class="workspace-actions">
+            <a href="<c:url value='/participant/home' />"><strong>Explore Hackathons</strong><small>Browse and filter active opportunities.</small></a>
+            <a href="<c:url value='/participant/my-applications' />"><strong>Open My Applications</strong><small>Track status, submission, and payment details.</small></a>
+            <a href="<c:url value='/participant/my-teams' />"><strong>Manage My Teams</strong><small>Update team lineup and members quickly.</small></a>
+            <a href="<c:url value='/participant/profile' />"><strong>Update Profile</strong><small>Keep contact and social information current.</small></a>
+            <a href="<c:url value='/charge' />"><strong>Open Payments</strong><small>Access payment workflow when required.</small></a>
+          </div>
+        </article>
+      </div>
+    </section>
+  </main>
+</div>
+<%@ include file="../shared/Toast.jspf" %>
 </body>
 </html>
-
-
-
-
-
-
-
-
-
-
-
-

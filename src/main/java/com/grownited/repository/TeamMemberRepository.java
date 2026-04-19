@@ -14,5 +14,9 @@ public interface TeamMemberRepository extends JpaRepository<TeamMemberEntity, In
 
     List<TeamMemberEntity> findByUserId(Integer userId);
 
+    void deleteByTeamId(Integer teamId);
+
+    void deleteByUserId(Integer userId);
+
     boolean existsByTeamIdAndUserId(Integer teamId, Integer userId);
 }

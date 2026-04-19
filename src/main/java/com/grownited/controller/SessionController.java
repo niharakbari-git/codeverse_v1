@@ -3,14 +3,17 @@ package com.grownited.controller;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.grownited.common.AppConstants;
+import com.grownited.entity.OrganizerOnboardingRequestEntity;
 import com.grownited.entity.UserDetailEntity;
 import com.grownited.entity.UserEntity;
 import com.grownited.service.AuthService;
+import com.grownited.service.OrganizerOnboardingService;
 
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
@@ -23,10 +26,19 @@ public class SessionController {
     @Autowired
     AuthService authService;
 
+    @Autowired
+    OrganizerOnboardingService organizerOnboardingService;
+
     @GetMapping("/signup")
     public String openSignupPage(Model model) {
         model.addAttribute("allUserType", authService.getAllUserTypesWithDefault());
         return "Signup";
+    }
+
+    @GetMapping("/organizer-onboarding")
+    public String openOrganizerOnboarding(Model model) {
+        model.addAttribute("onboardingRequest", new OrganizerOnboardingRequestEntity());
+        return "OrganizerOnboarding";
     }
 
     @GetMapping("/login")
@@ -62,7 +74,7 @@ public class SessionController {
         }
 
         model.addAttribute("success", "Reset link sent to your registered email address.");
-        return "ForgetPassword";
+        return "Login";
     }
 
     @GetMapping("/resetpassword")
@@ -101,6 +113,23 @@ public class SessionController {
 
         model.addAttribute("success", registrationResult.getSuccessMessage());
         return "Login";
+    }
+
+    @PostMapping("/organizer-onboarding/request")
+    public String submitOrganizerOnboarding(OrganizerOnboardingRequestEntity onboardingRequest, String password,
+            Model model, RedirectAttributes redirectAttributes) {
+        OrganizerOnboardingService.SubmissionResult submissionResult = organizerOnboardingService
+                .submitRequest(onboardingRequest, password);
+
+        if (!submissionResult.isSuccessful()) {
+            model.addAttribute("error", submissionResult.getMessage());
+            model.addAttribute("onboardingRequest", onboardingRequest);
+            return "OrganizerOnboarding";
+        }
+
+        redirectAttributes.addAttribute("msg", submissionResult.getMessage());
+        redirectAttributes.addAttribute("type", "success");
+        return "redirect:/login";
     }
 
     @GetMapping("logout")

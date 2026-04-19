@@ -14,6 +14,8 @@ public interface UserRepository extends JpaRepository<UserEntity, Integer>{
 	Optional<UserEntity>  findByEmail(String email);
 	
 	List<UserEntity> findByRole(String role);
+	List<UserEntity> findByRoleOrderByUserIdDesc(String role);
+	List<UserEntity> findAllByOrderByUserIdDesc();
 
 	long countByRole(String role);
 	

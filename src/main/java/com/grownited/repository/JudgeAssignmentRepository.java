@@ -14,5 +14,9 @@ public interface JudgeAssignmentRepository extends JpaRepository<JudgeAssignment
 
     List<JudgeAssignmentEntity> findByHackathonId(Integer hackathonId);
 
+    void deleteByJudgeUserId(Integer judgeUserId);
+
+    void deleteByHackathonId(Integer hackathonId);
+
     boolean existsByHackathonIdAndJudgeUserId(Integer hackathonId, Integer judgeUserId);
 }

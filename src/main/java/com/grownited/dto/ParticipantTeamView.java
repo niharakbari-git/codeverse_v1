@@ -8,6 +8,7 @@ public class ParticipantTeamView {
 
     private TeamEntity team;
     private String hackathonTitle;
+    private String leaderName;
     private Integer memberCount;
     private List<String> memberNames;
     private Boolean canManageMembers;
@@ -27,6 +28,14 @@ public class ParticipantTeamView {
 
     public void setHackathonTitle(String hackathonTitle) {
         this.hackathonTitle = hackathonTitle;
+    }
+
+    public String getLeaderName() {
+        return leaderName;
+    }
+
+    public void setLeaderName(String leaderName) {
+        this.leaderName = leaderName;
     }
 
     public Integer getMemberCount() {

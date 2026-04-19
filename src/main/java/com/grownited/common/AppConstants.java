@@ -27,6 +27,7 @@ public final class AppConstants {
     public static final String REDIRECT_LOGIN = "redirect:/login";
     public static final String PARTICIPANT_HOME_PATH = "/participant/home";
     public static final String REDIRECT_PARTICIPANT_HOME = "redirect:/participant/home";
+    public static final double HACKATHON_ENTRY_FEE_AMOUNT = 199.00;
 
     public static String normalizeRole(String role) {
         return role == null ? "" : role.trim().toUpperCase();
