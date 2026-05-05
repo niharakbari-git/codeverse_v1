@@ -1,6 +1,7 @@
 package com.grownited.service;
 
 import java.time.LocalDate;
+import java.util.Comparator;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -13,6 +14,7 @@ import org.springframework.stereotype.Service;
 
 import com.grownited.dto.ParticipantApplicationView;
 import com.grownited.dto.ParticipantTeamView;
+import com.grownited.common.AppConstants;
 import com.grownited.entity.HackathonApplicationEntity;
 import com.grownited.entity.HackathonEntity;
 import com.grownited.entity.TeamEntity;
@@ -49,7 +51,11 @@ public class ParticipantTeamService {
     @Autowired
     private SubmissionVersionRepository submissionVersionRepository;
 
-    public String createTeamAndApply(Integer hackathonId, String teamName, UserEntity currentUser) {
+    @Autowired
+    private HackathonAccessVerificationService hackathonAccessVerificationService;
+
+    public String createTeamAndApply(Integer hackathonId, String teamName, String verificationEmail, String inviteCode,
+            String otp, UserEntity currentUser) {
         if (currentUser == null) {
             return "redirect:/login";
         }
@@ -78,6 +84,15 @@ public class ParticipantTeamService {
         // Check if hackathon is expired (submission deadline or event ended)
         if (HackathonStatusUtil.isExpired(hackathon, today)) {
             return "redirect:/participant/home?msg=This+hackathon+is+expired+and+cannot+be+applied+to&type=error";
+        }
+
+        if (AppConstants.HACKATHON_SCOPE_CAMPUS_ONLY.equalsIgnoreCase(trimValue(hackathon.getParticipationScope()))) {
+            HackathonAccessVerificationService.OperationResult verificationResult = hackathonAccessVerificationService
+                    .verifyJoinOtp(currentUser.getUserId(), hackathonId, verificationEmail, inviteCode, otp);
+            if (!verificationResult.isSuccess()) {
+                return "redirect:/participant/team/new?hackathonId=" + hackathonId + "&msg="
+                        + verificationResult.getMessage() + "&type=error";
+            }
         }
 
         TeamEntity team = new TeamEntity();
@@ -127,6 +142,7 @@ public class ParticipantTeamService {
             view.setTeam(team);
             boolean isLeader = team.getLeaderUserId() != null && team.getLeaderUserId().equals(currentUserId);
             view.setCanManageMembers(isLeader);
+            view.setMemberManagementNote(isLeader ? null : "Only the team leader can add members.");
             view.setRoleInTeam(isLeader ? "Team Leader" : "Team Member");
 
             view.setLeaderName(userRepository.findById(team.getLeaderUserId())
@@ -135,6 +151,18 @@ public class ParticipantTeamService {
 
             Optional<HackathonEntity> opHackathon = hackathonRepository.findById(team.getHackathonId());
             view.setHackathonTitle(opHackathon.map(HackathonEntity::getTitle).orElse("Unknown Hackathon"));
+
+            if (isLeader && opHackathon.isPresent() && "PAID".equalsIgnoreCase(opHackathon.get().getPayment())) {
+                Optional<HackathonApplicationEntity> teamApplication = findTeamApplicationForLeader(team.getTeamId(), currentUserId);
+                if (teamApplication.isEmpty()) {
+                    view.setCanManageMembers(false);
+                    view.setMemberManagementNote("Application record missing. Re-apply before adding members.");
+                } else if (!isPaymentSettled(teamApplication.get().getPaymentStatus())) {
+                    view.setCanManageMembers(false);
+                    view.setMemberManagementNote("Complete payment first to add members to this paid hackathon.");
+                }
+            }
+
             List<TeamMemberEntity> members = teamMemberRepository.findByTeamId(team.getTeamId());
             view.setMemberCount(members.size());
 
@@ -175,10 +203,26 @@ public class ParticipantTeamService {
             return AddMemberResult.error("Hackathon+not+found");
         }
 
+        HackathonEntity hackathon = opHackathon.get();
+        if ("PAID".equalsIgnoreCase(hackathon.getPayment())) {
+            Optional<HackathonApplicationEntity> teamApplication = findTeamApplicationForLeader(teamId, currentUserId);
+            if (teamApplication.isEmpty()) {
+                return AddMemberResult.error("Application+record+not+found+for+this+team");
+            }
+            if (!isPaymentSettled(teamApplication.get().getPaymentStatus())) {
+                return AddMemberResult.error("Complete+payment+before+adding+team+members");
+            }
+        }
+
         int currentSize = teamMemberRepository.findByTeamId(teamId).size();
-        int maxTeamSize = opHackathon.get().getMaxTeamSize() == null ? Integer.MAX_VALUE : opHackathon.get().getMaxTeamSize();
+        int maxTeamSize = hackathon.getMaxTeamSize() == null ? Integer.MAX_VALUE : hackathon.getMaxTeamSize();
         if (currentSize >= maxTeamSize) {
             return AddMemberResult.error("Team+is+already+at+maximum+size");
+        }
+
+        if (AppConstants.HACKATHON_SCOPE_CAMPUS_ONLY.equalsIgnoreCase(trimValue(hackathon.getParticipationScope()))
+                && !hackathonAccessVerificationService.hasVerifiedAccess(member.getUserId(), hackathon.getHackathonId())) {
+            return AddMemberResult.error("Member+must+verify+campus+email+for+this+hackathon+before+joining");
         }
 
         TeamMemberEntity newMember = new TeamMemberEntity();
@@ -187,6 +231,23 @@ public class ParticipantTeamService {
         teamMemberRepository.save(newMember);
 
         return AddMemberResult.success("Team+member+added");
+    }
+
+    private String trimValue(String value) {
+        return value == null ? "" : value.trim();
+    }
+
+    private Optional<HackathonApplicationEntity> findTeamApplicationForLeader(Integer teamId, Integer leaderUserId) {
+        List<HackathonApplicationEntity> teamApplications = hackathonApplicationRepository.findByTeamId(teamId);
+        return teamApplications.stream()
+                .filter(app -> app.getParticipantUserId() != null && app.getParticipantUserId().equals(leaderUserId))
+                .max(Comparator.comparing(HackathonApplicationEntity::getAppliedAt,
+                        Comparator.nullsLast(Comparator.naturalOrder())));
+    }
+
+    private boolean isPaymentSettled(String paymentStatus) {
+        String normalized = paymentStatus == null ? "" : paymentStatus.trim().toUpperCase();
+        return "PAID".equals(normalized);
     }
 
     public List<ParticipantApplicationView> getMyApplications(Integer currentUserId) {
@@ -198,7 +259,18 @@ public class ParticipantTeamService {
 
             Optional<HackathonEntity> opHackathon = hackathonRepository.findById(app.getHackathonId());
             view.setHackathonTitle(opHackathon.map(HackathonEntity::getTitle).orElse("Unknown Hackathon"));
-            view.setEntryFeeAmount(opHackathon.map(HackathonEntity::getEntryFeeAmount).orElse(0));
+            Integer entryFee = opHackathon
+                    .map(h -> {
+                        if (h.getEntryFeeAmount() != null && h.getEntryFeeAmount() > 0) {
+                            return h.getEntryFeeAmount();
+                        }
+                        if ("PAID".equalsIgnoreCase(h.getPayment())) {
+                            return (int) AppConstants.HACKATHON_ENTRY_FEE_AMOUNT;
+                        }
+                        return 0;
+                    })
+                    .orElse(0);
+            view.setEntryFeeAmount(entryFee);
                 view.setSubmissionDeadline(opHackathon.map(h -> h.getSubmissionDeadline() != null ? h.getSubmissionDeadline()
                     : h.getRegistrationEndDate()).orElse(null));
                 view.setSubmissionVersionCount(submissionVersionRepository.countByApplicationId(app.getApplicationId()));

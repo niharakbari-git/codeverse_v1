@@ -45,6 +45,9 @@
 </style>
 </head>
 <body>
+<c:if test="${not empty param.msg}">
+  <div id="toast-data" data-type="${param.type == 'success' ? 'success' : 'error'}" style="display:none;"><c:out value="${param.msg}" /></div>
+</c:if>
 <header class="header">
   <a class="logo" href="<c:url value='/participant/home' />">
     <div class="logo-icon">CV</div>
@@ -82,6 +85,10 @@
       <span class="neo-badge status">${hackathon.status}</span>
       <span class="neo-badge">${hackathon.eventType}</span>
       <c:choose>
+        <c:when test="${hackathon.participationScope == 'OPEN_TO_ALL'}"><span class="neo-badge">Open to All</span></c:when>
+        <c:otherwise><span class="neo-badge">Campus Only</span></c:otherwise>
+      </c:choose>
+      <c:choose>
         <c:when test="${hackathon.payment == 'PAID'}"><span class="neo-badge">Application Fee: Rs. ${empty hackathon.entryFeeAmount ? 199 : hackathon.entryFeeAmount}</span></c:when>
         <c:otherwise><span class="neo-badge">Free Entry</span></c:otherwise>
       </c:choose>
@@ -90,7 +97,7 @@
     <div class="grid">
       <div class="item"><p>Team Size</p><h4>${hackathon.minTeamSize} - ${hackathon.maxTeamSize} members</h4></div>
       <div class="item"><p>Location</p><h4>${hackathon.eventType == 'ONLINE' ? 'Online Event' : hackathon.location}</h4></div>
-      <div class="item"><p>Eligibility</p><h4>All Participants</h4></div>
+      <div class="item"><p>Eligibility</p><h4>${hackathon.participationScope == 'OPEN_TO_ALL' ? 'All Participants' : 'Campus Participants'}</h4></div>
       <div class="item"><p>Registration Window</p><h4>
         <fmt:parseDate value="${hackathon.registrationStartDate}" pattern="yyyy-MM-dd" var="parsedRegStart" type="date" />
         <fmt:parseDate value="${hackathon.registrationEndDate}" pattern="yyyy-MM-dd" var="parsedRegEnd" type="date" />
@@ -121,6 +128,37 @@
       <div>${hackathon.submissionChecklist}</div>
     </div>
 
+    <c:if test="${isCampusOnly}">
+      <div class="desc">
+        <p>Campus Access Verification</p>
+        <c:choose>
+          <c:when test="${campusAccessVerified}">
+            <div class="neo-badge">Verified for this hackathon</div>
+          </c:when>
+          <c:otherwise>
+            <div style="display:grid;gap:10px;">
+              <div style="color:#5e6673;">Verify campus email with invitation code before applying or joining a team.</div>
+              <form action="<c:url value='/participant/hackathon/request-access-otp' />" method="post" style="display:grid;gap:8px;">
+                <input type="hidden" name="_csrf" value="${_csrfToken}">
+                <input type="hidden" name="hackathonId" value="${hackathon.hackathonId}">
+                <input type="email" name="verificationEmail" placeholder="student@college.edu" required>
+                <input type="text" name="inviteCode" placeholder="Invitation Code" required>
+                <button type="submit">Send OTP</button>
+              </form>
+              <form action="<c:url value='/participant/hackathon/verify-access-otp' />" method="post" style="display:grid;gap:8px;">
+                <input type="hidden" name="_csrf" value="${_csrfToken}">
+                <input type="hidden" name="hackathonId" value="${hackathon.hackathonId}">
+                <input type="email" name="verificationEmail" placeholder="student@college.edu" required>
+                <input type="text" name="inviteCode" placeholder="Invitation Code" required>
+                <input type="text" name="otp" placeholder="Enter OTP" required>
+                <button type="submit">Verify OTP</button>
+              </form>
+            </div>
+          </c:otherwise>
+        </c:choose>
+      </div>
+    </c:if>
+
     <div class="actions">
       <c:choose>
         <c:when test="${hasApplied}">
@@ -130,6 +168,9 @@
         <c:when test="${isExpired}">
           <span class="btn">Expired</span>
           <a class="btn" href="<c:url value='/participant/home?msg=This+hackathon+is+expired+and+cannot+be+applied+to&type=error' />">Back to Explore</a>
+        </c:when>
+        <c:when test="${isCampusOnly and not campusAccessVerified}">
+          <span class="btn">Verify Campus Access First</span>
         </c:when>
         <c:otherwise>
           <a class="btn" href="<c:url value='/participant/team/new?hackathonId=${hackathon.hackathonId}' />">Apply With Team</a>

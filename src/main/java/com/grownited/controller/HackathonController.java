@@ -220,6 +220,9 @@ public class HackathonController {
 	private void normalizeHackathonFields(HackathonEntity hackathonEntity) {
 		hackathonEntity.setStatus(normalizeValue(hackathonEntity.getStatus()));
 		hackathonEntity.setEventType(normalizeValue(hackathonEntity.getEventType()));
+		hackathonEntity.setParticipationScope(normalizeParticipationScope(hackathonEntity.getParticipationScope()));
+		hackathonEntity.setAllowedEmailDomains(trimValue(hackathonEntity.getAllowedEmailDomains()));
+		hackathonEntity.setInvitationCode(trimValue(hackathonEntity.getInvitationCode()));
 		hackathonEntity.setPayment(normalizeValue(hackathonEntity.getPayment()));
 		normalizeEntryFeeAmount(hackathonEntity);
 		hackathonEntity.setProblemTitle(trimValue(hackathonEntity.getProblemTitle()));
@@ -242,6 +245,15 @@ public class HackathonController {
 
 	private String trimValue(String value) {
 		return value == null ? null : value.trim();
+	}
+
+	private String normalizeParticipationScope(String participationScope) {
+		String normalized = normalizeValue(participationScope);
+		if (!AppConstants.HACKATHON_SCOPE_OPEN_TO_ALL.equals(normalized)
+				&& !AppConstants.HACKATHON_SCOPE_CAMPUS_ONLY.equals(normalized)) {
+			return AppConstants.HACKATHON_SCOPE_CAMPUS_ONLY;
+		}
+		return normalized;
 	}
 
 	private void decorateStatuses(List<HackathonEntity> hackathons) {
@@ -321,6 +333,20 @@ public class HackathonController {
 		String payment = normalizeValue(hackathonEntity.getPayment());
 		if ("PAID".equals(payment) && (hackathonEntity.getEntryFeeAmount() == null || hackathonEntity.getEntryFeeAmount() <= 0)) {
 			return false;
+		}
+
+		String participationScope = normalizeParticipationScope(hackathonEntity.getParticipationScope());
+		if (!AppConstants.HACKATHON_SCOPE_CAMPUS_ONLY.equals(participationScope)
+				&& !AppConstants.HACKATHON_SCOPE_OPEN_TO_ALL.equals(participationScope)) {
+			return false;
+		}
+		if (AppConstants.HACKATHON_SCOPE_CAMPUS_ONLY.equals(participationScope)) {
+			if (hackathonEntity.getAllowedEmailDomains() == null || hackathonEntity.getAllowedEmailDomains().isBlank()) {
+				return false;
+			}
+			if (hackathonEntity.getInvitationCode() == null || hackathonEntity.getInvitationCode().isBlank()) {
+				return false;
+			}
 		}
 
 		if (hackathonEntity.getProblemTitle() == null || hackathonEntity.getProblemTitle().isBlank()

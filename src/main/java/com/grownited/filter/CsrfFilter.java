@@ -76,7 +76,8 @@ public class CsrfFilter implements Filter {
     private boolean isBypassedRoute(HttpServletRequest req) {
         String method = req.getMethod();
         String uri = req.getRequestURI();
-        return "OPTIONS".equalsIgnoreCase(method) || uri.endsWith("/error") || uri.endsWith("/favicon.ico");
+        return "OPTIONS".equalsIgnoreCase(method) || uri.endsWith("/error") || uri.endsWith("/favicon.ico")
+                || uri.endsWith("/payments/razorpay/webhook");
     }
 
     private String extractProvidedToken(HttpServletRequest req) throws IOException, ServletException {

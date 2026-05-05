@@ -491,7 +491,7 @@ $documents["CHAPTER 6 SYSTEM ANALYSIS AND SYSTEM DESIGN(35-43).docx"] = Join-Lin
     "6.7 Design Constraints and Decisions",
     "- Self-registration is limited to participant role for control and security",
     "- Organizer ownership boundaries are enforced for hackathon operations",
-    "- FREE hackathons auto-mark payment as WAIVED to simplify workflow",
+    "- FREE hackathons require no payment; PAID hackathons always require payment",
     "- Online event type auto-sets location to reduce input errors",
     "",
     "6.8 Risk Analysis and Mitigation",
@@ -617,8 +617,8 @@ $documents["CHAPTER 8 TESTING(49-59).docx"] = Join-Lines @(
     "TC-06: Access protected URL without login",
     "Expected: Redirect to login page",
     "",
-    "TC-07: FREE hackathon payment status",
-    "Expected: Payment status automatically set to WAIVED"
+    "TC-07: FREE hackathon payment requirement",
+    "Expected: FREE hackathons require no payment; payment status remains PENDING"
 )
 
 $documents["CHAPTER 9 SNAPSHOT OF WEBSITE(60-72).docx"] = Join-Lines @(

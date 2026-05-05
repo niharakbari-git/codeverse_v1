@@ -39,10 +39,44 @@ public class PaymentTransactionService {
         return paymentTransactionRepository.save(transaction);
     }
 
+    public Optional<PaymentTransactionEntity> findByGatewayOrderId(String gatewayOrderId) {
+        if (gatewayOrderId == null || gatewayOrderId.isBlank()) {
+            return Optional.empty();
+        }
+        return paymentTransactionRepository.findByGatewayOrderId(gatewayOrderId.trim());
+    }
+
+    public Optional<PaymentTransactionEntity> findByGatewayTransactionId(String gatewayTransactionId) {
+        if (gatewayTransactionId == null || gatewayTransactionId.isBlank()) {
+            return Optional.empty();
+        }
+        return paymentTransactionRepository.findByGatewayTransactionId(gatewayTransactionId.trim());
+    }
+
+    public PaymentTransactionEntity linkOrder(PaymentTransactionEntity transaction, String gatewayOrderId,
+            String currency, String message) {
+        transaction.setGatewayOrderId(gatewayOrderId);
+        transaction.setCurrency(currency);
+        transaction.setResponseMessage(message);
+        transaction.setUpdatedAt(LocalDateTime.now());
+        return paymentTransactionRepository.save(transaction);
+    }
+
     public PaymentTransactionEntity markSuccess(PaymentTransactionEntity transaction, String gatewayTransactionId,
             String message) {
         transaction.setStatus("SUCCESS");
         transaction.setGatewayTransactionId(gatewayTransactionId);
+        transaction.setResponseMessage(message);
+        transaction.setWebhookVerified(true);
+        transaction.setUpdatedAt(LocalDateTime.now());
+        return paymentTransactionRepository.save(transaction);
+    }
+
+    public PaymentTransactionEntity markCheckoutSuccess(PaymentTransactionEntity transaction, String gatewayTransactionId,
+            String gatewaySignature, String message) {
+        transaction.setStatus("SUCCESS");
+        transaction.setGatewayTransactionId(gatewayTransactionId);
+        transaction.setGatewaySignature(gatewaySignature);
         transaction.setResponseMessage(message);
         transaction.setWebhookVerified(true);
         transaction.setUpdatedAt(LocalDateTime.now());

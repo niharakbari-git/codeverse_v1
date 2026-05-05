@@ -211,6 +211,11 @@
 			<div class="stat-num">${paidHackathons}</div>
 			<div class="stat-label">Paid Entry</div>
 		</div>
+		<div class="stat-divider"></div>
+		<div class="stat">
+			<div class="stat-num">${openToAllHackathons}</div>
+			<div class="stat-label">Open To All</div>
+		</div>
 	</div>
 
 	<!-- MAIN -->
@@ -259,6 +264,15 @@
 					</select>
 				</div>
 
+				<div class="filter-group">
+					<span class="filter-label">Participation Scope</span>
+					<select id="scopeFilter" class="filter-select">
+						<option value="">All scopes</option>
+						<option value="CAMPUS_ONLY">Campus Only</option>
+						<option value="OPEN_TO_ALL">Open To All</option>
+					</select>
+				</div>
+
 				<div class="divider"></div>
 				<button class="apply-btn" id="resetBtn">Reset Filters</button>
 			</div>
@@ -302,7 +316,7 @@
 							<div class="card" data-title="${fn:toLowerCase(h.title)}"
 								data-desc="${fn:toLowerCase(h.description)}"
 								data-type="${h.payment}" data-minteam="${h.minTeamSize}"
-								data-maxteam="${h.maxTeamSize}">
+								data-maxteam="${h.maxTeamSize}" data-scope="${empty h.participationScope ? 'CAMPUS_ONLY' : h.participationScope}">
 								<div class="card-top">
 
 									<!-- Icon: rotate through 3 SVG symbols, each with its own colour -->
@@ -378,7 +392,11 @@
 								<div class="tags">
 									<span class="tag tag-type">${h.eventType}</span> <span
 										class="tag tag-team">${h.minTeamSize} -
-										${h.maxTeamSize} members</span> <span class="tag tag-eligibility">Open to Participants</span>
+											${h.maxTeamSize} members</span>
+										<c:choose>
+											<c:when test="${h.participationScope == 'OPEN_TO_ALL'}"><span class="tag tag-eligibility">Open to All</span></c:when>
+											<c:otherwise><span class="tag tag-eligibility">Campus Only</span></c:otherwise>
+										</c:choose>
 									<c:choose>
 										<c:when test="${h.payment == 'PAID'}"><span class="tag tag-fee">Application Fee: Rs. ${empty h.entryFeeAmount ? 199 : h.entryFeeAmount}</span></c:when>
 										<c:otherwise><span class="tag tag-fee">Free Entry</span></c:otherwise>
@@ -433,6 +451,7 @@
   const cards        = Array.from(document.querySelectorAll('.card'));
   const searchInput  = document.getElementById('searchInput');
   const teamSizeSel  = document.getElementById('teamSizeFilter');
+	const scopeSel     = document.getElementById('scopeFilter');
   const sortSel      = document.getElementById('sortSelect');
   const resetBtn     = document.getElementById('resetBtn');
   const noResults    = document.getElementById('noResults');
@@ -447,6 +466,7 @@
       keyword    : searchInput ? searchInput.value.trim().toLowerCase() : '',
       type       : (document.querySelector('input[name="type"]:checked') || {}).value || '',
       teamSize   : teamSizeSel.value,
+			scope      : scopeSel ? scopeSel.value : '',
       sort       : sortSel.value
     };
   }
@@ -461,6 +481,7 @@
       const type   = card.dataset.type        || '';
       const minT   = parseInt(card.dataset.minteam) || 0;
       const maxT   = parseInt(card.dataset.maxteam) || 99;
+	const scope  = card.dataset.scope       || 'CAMPUS_ONLY';
 
       // --- keyword ---
       const kw = f.keyword;
@@ -476,7 +497,9 @@
         teamMatch = sz >= minT && sz <= maxT;
       }
 
-	const show = kwMatch && typeMatch && teamMatch;
+	const scopeMatch = !f.scope || scope.toUpperCase() === f.scope.toUpperCase();
+
+	const show = kwMatch && typeMatch && teamMatch && scopeMatch;
       card.classList.toggle('hidden', !show);
       if (show) visible.push(card);
     });
@@ -519,12 +542,14 @@
   if (searchInput) searchInput.addEventListener('input', applyFilters);
   document.querySelectorAll('input[name="type"]').forEach(r => r.addEventListener('change', applyFilters));
   teamSizeSel.addEventListener('change', applyFilters);
+	if (scopeSel) scopeSel.addEventListener('change', applyFilters);
   sortSel.addEventListener('change', applyFilters);
 
   resetBtn.addEventListener('click', function () {
     if (searchInput) searchInput.value = '';
     document.getElementById('type-all').checked = true;
     teamSizeSel.value = '';
+		if (scopeSel) scopeSel.value = '';
     sortSel.value = 'default';
     applyFilters();
   });

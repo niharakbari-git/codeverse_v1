@@ -99,6 +99,7 @@
         <ol class="workspace-list">
           <li>Review current team members and their roles.</li>
           <li>Add new members by their email address (if you're the leader).</li>
+          <li>For campus-only hackathons, members must verify their campus email with OTP before joining.</li>
           <li>Keep team information updated before submission deadline.</li>
         </ol>
         <p class="workspace-hint">All team members receive notifications when added. They can view the team details from their dashboard.</p>
@@ -152,7 +153,7 @@
                 </form>
               </c:when>
               <c:otherwise>
-                <p class="meta" style="margin-top:10px;color:#8a5a00;font-weight:700">Only the team leader can add members.</p>
+                <p class="meta" style="margin-top:10px;color:#8a5a00;font-weight:700">${empty t.memberManagementNote ? 'Member management is currently unavailable.' : t.memberManagementNote}</p>
               </c:otherwise>
             </c:choose>
           </div>

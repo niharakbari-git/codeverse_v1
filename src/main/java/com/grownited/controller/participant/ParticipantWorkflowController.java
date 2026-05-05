@@ -26,6 +26,7 @@ import com.grownited.service.ParticipantTeamService;
 import com.grownited.service.FileUploadService;
 import com.grownited.repository.SubmissionVersionRepository;
 import com.grownited.entity.SubmissionVersionEntity;
+import com.grownited.service.HackathonAccessVerificationService;
 import com.grownited.service.NotificationService;
 import com.grownited.util.HackathonStatusUtil;
 import com.grownited.util.FileUploadValidator;
@@ -54,6 +55,9 @@ public class ParticipantWorkflowController {
     @Autowired
     NotificationService notificationService;
 
+    @Autowired
+    HackathonAccessVerificationService hackathonAccessVerificationService;
+
     @GetMapping("/participant/team/new")
     public String newTeam(@RequestParam Integer hackathonId, Model model) {
         Optional<HackathonEntity> opHackathon = hackathonRepository.findById(hackathonId);
@@ -66,12 +70,65 @@ public class ParticipantWorkflowController {
     }
 
     @PostMapping("/participant/team/create")
-    public String createTeamAndApply(@RequestParam Integer hackathonId, @RequestParam String teamName, HttpSession session) {
+    public String createTeamAndApply(@RequestParam Integer hackathonId, @RequestParam String teamName,
+            @RequestParam(required = false) String verificationEmail,
+            @RequestParam(required = false) String inviteCode,
+            @RequestParam(required = false) String otp,
+            HttpSession session) {
         UserEntity currentUser = SessionUserUtil.getCurrentUser(session);
         if (currentUser == null) {
             return AppConstants.REDIRECT_LOGIN;
         }
-        return participantTeamService.createTeamAndApply(hackathonId, teamName, currentUser);
+        return participantTeamService.createTeamAndApply(hackathonId, teamName, verificationEmail, inviteCode, otp, currentUser);
+    }
+
+    @PostMapping("/participant/hackathon/request-join-otp")
+    public String requestJoinOtp(@RequestParam Integer hackathonId,
+            @RequestParam String verificationEmail,
+            @RequestParam String inviteCode,
+            HttpSession session) {
+        UserEntity currentUser = SessionUserUtil.getCurrentUser(session);
+        if (currentUser == null) {
+            return AppConstants.REDIRECT_LOGIN;
+        }
+
+        HackathonAccessVerificationService.OperationResult result = hackathonAccessVerificationService
+                .requestJoinOtp(currentUser.getUserId(), hackathonId, verificationEmail, inviteCode);
+        String type = result.isSuccess() ? "success" : "error";
+        return "redirect:/participant/team/new?hackathonId=" + hackathonId + "&msg=" + result.getMessage() + "&type=" + type;
+    }
+
+    @PostMapping("/participant/hackathon/request-access-otp")
+    public String requestAccessOtpFromDetails(@RequestParam Integer hackathonId,
+            @RequestParam String verificationEmail,
+            @RequestParam String inviteCode,
+            HttpSession session) {
+        UserEntity currentUser = SessionUserUtil.getCurrentUser(session);
+        if (currentUser == null) {
+            return AppConstants.REDIRECT_LOGIN;
+        }
+
+        HackathonAccessVerificationService.OperationResult result = hackathonAccessVerificationService
+                .requestJoinOtp(currentUser.getUserId(), hackathonId, verificationEmail, inviteCode);
+        String type = result.isSuccess() ? "success" : "error";
+        return "redirect:/participant/hackathon/" + hackathonId + "?msg=" + result.getMessage() + "&type=" + type;
+    }
+
+    @PostMapping("/participant/hackathon/verify-access-otp")
+    public String verifyAccessOtpFromDetails(@RequestParam Integer hackathonId,
+            @RequestParam String verificationEmail,
+            @RequestParam String inviteCode,
+            @RequestParam String otp,
+            HttpSession session) {
+        UserEntity currentUser = SessionUserUtil.getCurrentUser(session);
+        if (currentUser == null) {
+            return AppConstants.REDIRECT_LOGIN;
+        }
+
+        HackathonAccessVerificationService.OperationResult result = hackathonAccessVerificationService
+                .verifyJoinOtp(currentUser.getUserId(), hackathonId, verificationEmail, inviteCode, otp);
+        String type = result.isSuccess() ? "success" : "error";
+        return "redirect:/participant/hackathon/" + hackathonId + "?msg=" + result.getMessage() + "&type=" + type;
     }
 
     @GetMapping("/participant/my-teams")
@@ -140,6 +197,13 @@ public class ParticipantWorkflowController {
         }
 
         HackathonEntity hackathon = opHackathon.get();
+        boolean requiresPayment = "PAID".equalsIgnoreCase(hackathon.getPayment());
+        String paymentStatus = app.getPaymentStatus() == null ? "" : app.getPaymentStatus().trim().toUpperCase();
+        boolean paymentSettled = "PAID".equals(paymentStatus);
+        if (requiresPayment && !paymentSettled) {
+            return "redirect:/participant/my-applications?msg=Complete+payment+before+submitting+work&type=error";
+        }
+
         LocalDate submissionDeadline = hackathon.getSubmissionDeadline() != null ? hackathon.getSubmissionDeadline()
                 : hackathon.getRegistrationEndDate();
         int graceHours = HackathonStatusUtil.resolveGracePeriodHours(hackathon);

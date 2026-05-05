@@ -19,6 +19,7 @@ import com.grownited.entity.HackathonEntity;
 import com.grownited.entity.UserDetailEntity;
 import com.grownited.entity.UserEntity;
 import com.grownited.service.AuthService;
+import com.grownited.service.HackathonAccessVerificationService;
 import com.grownited.service.ParticipantTeamService;
 import com.grownited.util.HackathonStatusUtil;
 import com.grownited.util.SessionUserUtil;
@@ -54,6 +55,9 @@ public class ParticipantController {
 
 	@Autowired
 	UserRepository userRepository;
+
+	@Autowired
+	HackathonAccessVerificationService hackathonAccessVerificationService;
 	
 	@GetMapping("/participant/participant-dashboard")
 	public String participantDashboard(Model model, HttpSession session) {
@@ -63,6 +67,7 @@ public class ParticipantController {
 		model.addAttribute("upcomingHackathons", countUpcomingHackathons(visibleHackathons));
 		model.addAttribute("freeHackathons", countPaymentHackathons(visibleHackathons, "FREE"));
 		model.addAttribute("paidHackathons", countPaymentHackathons(visibleHackathons, "PAID"));
+		model.addAttribute("openToAllHackathons", countScopeHackathons(visibleHackathons, AppConstants.HACKATHON_SCOPE_OPEN_TO_ALL));
 		model.addAttribute("selectedView", "ALL");
 		
 		UserEntity currentUser = SessionUserUtil.getCurrentUser(session);
@@ -88,6 +93,7 @@ public class ParticipantController {
 		model.addAttribute("upcomingHackathons", countUpcomingHackathons(visibleHackathons));
 		model.addAttribute("freeHackathons", countPaymentHackathons(visibleHackathons, "FREE"));
 		model.addAttribute("paidHackathons", countPaymentHackathons(visibleHackathons, "PAID"));
+		model.addAttribute("openToAllHackathons", countScopeHackathons(visibleHackathons, AppConstants.HACKATHON_SCOPE_OPEN_TO_ALL));
 		model.addAttribute("selectedView", normalizeView(view));
 		return   "participant/Home";
 	}
@@ -203,15 +209,19 @@ public class ParticipantController {
 
 		UserEntity currentUser = (UserEntity) session.getAttribute("user");
 		boolean hasApplied = false;
+		boolean campusAccessVerified = false;
 		if (currentUser != null) {
 			hasApplied = hackathonApplicationRepository.existsByHackathonIdAndParticipantUserId(hackathonId,
 					currentUser.getUserId());
+			campusAccessVerified = hackathonAccessVerificationService.hasVerifiedAccess(currentUser.getUserId(), hackathonId);
 		}
 
 		HackathonEntity hackathon = opHackathon.get();
 		hackathon.setDisplayStatus(HackathonStatusUtil.resolveStatus(hackathon, LocalDate.now()));
 		model.addAttribute("hackathon", hackathon);
 		model.addAttribute("hasApplied", hasApplied);
+		model.addAttribute("campusAccessVerified", campusAccessVerified);
+		model.addAttribute("isCampusOnly", AppConstants.HACKATHON_SCOPE_CAMPUS_ONLY.equalsIgnoreCase(hackathon.getParticipationScope()));
 		boolean isExpired = HackathonStatusUtil.isExpired(hackathon, LocalDate.now());
 		model.addAttribute("isExpired", isExpired);
 		return "participant/HackathonDetails";
@@ -234,6 +244,9 @@ public class ParticipantController {
 		if ("UPCOMING".equals(normalizedView)) {
 			return hackathons.stream().filter(h -> HackathonStatusUtil.isUpcoming(h, LocalDate.now())).toList();
 		}
+		if ("OPEN".equals(normalizedView)) {
+			return hackathons.stream().filter(h -> AppConstants.HACKATHON_SCOPE_OPEN_TO_ALL.equals(resolveParticipationScope(h))).toList();
+		}
 		if ("FREE".equals(normalizedView)) {
 			return hackathons.stream().filter(h -> "FREE".equalsIgnoreCase(h.getPayment())).toList();
 		}
@@ -251,6 +264,9 @@ public class ParticipantController {
 		if ("SOON".equals(normalized)) {
 			return "UPCOMING";
 		}
+		if ("PUBLIC".equals(normalized)) {
+			return "OPEN";
+		}
 		return normalized;
 	}
 
@@ -264,6 +280,17 @@ public class ParticipantController {
 
 	private long countPaymentHackathons(List<HackathonEntity> hackathons, String payment) {
 		return hackathons.stream().filter(h -> payment.equalsIgnoreCase(h.getPayment())).count();
+	}
+
+	private long countScopeHackathons(List<HackathonEntity> hackathons, String scope) {
+		return hackathons.stream().filter(h -> scope.equals(resolveParticipationScope(h))).count();
+	}
+
+	private String resolveParticipationScope(HackathonEntity hackathon) {
+		if (hackathon == null || hackathon.getParticipationScope() == null || hackathon.getParticipationScope().isBlank()) {
+			return AppConstants.HACKATHON_SCOPE_CAMPUS_ONLY;
+		}
+		return hackathon.getParticipationScope().trim().toUpperCase();
 	}
 
 	private Map<String, Long> calculateApplicationStats(List<ParticipantApplicationView> applications) {

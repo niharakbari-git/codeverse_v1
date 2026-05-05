@@ -115,7 +115,6 @@ table{min-width:980px}
                     <c:when test="${a.application.paymentStatus == 'PENDING'}">Awaiting Payment</c:when>
                     <c:when test="${a.application.paymentStatus == 'PAID'}">Paid</c:when>
                     <c:when test="${a.application.paymentStatus == 'FAILED'}">Payment Failed</c:when>
-                    <c:when test="${a.application.paymentStatus == 'WAIVED'}">Waived</c:when>
                     <c:otherwise>${a.application.paymentStatus}</c:otherwise>
                   </c:choose>
                 </span>
@@ -137,7 +136,6 @@ table{min-width:980px}
                     <option value="PENDING" ${a.application.paymentStatus == 'PENDING' ? 'selected' : ''}>Awaiting Payment</option>
                     <option value="PAID" ${a.application.paymentStatus == 'PAID' ? 'selected' : ''}>Paid</option>
                     <option value="FAILED" ${a.application.paymentStatus == 'FAILED' ? 'selected' : ''}>Payment Failed</option>
-                    <option value="WAIVED" ${a.application.paymentStatus == 'WAIVED' ? 'selected' : ''}>Waived</option>
                   </select>
                   <button type="submit">Save</button>
                 </form>

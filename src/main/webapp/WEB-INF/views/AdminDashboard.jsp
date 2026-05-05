@@ -19,11 +19,11 @@
 .nav-links a.active{background:#1f2329;color:#fff;border-color:#1f2329}
 
 .page{display:grid;grid-template-columns:260px 1fr;gap:12px;min-height:calc(100vh - 64px);padding:16px;max-width:1320px;margin:0 auto}
-.side{padding:14px}
+.side{padding:14px;position:sticky;top:16px;height:fit-content;max-height:calc(100vh - 96px);overflow-y:auto}
 .side h2{font-size:30px}
 .side .links{display:grid;gap:8px;margin-top:10px}
 .side .links a{padding:10px;border:2px solid #1f2329;border-radius:12px;text-decoration:none;background:#fff}
-.main{display:grid;gap:12px}
+.main{display:grid;gap:12px;overflow-y:auto;max-height:calc(100vh - 96px)}
 .hero{padding:16px;background:#1f2937;color:#fff}
 .hero h1{font-size:clamp(34px,5vw,58px)}
 .dual{display:grid;grid-template-columns:1fr;gap:12px}

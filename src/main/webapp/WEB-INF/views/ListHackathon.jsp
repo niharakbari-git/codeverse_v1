@@ -24,8 +24,8 @@
 .metric .v{font-size:34px;font-family:"Syne",sans-serif;line-height:1;margin-top:4px}
 .table-card{overflow:auto;padding:10px}
 .status{display:inline-flex;padding:4px 8px;border:2px solid #1f2329;border-radius:999px;background:#fff;font-size:11px;font-weight:700;text-transform:uppercase}
-.ops{display:flex;gap:6px;flex-wrap:wrap}
-.ops a{padding:6px 8px;border:2px solid #1f2329;border-radius:10px;text-decoration:none;font-weight:700;font-size:11px;color:#1f2329;background:#fff}
+.ops{display:flex;gap:10px;flex-wrap:nowrap;align-items:center;min-height:36px}
+.ops a{padding:8px 12px;border:2px solid #1f2329;border-radius:10px;text-decoration:none;font-weight:700;font-size:11px;color:#1f2329;background:#fff;height:36px;display:inline-flex;align-items:center;justify-content:center;white-space:nowrap}
 .empty{text-align:center;padding:16px;font-weight:700}
 @media(max-width:1050px){.board{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:760px){.board{grid-template-columns:1fr}}
@@ -64,6 +64,7 @@
           <th>Registration Start</th>
           <th>Registration End</th>
           <th>Status</th>
+          <th>Scope</th>
           <th>Payment</th>
           <th>Application Fee</th>
           <th>Organizer ID</th>
@@ -73,7 +74,7 @@
       <tbody>
         <c:choose>
           <c:when test="${empty hackathons}">
-            <tr><td class="empty" colspan="8">No hackathons available.</td></tr>
+            <tr><td class="empty" colspan="9">No hackathons available.</td></tr>
           </c:when>
           <c:otherwise>
             <c:forEach items="${hackathons}" var="h">
@@ -82,6 +83,12 @@
                 <td><fmt:parseDate value="${h.registrationStartDate}" pattern="yyyy-MM-dd" var="listRegStart" type="date" /><fmt:formatDate value="${listRegStart}" pattern="dd-MM-yyyy" /></td>
                 <td><fmt:parseDate value="${h.registrationEndDate}" pattern="yyyy-MM-dd" var="listRegEnd" type="date" /><fmt:formatDate value="${listRegEnd}" pattern="dd-MM-yyyy" /></td>
                 <td><span class="status"><c:out value="${empty h.displayStatus ? h.status : h.displayStatus}"/></span></td>
+                <td>
+                  <c:choose>
+                    <c:when test="${h.participationScope == 'OPEN_TO_ALL'}">Open to All</c:when>
+                    <c:otherwise>Campus Only</c:otherwise>
+                  </c:choose>
+                </td>
                 <td><c:out value="${h.payment}"/></td>
                 <td>
                   <c:choose>

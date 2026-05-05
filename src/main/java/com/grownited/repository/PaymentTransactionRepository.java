@@ -13,6 +13,12 @@ public interface PaymentTransactionRepository extends JpaRepository<PaymentTrans
 
     Optional<PaymentTransactionEntity> findByIdempotencyKey(String idempotencyKey);
 
+    Optional<PaymentTransactionEntity> findByGatewayOrderId(String gatewayOrderId);
+
+    Optional<PaymentTransactionEntity> findByGatewayTransactionId(String gatewayTransactionId);
+
+    Optional<PaymentTransactionEntity> findFirstByApplicationIdOrderByCreatedAtDesc(Integer applicationId);
+
     List<PaymentTransactionEntity> findByApplicationIdOrderByCreatedAtDesc(Integer applicationId);
 
     void deleteByApplicationId(Integer applicationId);

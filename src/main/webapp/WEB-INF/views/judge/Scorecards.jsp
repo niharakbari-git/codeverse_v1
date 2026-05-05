@@ -110,7 +110,6 @@
               <c:when test="${s.application.paymentStatus == 'PENDING'}">Awaiting Payment</c:when>
               <c:when test="${s.application.paymentStatus == 'PAID'}">Paid</c:when>
               <c:when test="${s.application.paymentStatus == 'FAILED'}">Payment Failed</c:when>
-              <c:when test="${s.application.paymentStatus == 'WAIVED'}">Waived</c:when>
               <c:otherwise>${s.application.paymentStatus}</c:otherwise>
             </c:choose>
           </p>

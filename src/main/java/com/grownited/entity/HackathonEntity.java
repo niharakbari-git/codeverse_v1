@@ -21,6 +21,9 @@ public class HackathonEntity {
 	String status;
 
 	String eventType;
+	String participationScope;
+	String allowedEmailDomains;
+	String invitationCode;
 	String payment;
 	Integer entryFeeAmount;
 	Integer minTeamSize;
@@ -69,6 +72,24 @@ public class HackathonEntity {
 	}
 	public void setEventType(String eventType) {
 		this.eventType = eventType;
+	}
+	public String getParticipationScope() {
+		return participationScope;
+	}
+	public void setParticipationScope(String participationScope) {
+		this.participationScope = participationScope;
+	}
+	public String getAllowedEmailDomains() {
+		return allowedEmailDomains;
+	}
+	public void setAllowedEmailDomains(String allowedEmailDomains) {
+		this.allowedEmailDomains = allowedEmailDomains;
+	}
+	public String getInvitationCode() {
+		return invitationCode;
+	}
+	public void setInvitationCode(String invitationCode) {
+		this.invitationCode = invitationCode;
 	}
 	public String getPayment() {
 		return payment;

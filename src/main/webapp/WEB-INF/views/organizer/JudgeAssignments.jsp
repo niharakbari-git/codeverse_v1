@@ -70,13 +70,13 @@ table{min-width:760px}
   <main class="main">
     <section class="neo-panel hero" data-reveal>
       <h1 class="neo-title">Judge Assignments</h1>
-      <p>Map judges to your hackathons and keep review ownership clearly distributed.</p>
+      <p>Use your own judges (faculty, alumni, industry mentors) and map them to each hackathon.</p>
     </section>
 
     <form class="neo-panel form" action="<c:url value='/organizer/assign-judge' />" method="post" data-reveal>
       <input type="hidden" name="_csrf" value="${_csrfToken}">
       <div class="field">
-        <label>Hackathon</label>
+        <label>Hackathon (CodeVerse's Judges)</label>
         <select name="hackathonId" required>
           <option value="">-- Select Hackathon --</option>
           <c:forEach items="${myHackathons}" var="h">
@@ -95,6 +95,26 @@ table{min-width:760px}
       </div>
       <div class="form-action">
         <button type="submit">Assign Judge</button>
+      </div>
+    </form>
+
+    <form class="neo-panel form" action="<c:url value='/organizer/assign-judge-by-email' />" method="post" data-reveal>
+      <input type="hidden" name="_csrf" value="${_csrfToken}">
+      <div class="field">
+        <label>Hackathon</label>
+        <select name="hackathonId" required>
+          <option value="">-- Select Hackathon --</option>
+          <c:forEach items="${myHackathons}" var="h">
+            <option value="${h.hackathonId}">${h.title}</option>
+          </c:forEach>
+        </select>
+      </div>
+      <div class="field">
+        <label>Judge Email (direct assign)</label>
+        <input type="email" name="judgeEmail" placeholder="judge@example.com" required>
+      </div>
+      <div class="form-action">
+        <button type="submit">Assign by Email</button>
       </div>
     </form>
 

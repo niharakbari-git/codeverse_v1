@@ -63,6 +63,9 @@
 .status-scored{background:rgba(217,119,6,.12);color:var(--cv-warn)}
 .status-pending-payment{background:rgba(217,119,6,.12);color:var(--cv-warn)}
 .status-payment-done{background:rgba(15,118,110,.12);color:var(--cv-accent-2)}
+.payment-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+.payment-actions form{margin:0}
+.payment-actions button{border:none;cursor:pointer;background:#1f2329;color:#fff;font-weight:700;padding:9px 12px;border-radius:8px}
 .submit-section{display:grid;gap:8px;margin-top:10px;padding-top:10px;border-top:1px solid #e7ebf2}
 .submit-header{font-weight:700;font-size:13px;color:#1f2329}
 .submit-form{display:grid;gap:8px}
@@ -178,7 +181,6 @@
                       <c:when test="${v.application.paymentStatus == 'PENDING'}">Awaiting Payment</c:when>
                       <c:when test="${v.application.paymentStatus == 'PAID'}">Paid</c:when>
                       <c:when test="${v.application.paymentStatus == 'FAILED'}">Payment Failed</c:when>
-                      <c:when test="${v.application.paymentStatus == 'WAIVED'}">Waived</c:when>
                       <c:otherwise>${v.application.paymentStatus}</c:otherwise>
                     </c:choose>
                   </div>
@@ -196,11 +198,21 @@
                     <c:when test="${v.application.paymentStatus == 'PENDING'}">Awaiting Payment</c:when>
                     <c:when test="${v.application.paymentStatus == 'PAID'}">Paid</c:when>
                     <c:when test="${v.application.paymentStatus == 'FAILED'}">Payment Failed</c:when>
-                    <c:when test="${v.application.paymentStatus == 'WAIVED'}">Waived</c:when>
                     <c:otherwise>${v.application.paymentStatus}</c:otherwise>
                   </c:choose>
                 </span>
               </div>
+
+              <c:if test="${v.entryFeeAmount > 0 && v.application.paymentStatus != 'PAID'}">
+                <div class="payment-actions">
+                  <form action="<c:url value='/participant/payment/initiate' />" method="post">
+                    <input type="hidden" name="_csrf" value="${_csrfToken}">
+                    <input type="hidden" name="applicationId" value="${v.application.applicationId}">
+                    <button type="submit">Pay with UPI / Cards</button>
+                  </form>
+                  <a class="btn" href="<c:url value='/charge' />">Payment Help</a>
+                </div>
+              </c:if>
 
               <div class="app-meta" style="margin:0">
                 <div class="app-meta-item">
@@ -215,6 +227,14 @@
               </div>
 
               <c:if test="${v.application.status == 'APPROVED' || v.application.status == 'APPLIED'}">
+                <c:if test="${v.entryFeeAmount > 0 && v.application.paymentStatus != 'PAID'}">
+                  <div style="font-size:12px;color:#5e6673;padding:8px;background:#f8fafc;border-radius:6px;text-align:center">
+                    Submission unlocks after payment is completed.
+                  </div>
+                </c:if>
+              </c:if>
+
+              <c:if test="${(v.application.status == 'APPROVED' || v.application.status == 'APPLIED') && (v.entryFeeAmount == 0 || v.application.paymentStatus == 'PAID')}">
                 <details class="submit-section">
                   <summary class="submit-header">
                     <c:choose>

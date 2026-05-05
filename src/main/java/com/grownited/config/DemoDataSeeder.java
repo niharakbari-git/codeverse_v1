@@ -313,7 +313,7 @@ public class DemoDataSeeder implements CommandLineRunner {
         applications.add(createApplication(hackathons.get(1), team2, participants.get(1), "SHORTLISTED", "PAID", -1));
         applications.add(createApplication(hackathons.get(1), team3, participants.get(2), "REJECTED", "FAILED", -2));
         applications.add(createApplication(hackathons.get(2), team4, participants.get(3), "FINALIST", "PAID", -3));
-        applications.add(createApplication(hackathons.get(3), team5, participants.get(4), "WINNER", "WAIVED", -12));
+        applications.add(createApplication(hackathons.get(3), team5, participants.get(4), "WINNER", "PENDING", -12));
 
         return applications;
     }

@@ -12,6 +12,7 @@ public class ParticipantTeamView {
     private Integer memberCount;
     private List<String> memberNames;
     private Boolean canManageMembers;
+    private String memberManagementNote;
     private String roleInTeam;
 
     public TeamEntity getTeam() {
@@ -60,6 +61,14 @@ public class ParticipantTeamView {
 
     public void setCanManageMembers(Boolean canManageMembers) {
         this.canManageMembers = canManageMembers;
+    }
+
+    public String getMemberManagementNote() {
+        return memberManagementNote;
+    }
+
+    public void setMemberManagementNote(String memberManagementNote) {
+        this.memberManagementNote = memberManagementNote;
     }
 
     public String getRoleInTeam() {

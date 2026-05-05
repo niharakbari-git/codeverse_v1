@@ -20,7 +20,10 @@ public class PaymentTransactionEntity {
     private Double amount;
     private String status;
     private String idempotencyKey;
+    private String gatewayOrderId;
     private String gatewayTransactionId;
+    private String gatewaySignature;
+    private String currency;
     private String responseMessage;
     private boolean webhookVerified;
     private LocalDateTime createdAt;
@@ -66,12 +69,36 @@ public class PaymentTransactionEntity {
         this.idempotencyKey = idempotencyKey;
     }
 
+    public String getGatewayOrderId() {
+        return gatewayOrderId;
+    }
+
+    public void setGatewayOrderId(String gatewayOrderId) {
+        this.gatewayOrderId = gatewayOrderId;
+    }
+
     public String getGatewayTransactionId() {
         return gatewayTransactionId;
     }
 
     public void setGatewayTransactionId(String gatewayTransactionId) {
         this.gatewayTransactionId = gatewayTransactionId;
+    }
+
+    public String getGatewaySignature() {
+        return gatewaySignature;
+    }
+
+    public void setGatewaySignature(String gatewaySignature) {
+        this.gatewaySignature = gatewaySignature;
+    }
+
+    public String getCurrency() {
+        return currency;
+    }
+
+    public void setCurrency(String currency) {
+        this.currency = currency;
     }
 
     public String getResponseMessage() {

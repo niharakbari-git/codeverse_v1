@@ -67,6 +67,21 @@
         </select>
       </div>
       <div class="field">
+        <label>Participation Scope</label>
+        <select name="participationScope" required>
+          <option value="CAMPUS_ONLY" ${empty hackathon.participationScope || hackathon.participationScope == 'CAMPUS_ONLY' ? 'selected' : ''}>Campus Only (default)</option>
+          <option value="OPEN_TO_ALL" ${hackathon.participationScope == 'OPEN_TO_ALL' ? 'selected' : ''}>Open to All (show in Explore)</option>
+        </select>
+      </div>
+      <div class="field full">
+        <label>Allowed Email Domains (comma separated)</label>
+        <input type="text" name="allowedEmailDomains" value="${hackathon.allowedEmailDomains}" placeholder="college.edu, dept.college.edu">
+      </div>
+      <div class="field">
+        <label>Invitation Code</label>
+        <input type="text" name="invitationCode" value="${hackathon.invitationCode}" placeholder="CAMPUS2026">
+      </div>
+      <div class="field">
         <label>Payment</label>
         <select name="payment" required>
           <option value="">-- Select Payment Type --</option>

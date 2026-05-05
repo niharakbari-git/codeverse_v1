@@ -25,8 +25,10 @@
 .status.approved{background:rgba(15,118,110,.12);color:var(--cv-accent-2);border-color:rgba(15,118,110,.18)}
 .status.rejected{background:#f1f5f9;color:#64748b;border-color:#d5dde8}
 .action-col{min-width:280px}
-.action-form{display:grid;gap:6px}
-.action-row{display:flex;gap:6px;flex-wrap:wrap}
+.action-form{display:flex;gap:8px;flex-wrap:nowrap;align-items:center}
+.action-form form{display:inline-flex;gap:8px;flex-wrap:nowrap;align-items:center}
+.action-form input[type="text"]{flex:1;min-width:140px}
+.action-row{display:flex;gap:8px;flex-wrap:nowrap;align-items:center;min-height:36px}
 .empty{text-align:center;padding:16px;font-weight:700}
 @media(max-width:960px){.metrics{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:640px){.metrics{grid-template-columns:1fr}}

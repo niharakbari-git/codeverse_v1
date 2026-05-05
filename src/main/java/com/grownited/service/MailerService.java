@@ -71,6 +71,20 @@ public class MailerService {
 		return sendMail(to, subject, body);
 	}
 
+	public boolean sendHackathonJoinOtpMail(String to, String hackathonTitle, String otp, int validMinutes) {
+		String safeTitle = safeValue(hackathonTitle);
+		String safeOtp = safeValue(otp);
+		String body = "<html><body>"
+				+ "<h2>Campus Access Verification</h2>"
+				+ "<p>You requested campus verification for <b>" + safeTitle + "</b>.</p>"
+				+ "<p>Your OTP is: <b style=\"font-size:18px;letter-spacing:2px;\">" + safeOtp + "</b></p>"
+				+ "<p>This OTP is valid for " + validMinutes + " minutes.</p>"
+				+ "<p>If you did not request this, please ignore this email.</p>"
+				+ "<p>Thanks,<br/>" + applicationName + " Team</p>"
+				+ "</body></html>";
+		return sendMail(to, applicationName + " - Campus verification OTP", body);
+	}
+
 	private String buildWelcomeBody(UserEntity user) {
 		try {
 			Resource resource = resourceLoader.getResource("classpath:templates/WelcomeMailTemplate.html");

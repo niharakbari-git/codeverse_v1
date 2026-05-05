@@ -21,8 +21,8 @@
 .status{display:inline-flex;padding:4px 10px;border-radius:999px;font-size:12px;font-weight:700;border:1px solid transparent}
 .status.on{background:rgba(15,118,110,.12);color:var(--cv-accent-2);border-color:rgba(15,118,110,.18)}
 .status.off{background:#f1f5f9;color:#64748b;border-color:#d5dde8}
-.row-actions{display:flex;gap:6px;flex-wrap:wrap}
-.row-actions a{padding:6px 10px;font-size:12px}
+.row-actions{display:flex;gap:10px;flex-wrap:nowrap;align-items:center;min-height:36px}
+.row-actions a{padding:8px 12px;font-size:12px;display:inline-flex;align-items:center;justify-content:center;white-space:nowrap;height:36px}
 </style>
 </head>
 <body>

@@ -27,6 +27,7 @@ import com.grownited.repository.JudgeAssignmentRepository;
 import com.grownited.repository.JudgeScoreRepository;
 import com.grownited.repository.UserDetailRepository;
 import com.grownited.repository.UserRepository;
+import com.grownited.repository.UserTypeRepository;
 import com.grownited.service.AuthService;
 import com.grownited.service.AuditLogService;
 import com.grownited.service.NotificationService;
@@ -58,6 +59,9 @@ public class OrganizerController {
 
     @Autowired
     UserDetailRepository userDetailRepository;
+
+    @Autowired
+    UserTypeRepository userTypeRepository;
 
     @Autowired
     AuthService authService;
@@ -127,19 +131,83 @@ public class OrganizerController {
             return "redirect:/organizer/judge-assignments?msg=Selected+user+is+not+a+judge&type=error";
         }
 
-        if (judgeAssignmentRepository.existsByHackathonIdAndJudgeUserId(hackathonId, judgeUserId)) {
+        return assignJudgeToHackathon(hackathon, opJudge.get().getUserId(), currentUser);
+    }
+
+    @PostMapping("/organizer/assign-judge-by-email")
+    public String assignJudgeByEmail(@RequestParam Integer hackathonId, @RequestParam String judgeEmail, HttpSession session) {
+        UserEntity currentUser = SessionUserUtil.getCurrentUser(session);
+        if (currentUser == null) {
+            return AppConstants.REDIRECT_LOGIN;
+        }
+
+        Optional<HackathonEntity> opHackathon = hackathonRepository.findById(hackathonId);
+        if (opHackathon.isEmpty()) {
+            return "redirect:/organizer/judge-assignments?msg=Hackathon+not+found&type=error";
+        }
+
+        HackathonEntity hackathon = opHackathon.get();
+        boolean isAdmin = AppConstants.ROLE_ADMIN.equalsIgnoreCase(currentUser.getRole());
+        boolean isOwner = hackathon.getUserId() != null && hackathon.getUserId().equals(currentUser.getUserId());
+        if (!isAdmin && !isOwner) {
+            return "redirect:/organizer/judge-assignments?msg=You+can+assign+judges+only+to+your+hackathons&type=error";
+        }
+
+        if (judgeEmail == null || judgeEmail.isBlank()) {
+            return "redirect:/organizer/judge-assignments?msg=Judge+email+is+required&type=error";
+        }
+
+        Optional<UserEntity> opTargetUser = userRepository.findByEmailIgnoreCase(judgeEmail.trim());
+        if (opTargetUser.isEmpty()) {
+            return "redirect:/organizer/judge-assignments?msg=No+account+found+with+that+email&type=error";
+        }
+
+        UserEntity targetUser = opTargetUser.get();
+        String targetRole = AppConstants.normalizeRole(targetUser.getRole());
+
+        if (AppConstants.ROLE_PARTICIPANT.equals(targetRole)) {
+            targetUser.setRole(AppConstants.ROLE_JUDGE);
+            userRepository.save(targetUser);
+            promoteUserDetailTypeToJudge(targetUser.getUserId());
+        } else if (!AppConstants.ROLE_JUDGE.equals(targetRole)) {
+            return "redirect:/organizer/judge-assignments?msg=Only+participant+accounts+can+be+promoted+to+judge.+Admin+or+Organizer+cannot+be+changed&type=error";
+        }
+
+        return assignJudgeToHackathon(hackathon, targetUser.getUserId(), currentUser);
+    }
+
+    private void promoteUserDetailTypeToJudge(Integer userId) {
+        Integer judgeUserTypeId = userTypeRepository.findByUserTypeIgnoreCase(AppConstants.ROLE_JUDGE)
+                .map(ut -> ut.getUserTypeId())
+                .orElse(null);
+
+        if (judgeUserTypeId == null) {
+            return;
+        }
+
+        UserDetailEntity userDetail = userDetailRepository.findByUserId(userId).orElseGet(() -> {
+            UserDetailEntity created = new UserDetailEntity();
+            created.setUserId(userId);
+            return created;
+        });
+        userDetail.setUserTypeId(judgeUserTypeId);
+        userDetailRepository.save(userDetail);
+    }
+
+    private String assignJudgeToHackathon(HackathonEntity hackathon, Integer judgeUserId, UserEntity assignedBy) {
+        if (judgeAssignmentRepository.existsByHackathonIdAndJudgeUserId(hackathon.getHackathonId(), judgeUserId)) {
             return "redirect:/organizer/judge-assignments?msg=Judge+already+assigned&type=info";
         }
 
         JudgeAssignmentEntity assignment = new JudgeAssignmentEntity();
-        assignment.setHackathonId(hackathonId);
+        assignment.setHackathonId(hackathon.getHackathonId());
         assignment.setJudgeUserId(judgeUserId);
-        assignment.setAssignedByUserId(currentUser.getUserId());
+        assignment.setAssignedByUserId(assignedBy.getUserId());
         assignment.setAssignedAt(LocalDate.now());
         judgeAssignmentRepository.save(assignment);
-        auditLogService.logAssignmentChange(assignment.getJudgeAssignmentId(), "CREATE", currentUser.getUserId(),
-            "Judge=" + judgeUserId + ", Hackathon=" + hackathonId);
-        notificationService.notifyJudgeAssignment(judgeUserId, hackathonId, hackathon.getTitle());
+        auditLogService.logAssignmentChange(assignment.getJudgeAssignmentId(), "CREATE", assignedBy.getUserId(),
+            "Judge=" + judgeUserId + ", Hackathon=" + hackathon.getHackathonId());
+        notificationService.notifyJudgeAssignment(judgeUserId, hackathon.getHackathonId(), hackathon.getTitle());
 
         return "redirect:/organizer/judge-assignments?msg=Judge+assigned+successfully&type=success";
     }

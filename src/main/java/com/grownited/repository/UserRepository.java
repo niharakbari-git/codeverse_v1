@@ -12,6 +12,7 @@ import com.grownited.entity.UserEntity;
 public interface UserRepository extends JpaRepository<UserEntity, Integer>{
 
 	Optional<UserEntity>  findByEmail(String email);
+	Optional<UserEntity> findByEmailIgnoreCase(String email);
 	
 	List<UserEntity> findByRole(String role);
 	List<UserEntity> findByRoleOrderByUserIdDesc(String role);

@@ -37,6 +37,9 @@ label{display:block;font-size:12px;font-weight:700;text-transform:uppercase;lett
 </style>
 </head>
 <body>
+<c:if test="${not empty param.msg}">
+  <div id="toast-data" data-type="${param.type == 'success' ? 'success' : 'error'}" style="display:none;"><c:out value="${param.msg}" /></div>
+</c:if>
 <header class="header">
   <a class="logo" href="<c:url value='/participant/home' />">
     <div class="logo-icon">CV</div>
@@ -67,11 +70,36 @@ label{display:block;font-size:12px;font-weight:700;text-transform:uppercase;lett
   <div class="neo-panel card" data-reveal>
     <h1 class="neo-title">Create Team</h1>
     <p>Apply to <strong>${hackathon.title}</strong> by creating your team.</p>
+
+    <c:if test="${hackathon.participationScope == 'CAMPUS_ONLY'}">
+      <div class="neo-panel" style="padding:12px;margin-bottom:12px;">
+        <p style="margin:0 0 8px;color:#1f2329;font-weight:700;">Campus Verification Required</p>
+        <p style="margin:0 0 10px;color:#5e6673;">Enter your campus email and invitation code. OTP will be sent to that email.</p>
+        <form action="<c:url value='/participant/hackathon/request-join-otp' />" method="post" style="display:grid;gap:8px;">
+          <input type="hidden" name="_csrf" value="${_csrfToken}">
+          <input type="hidden" name="hackathonId" value="${hackathon.hackathonId}">
+          <label for="verificationEmail">Campus Email</label>
+          <input id="verificationEmail" type="email" name="verificationEmail" placeholder="student@college.edu" required>
+          <label for="inviteCode">Invitation Code</label>
+          <input id="inviteCode" type="text" name="inviteCode" placeholder="CAMPUS2026" required>
+          <button type="submit">Send OTP</button>
+        </form>
+      </div>
+    </c:if>
+
     <form action="<c:url value='/participant/team/create' />" method="post">
       <input type="hidden" name="_csrf" value="${_csrfToken}">
       <input type="hidden" name="hackathonId" value="${hackathon.hackathonId}">
       <label for="teamName">Team Name</label>
       <input id="teamName" type="text" name="teamName" placeholder="e.g. CodeStorm" required>
+      <c:if test="${hackathon.participationScope == 'CAMPUS_ONLY'}">
+        <label for="verificationEmailApply">Campus Email</label>
+        <input id="verificationEmailApply" type="email" name="verificationEmail" placeholder="student@college.edu" required>
+        <label for="inviteCodeApply">Invitation Code</label>
+        <input id="inviteCodeApply" type="text" name="inviteCode" placeholder="CAMPUS2026" required>
+        <label for="otp">OTP</label>
+        <input id="otp" type="text" name="otp" placeholder="Enter OTP" required>
+      </c:if>
       <div class="actions">
         <button type="submit">Create Team & Apply</button>
         <a class="btn" href="<c:url value='/participant/hackathon/${hackathon.hackathonId}' />">Back</a>

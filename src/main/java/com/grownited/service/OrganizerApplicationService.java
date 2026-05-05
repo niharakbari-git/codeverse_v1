@@ -23,7 +23,7 @@ import com.grownited.repository.UserRepository;
 public class OrganizerApplicationService {
 
     private static final Set<String> ALLOWED_STATUSES = Set.of("APPLIED", "SHORTLISTED", "REJECTED", "FINALIST", "WINNER");
-    private static final Set<String> ALLOWED_PAYMENT_STATUSES = Set.of("PENDING", "PAID", "FAILED", "WAIVED");
+    private static final Set<String> ALLOWED_PAYMENT_STATUSES = Set.of("PENDING", "PAID", "FAILED");
     private static final Map<String, Set<String>> STATUS_TRANSITIONS = buildStatusTransitions();
 
     @Autowired
@@ -105,9 +105,7 @@ public class OrganizerApplicationService {
         String oldStatus = app.getStatus();
         app.setStatus(normalizedStatus);
 
-        if ("FREE".equalsIgnoreCase(hackathon.getPayment())) {
-            app.setPaymentStatus("WAIVED");
-        } else if (paymentStatus != null && !paymentStatus.isBlank()) {
+        if (paymentStatus != null && !paymentStatus.isBlank()) {
             String normalizedPaymentStatus = normalize(paymentStatus);
             if (!ALLOWED_PAYMENT_STATUSES.contains(normalizedPaymentStatus)) {
                 return UpdateApplicationResult.error("redirect:/organizer/applications?hackathonId=" + app.getHackathonId()

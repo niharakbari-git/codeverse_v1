@@ -23,8 +23,8 @@
 .metric .v{font-size:34px;font-family:"Syne",sans-serif;line-height:1;margin-top:4px}
 .table-card{overflow:auto;padding:10px}
 .role{display:inline-flex;padding:4px 8px;border:2px solid #1f2329;border-radius:999px;background:#fff;font-size:11px;font-weight:700;text-transform:uppercase}
-.actions{display:flex;gap:6px;flex-wrap:wrap}
-.actions a{padding:6px 8px;border:2px solid #1f2329;border-radius:10px;text-decoration:none;font-weight:700;font-size:11px;background:#fff;color:#1f2329}
+.actions{display:flex;gap:10px;flex-wrap:nowrap;align-items:center;min-height:36px}
+.actions a{padding:8px 12px;border:2px solid #1f2329;border-radius:10px;text-decoration:none;font-weight:700;font-size:11px;background:#fff;color:#1f2329;height:36px;display:inline-flex;align-items:center;justify-content:center;white-space:nowrap}
 .empty{text-align:center;padding:16px;font-weight:700}
 @media(max-width:1050px){.stats{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:640px){.stats{grid-template-columns:1fr}}
