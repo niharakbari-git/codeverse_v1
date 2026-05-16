@@ -7,8 +7,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Organizer Requests | CodeVerse</title>
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=Syne:wght@700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/neo-viva-theme.css?v=20260415b">
-<script defer src="${pageContext.request.contextPath}/assets/js/neo-viva-theme.js?v=20260415b"></script>
+<link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/neo-viva-theme.css?v=20260512c">
+<script defer src="${pageContext.request.contextPath}/assets/js/neo-viva-theme.js?v=20260512c"></script>
 <style>
 .page{padding:16px;display:grid;gap:12px}
 .hero{padding:14px;display:flex;justify-content:space-between;gap:10px;align-items:center;flex-wrap:wrap;background:#1f2937;color:#fff}
@@ -80,7 +80,20 @@
                 <td>${r.firstName} ${r.lastName}</td>
                 <td>${r.email}</td>
                 <td>${r.organizationName}</td>
-                <td><a href="${r.websiteUrl}" target="_blank" rel="noopener noreferrer">${r.websiteUrl != null ? (r.websiteUrl.length() > 30 ? r.websiteUrl.substring(0, 30).concat('...') : r.websiteUrl) : '-'}</a></td>
+                <td>
+                  <c:choose>
+                    <c:when test="${not empty r.websiteUrl}">
+                      <div class="url-display-row">
+                        <a href="${r.websiteUrl}" target="_blank" rel="noopener noreferrer">${r.websiteUrl.length() > 30 ? r.websiteUrl.substring(0, 30).concat('...') : r.websiteUrl}</a>
+                        <div class="url-actions">
+                          <button type="button" class="url-action-btn copy-url" data-url="${r.websiteUrl}" title="Copy link"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 9h8a2 2 0 0 1 2 2v8"></path><rect x="5" y="5" width="10" height="10" rx="2"></rect><path d="M13 13l6-6"></path><path d="M14 7h5v5"></path></svg></button>
+                          <button type="button" class="url-action-btn open-url" data-url="${r.websiteUrl}" title="Open link"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 5h5v5"></path><path d="M10 14L19 5"></path><path d="M19 13v6a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2h6"></path></svg></button>
+                        </div>
+                      </div>
+                    </c:when>
+                    <c:otherwise>-</c:otherwise>
+                  </c:choose>
+                </td>
                 <td>${r.city}, ${r.state}</td>
                 <td>
                   <span class="status ${r.status == 'APPROVED' ? 'approved' : (r.status == 'REJECTED' ? 'rejected' : 'pending')}">${r.status}</span>

@@ -79,6 +79,11 @@ public class RazorpayPaymentService {
             throw new IllegalArgumentException("User session expired");
         }
 
+        if (gatewayProperties.getKeyId() == null || gatewayProperties.getKeyId().isBlank()
+                || gatewayProperties.getKeySecret() == null || gatewayProperties.getKeySecret().isBlank()) {
+            throw new IllegalArgumentException("Razorpay keys are not configured on server");
+        }
+
         HackathonApplicationEntity application = hackathonApplicationRepository.findById(applicationId)
                 .orElseThrow(() -> new IllegalArgumentException("Application not found"));
         if (application.getParticipantUserId() == null || !application.getParticipantUserId().equals(currentUser.getUserId())) {
@@ -97,7 +102,8 @@ public class RazorpayPaymentService {
             throw new IllegalArgumentException("This hackathon does not require payment");
         }
 
-        String idempotencyKey = "razorpay-app-" + applicationId;
+        // Create a fresh transaction/order per checkout attempt so stale orders from older keys/accounts are not reused.
+        String idempotencyKey = "razorpay-app-" + applicationId + "-" + UUID.randomUUID().toString().substring(0, 8);
         PaymentTransactionEntity transaction = paymentTransactionService.startTransaction(applicationId,
                 (double) amountRupees, idempotencyKey);
 
@@ -214,6 +220,8 @@ public class RazorpayPaymentService {
         Optional<UserEntity> opParticipant = userRepository.findById(application.getParticipantUserId());
         view.setParticipantName(opParticipant.map(user -> user.getFirstName() + " " + user.getLastName())
                 .orElse("Participant"));
+        view.setParticipantEmail(opParticipant.map(UserEntity::getEmail).orElse(""));
+        view.setParticipantContact(opParticipant.map(UserEntity::getContactNum).orElse(""));
 
         return view;
     }

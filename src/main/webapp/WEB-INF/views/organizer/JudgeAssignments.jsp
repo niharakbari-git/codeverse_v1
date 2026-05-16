@@ -8,8 +8,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Judge Assignments</title>
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=Syne:wght@700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/neo-viva-theme.css?v=20260415b">
-<script defer src="${pageContext.request.contextPath}/assets/js/neo-viva-theme.js?v=20260415b"></script>
+<link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/neo-viva-theme.css?v=20260512c">
+<script defer src="${pageContext.request.contextPath}/assets/js/neo-viva-theme.js?v=20260512c"></script>
 <style>
 .header{position:sticky;top:0;z-index:100;height:64px;display:flex;align-items:center;justify-content:space-between;gap:10px;padding:0 24px;background:rgba(247,244,236,.92);backdrop-filter:blur(8px);border-bottom:1px solid #d7dce5}
 .logo{display:flex;align-items:center;gap:10px;text-decoration:none;color:#1f2329}
@@ -26,19 +26,53 @@
 .side .links{display:grid;gap:8px;margin-top:10px}
 .side .links a{padding:10px;border:2px solid #1f2329;border-radius:12px;text-decoration:none;background:#fff}
 .side .links a.active{background:#1f2329;color:#fff}
-.main{display:flex;flex-direction:column;gap:12px;flex:1}
+.main{display:flex;flex-direction:column;gap:12px;flex:1;min-width:0}
 .hero{padding:16px;background:#1f2937;color:#fff;flex-shrink:0}
 .hero h1{font-size:clamp(32px,5vw,52px)}
 .hero p{margin-top:8px;color:#ecfffb}
-.form{padding:8px 14px;display:flex;gap:10px;align-items:flex-end;flex-wrap:wrap;min-height:0;margin:0;flex-shrink:0}
-.field{margin:0;flex:1 1 320px}
+.assignment-form-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.assignment-form-card{padding:14px;display:flex;flex-direction:column;gap:12px;min-width:0}
+.assignment-form-copy{display:grid;gap:6px}
+.assignment-form-copy .eyebrow{font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:.08em;color:#0f766e}
+.assignment-form-copy h3{font-size:20px;line-height:1.1}
+.assignment-form-copy p{color:#52606d;font-size:14px;line-height:1.5}
+.form{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;align-items:end}
+.field{margin:0;min-width:0}
 .field label{display:block;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px}
-.form-action{align-self:flex-end;flex:0 0 auto}
-.panel{padding:10px;overflow:auto;flex:1;display:flex;flex-direction:column}
-table{min-width:760px}
+.field select,.field input{width:100%;min-width:0}
+.form-action{align-self:end}
+.form-action button{width:100%}
+.assignments-panel{display:flex;flex-direction:column;gap:14px;padding:14px}
+.panel-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.panel-head h3{font-size:24px}
+.panel-head p{margin-top:4px;color:#52606d;font-size:14px}
+.panel-metrics{display:flex;gap:8px;flex-wrap:wrap}
+.metric-pill{display:inline-flex;align-items:center;gap:6px;padding:8px 12px;border-radius:999px;background:#eef3f8;color:#1f2937;font-size:12px;font-weight:700;border:1px solid #d7dce5}
+.assignment-grid{display:grid;gap:12px}
+.assignment-card{border:1px solid #d7dce5;border-radius:18px;background:#fff;overflow:hidden;box-shadow:0 10px 24px rgba(31,35,41,.05)}
+.assignment-card[open]{border-color:#cfd8e3}
+.assignment-summary{list-style:none;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:16px 18px;background:linear-gradient(180deg,#ffffff 0%,#f7f9fc 100%);cursor:pointer}
+.assignment-summary::-webkit-details-marker{display:none}
+.assignment-summary-left{display:grid;gap:4px;min-width:0}
+.assignment-summary-left h4{font-size:20px;line-height:1.15;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.assignment-summary-left p{font-size:13px;color:#52606d}
+.assignment-summary-right{display:flex;align-items:center;gap:8px;flex-wrap:wrap;justify-content:flex-end}
+.count-badge,.date-badge{display:inline-flex;align-items:center;gap:6px;padding:8px 12px;border-radius:999px;font-size:12px;font-weight:800;white-space:nowrap}
+.count-badge{background:#1f2329;color:#fff}
+.date-badge{background:#e7f4f1;color:#0f766e;border:1px solid #c8e9e1}
+.assignment-body{padding:0 18px 18px}
+.judge-list{display:grid;gap:10px}
+.judge-row{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:12px;align-items:center;padding:14px;border:1px solid #e3e7ee;border-radius:14px;background:#fff}
+.judge-info{min-width:0}
+.judge-name{font-size:15px;font-weight:800;color:#1f2329;line-height:1.2}
+.judge-email{margin-top:4px;font-size:13px;color:#52606d;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.judge-date{display:grid;justify-items:end;gap:4px;text-align:right}
+.judge-date .label{font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.08em;color:#52606d}
+.judge-date .value{font-size:14px;font-weight:800;color:#1f2329}
 .empty{padding:16px;text-align:center;font-weight:700}
-@media(max-width:980px){.form{align-items:stretch}.form-action{align-self:stretch}}
-@media(max-width:860px){.header{height:auto;padding:12px;align-items:flex-start;flex-direction:column}.page{grid-template-columns:1fr}}
+.empty.compact{border:1px dashed #d7dce5;border-radius:14px;background:#fafbfc}
+@media(max-width:1080px){.assignment-form-grid{grid-template-columns:1fr}.form{grid-template-columns:1fr 1fr}}
+@media(max-width:860px){.header{height:auto;padding:12px;align-items:flex-start;flex-direction:column}.page{grid-template-columns:1fr}.assignment-summary,.judge-row{grid-template-columns:1fr}.assignment-summary-right,.judge-date{justify-items:flex-start;justify-content:flex-start;text-align:left}.form{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
@@ -73,74 +107,131 @@ table{min-width:760px}
       <p>Use your own judges (faculty, alumni, industry mentors) and map them to each hackathon.</p>
     </section>
 
-    <form class="neo-panel form" action="<c:url value='/organizer/assign-judge' />" method="post" data-reveal>
-      <input type="hidden" name="_csrf" value="${_csrfToken}">
-      <div class="field">
-        <label>Hackathon (CodeVerse's Judges)</label>
-        <select name="hackathonId" required>
-          <option value="">-- Select Hackathon --</option>
-          <c:forEach items="${myHackathons}" var="h">
-            <option value="${h.hackathonId}">${h.title}</option>
-          </c:forEach>
-        </select>
+    <section class="neo-panel assignment-form-grid" data-reveal>
+      <div class="neo-panel assignment-form-card">
+        <div class="assignment-form-copy">
+          <div class="eyebrow">Existing Judge</div>
+          <h3 class="neo-title">Assign from the judge list</h3>
+          <p>Select a judge account and attach it to the hackathon you manage.</p>
+        </div>
+        <form class="form" action="<c:url value='/organizer/assign-judge' />" method="post">
+          <input type="hidden" name="_csrf" value="${_csrfToken}">
+          <div class="field">
+            <label>Hackathon</label>
+            <select name="hackathonId" required>
+              <option value="">-- Select Hackathon --</option>
+              <c:forEach items="${myHackathons}" var="h">
+                <option value="${h.hackathonId}">${h.title}</option>
+              </c:forEach>
+            </select>
+          </div>
+          <div class="field">
+            <label>Judge</label>
+            <select name="judgeUserId" required>
+              <option value="">-- Select Judge --</option>
+              <c:forEach items="${judges}" var="j">
+                <option value="${j.userId}">${j.firstName} ${j.lastName} (${j.email})</option>
+              </c:forEach>
+            </select>
+          </div>
+          <div class="form-action">
+            <button type="submit">Assign Judge</button>
+          </div>
+        </form>
       </div>
-      <div class="field">
-        <label>Judge</label>
-        <select name="judgeUserId" required>
-          <option value="">-- Select Judge --</option>
-          <c:forEach items="${judges}" var="j">
-            <option value="${j.userId}">${j.firstName} ${j.lastName} (${j.email})</option>
-          </c:forEach>
-        </select>
-      </div>
-      <div class="form-action">
-        <button type="submit">Assign Judge</button>
-      </div>
-    </form>
 
-    <form class="neo-panel form" action="<c:url value='/organizer/assign-judge-by-email' />" method="post" data-reveal>
-      <input type="hidden" name="_csrf" value="${_csrfToken}">
-      <div class="field">
-        <label>Hackathon</label>
-        <select name="hackathonId" required>
-          <option value="">-- Select Hackathon --</option>
-          <c:forEach items="${myHackathons}" var="h">
-            <option value="${h.hackathonId}">${h.title}</option>
-          </c:forEach>
-        </select>
+      <div class="neo-panel assignment-form-card">
+        <div class="assignment-form-copy">
+          <div class="eyebrow">Direct Email</div>
+          <h3 class="neo-title">Assign by email</h3>
+          <p>Promote a participant account to judge if needed, then assign them in one step.</p>
+        </div>
+        <form class="form" action="<c:url value='/organizer/assign-judge-by-email' />" method="post">
+          <input type="hidden" name="_csrf" value="${_csrfToken}">
+          <div class="field">
+            <label>Hackathon</label>
+            <select name="hackathonId" required>
+              <option value="">-- Select Hackathon --</option>
+              <c:forEach items="${myHackathons}" var="h">
+                <option value="${h.hackathonId}">${h.title}</option>
+              </c:forEach>
+            </select>
+          </div>
+          <div class="field">
+            <label>Judge Email</label>
+            <input type="email" name="judgeEmail" placeholder="judge@example.com" required>
+          </div>
+          <div class="form-action">
+            <button type="submit">Assign by Email</button>
+          </div>
+        </form>
       </div>
-      <div class="field">
-        <label>Judge Email (direct assign)</label>
-        <input type="email" name="judgeEmail" placeholder="judge@example.com" required>
-      </div>
-      <div class="form-action">
-        <button type="submit">Assign by Email</button>
-      </div>
-    </form>
+    </section>
 
-    <section class="neo-panel panel" data-reveal>
-      <table>
-        <thead>
-          <tr>
-            <th>Hackathon</th>
-            <th>Judge</th>
-            <th>Assigned On</th>
-          </tr>
-        </thead>
-        <tbody>
-          <c:forEach items="${assignmentViews}" var="a">
-            <tr>
-              <td>${a.hackathonTitle}</td>
-              <td>${a.judgeName}</td>
-              <fmt:parseDate value="${a.assignedAt}" pattern="yyyy-MM-dd" var="parsedAssignedAt" type="date" />
-              <td><fmt:formatDate value="${parsedAssignedAt}" pattern="dd-MM-yyyy" /></td>
-            </tr>
-          </c:forEach>
-          <c:if test="${empty assignmentViews}">
-            <tr><td colspan="3" class="empty">No assignments yet.</td></tr>
-          </c:if>
-        </tbody>
-      </table>
+    <section class="neo-panel assignments-panel" data-reveal>
+      <div class="panel-head">
+        <div>
+          <div class="neo-badge">Assignments</div>
+          <h3 class="neo-title">Grouped by Hackathon</h3>
+          <p>Each hackathon opens into a compact judge list with assignment dates.</p>
+        </div>
+        <div class="panel-metrics">
+          <span class="metric-pill">${assignmentGroups.size()} hackathons</span>
+          <span class="metric-pill">${judges.size()} judges available</span>
+        </div>
+      </div>
+
+      <c:choose>
+        <c:when test="${empty assignmentGroups}">
+          <div class="empty">No hackathons available to assign judges.</div>
+        </c:when>
+        <c:otherwise>
+          <div class="assignment-grid">
+            <c:forEach items="${assignmentGroups}" var="group">
+              <details class="assignment-card" open>
+                <summary class="assignment-summary">
+                  <div class="assignment-summary-left">
+                    <h4>${group.hackathonTitle}</h4>
+                    <p>Hackathon ID #${group.hackathonId}</p>
+                  </div>
+                  <div class="assignment-summary-right">
+                    <span class="count-badge">${group.judgeCount} judge<c:if test="${group.judgeCount != 1}">s</c:if></span>
+                    <c:if test="${not empty group.latestAssignedAtLabel}">
+                      <span class="date-badge">Latest: ${group.latestAssignedAtLabel}</span>
+                    </c:if>
+                  </div>
+                </summary>
+
+                <div class="assignment-body">
+                  <c:choose>
+                    <c:when test="${empty group.judges}">
+                      <div class="empty compact">No judges assigned yet.</div>
+                    </c:when>
+                    <c:otherwise>
+                      <div class="judge-list">
+                        <c:forEach items="${group.judges}" var="judge">
+                          <article class="judge-row">
+                            <div class="judge-info">
+                              <div class="judge-name">${judge.judgeName}</div>
+                              <c:if test="${not empty judge.judgeEmail}">
+                                <div class="judge-email">${judge.judgeEmail}</div>
+                              </c:if>
+                            </div>
+                            <div class="judge-date">
+                              <div class="label">Assigned On</div>
+                              <div class="value">${judge.assignedAtLabel}</div>
+                            </div>
+                          </article>
+                        </c:forEach>
+                      </div>
+                    </c:otherwise>
+                  </c:choose>
+                </div>
+              </details>
+            </c:forEach>
+          </div>
+        </c:otherwise>
+      </c:choose>
     </section>
   </main>
 </div>

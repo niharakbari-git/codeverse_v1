@@ -1,6 +1,7 @@
 package com.grownited.controller.organizer;
 
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -87,23 +88,60 @@ public class OrganizerController {
         }
 
         List<UserEntity> judges = userRepository.findByRole("JUDGE");
+        DateTimeFormatter assignmentDateFormatter = DateTimeFormatter.ofPattern("dd MMM yyyy");
 
-        List<AssignmentView> assignmentViews = new ArrayList<>();
+        List<HackathonAssignmentGroupView> assignmentGroups = new ArrayList<>();
         for (HackathonEntity hackathon : myHackathons) {
             List<JudgeAssignmentEntity> assignments = judgeAssignmentRepository.findByHackathonId(hackathon.getHackathonId());
+            assignments.sort((left, right) -> {
+                LocalDate rightDate = right.getAssignedAt();
+                LocalDate leftDate = left.getAssignedAt();
+                if (rightDate == null && leftDate == null) {
+                    return Integer.compare(right.getJudgeAssignmentId() == null ? 0 : right.getJudgeAssignmentId(),
+                            left.getJudgeAssignmentId() == null ? 0 : left.getJudgeAssignmentId());
+                }
+                if (rightDate == null) {
+                    return 1;
+                }
+                if (leftDate == null) {
+                    return -1;
+                }
+                int dateCompare = rightDate.compareTo(leftDate);
+                if (dateCompare != 0) {
+                    return dateCompare;
+                }
+                return Integer.compare(right.getJudgeAssignmentId() == null ? 0 : right.getJudgeAssignmentId(),
+                        left.getJudgeAssignmentId() == null ? 0 : left.getJudgeAssignmentId());
+            });
+
+            HackathonAssignmentGroupView group = new HackathonAssignmentGroupView();
+            group.setHackathonId(hackathon.getHackathonId());
+            group.setHackathonTitle(hackathon.getTitle());
+            group.setJudgeCount(assignments.size());
+
             for (JudgeAssignmentEntity assignment : assignments) {
-                AssignmentView view = new AssignmentView();
-                view.setHackathonTitle(hackathon.getTitle());
-                view.setAssignedAt(assignment.getAssignedAt());
                 Optional<UserEntity> opJudge = userRepository.findById(assignment.getJudgeUserId());
-                view.setJudgeName(opJudge.map(j -> j.getFirstName() + " " + j.getLastName()).orElse("Unknown Judge"));
-                assignmentViews.add(view);
+                JudgeAssignmentJudgeView judgeView = new JudgeAssignmentJudgeView();
+                judgeView.setJudgeName(opJudge.map(j -> j.getFirstName() + " " + j.getLastName()).orElse("Unknown Judge"));
+                judgeView.setJudgeEmail(opJudge.map(UserEntity::getEmail).orElse(""));
+                judgeView.setAssignedAt(assignment.getAssignedAt());
+                judgeView.setAssignedAtLabel(assignment.getAssignedAt() == null
+                        ? "Unknown date"
+                        : assignment.getAssignedAt().format(assignmentDateFormatter));
+                group.getJudges().add(judgeView);
             }
+
+            if (!assignments.isEmpty() && assignments.get(0).getAssignedAt() != null) {
+                group.setLatestAssignedAt(assignments.get(0).getAssignedAt());
+                group.setLatestAssignedAtLabel(assignments.get(0).getAssignedAt().format(assignmentDateFormatter));
+            }
+
+            assignmentGroups.add(group);
         }
 
         model.addAttribute("myHackathons", myHackathons);
         model.addAttribute("judges", judges);
-        model.addAttribute("assignmentViews", assignmentViews);
+        model.addAttribute("assignmentGroups", assignmentGroups);
         return "organizer/JudgeAssignments";
     }
 
@@ -403,6 +441,98 @@ public class OrganizerController {
             return Integer.parseInt(trimmed);
         } catch (NumberFormatException ex) {
             return null;
+        }
+    }
+
+    public static class HackathonAssignmentGroupView {
+        private Integer hackathonId;
+        private String hackathonTitle;
+        private Integer judgeCount;
+        private LocalDate latestAssignedAt;
+        private String latestAssignedAtLabel;
+        private final List<JudgeAssignmentJudgeView> judges = new ArrayList<>();
+
+        public Integer getHackathonId() {
+            return hackathonId;
+        }
+
+        public void setHackathonId(Integer hackathonId) {
+            this.hackathonId = hackathonId;
+        }
+
+        public String getHackathonTitle() {
+            return hackathonTitle;
+        }
+
+        public void setHackathonTitle(String hackathonTitle) {
+            this.hackathonTitle = hackathonTitle;
+        }
+
+        public Integer getJudgeCount() {
+            return judgeCount;
+        }
+
+        public void setJudgeCount(Integer judgeCount) {
+            this.judgeCount = judgeCount;
+        }
+
+        public LocalDate getLatestAssignedAt() {
+            return latestAssignedAt;
+        }
+
+        public void setLatestAssignedAt(LocalDate latestAssignedAt) {
+            this.latestAssignedAt = latestAssignedAt;
+        }
+
+        public String getLatestAssignedAtLabel() {
+            return latestAssignedAtLabel;
+        }
+
+        public void setLatestAssignedAtLabel(String latestAssignedAtLabel) {
+            this.latestAssignedAtLabel = latestAssignedAtLabel;
+        }
+
+        public List<JudgeAssignmentJudgeView> getJudges() {
+            return judges;
+        }
+    }
+
+    public static class JudgeAssignmentJudgeView {
+        private String judgeName;
+        private String judgeEmail;
+        private LocalDate assignedAt;
+        private String assignedAtLabel;
+
+        public String getJudgeName() {
+            return judgeName;
+        }
+
+        public void setJudgeName(String judgeName) {
+            this.judgeName = judgeName;
+        }
+
+        public String getJudgeEmail() {
+            return judgeEmail;
+        }
+
+        public void setJudgeEmail(String judgeEmail) {
+            this.judgeEmail = judgeEmail;
+        }
+
+        public LocalDate getAssignedAt() {
+            return assignedAt;
+        }
+
+        public void setAssignedAt(LocalDate assignedAt) {
+            this.assignedAt = assignedAt;
+        }
+
+        public String getAssignedAtLabel() {
+            return assignedAtLabel;
+        }
+
+        public void setAssignedAtLabel(String assignedAtLabel) {
+            this.assignedAtLabel = assignedAtLabel;
         }
     }
 

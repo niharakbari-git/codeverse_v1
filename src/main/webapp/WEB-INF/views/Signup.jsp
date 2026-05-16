@@ -7,8 +7,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Register | CodeVerse</title>
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=Syne:wght@700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/neo-viva-theme.css?v=20260415b">
-<script defer src="${pageContext.request.contextPath}/assets/js/neo-viva-theme.js?v=20260415b"></script>
+<link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/neo-viva-theme.css?v=20260512c">
+<script defer src="${pageContext.request.contextPath}/assets/js/neo-viva-theme.js?v=20260512c"></script>
 <style>
 .reg-shell{min-height:100vh;display:grid;grid-template-columns:320px 1fr;gap:12px;padding:16px}
 .info{
@@ -68,13 +68,15 @@ label{font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:upperca
         <!-- Personal Details -->
         <div class="field"><label>First Name*</label><input type="text" name="firstName" autocomplete="new-password" required></div>
         <div class="field"><label>Last Name*</label><input type="text" name="lastName" autocomplete="new-password" required></div>
-        <div class="field" style="display: flex; flex-direction: column;">
+        <div class="field">
           <label>Gender*</label>
-          <div class="gender" style="display: flex; gap: 15px; flex: 1; align-items: center;">
-            <label style="display: flex; align-items: center; gap: 5px; margin: 0; cursor: pointer;"><input type="radio" name="gender" value="MALE" required autocomplete="new-password" style="margin: 0;"> Male</label>
-            <label style="display: flex; align-items: center; gap: 5px; margin: 0; cursor: pointer;"><input type="radio" name="gender" value="FEMALE" autocomplete="new-password" style="margin: 0;"> Female</label>
-            <label style="display: flex; align-items: center; gap: 5px; margin: 0; cursor: pointer;"><input type="radio" name="gender" value="OTHER" autocomplete="new-password" style="margin: 0;"> Other</label>
-          </div>
+          <select name="gender" required autocomplete="new-password">
+            <option value="" disabled selected>Select gender</option>
+            <option value="MALE">Male</option>
+            <option value="FEMALE">Female</option>
+            <option value="OTHER">Other</option>
+            <option value="PREFER_NOT_TO_SAY">Prefer not to say</option>
+          </select>
         </div>
 
         <!-- Account Details -->
@@ -90,7 +92,17 @@ label{font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:upperca
         <!-- Education & Professional -->
         <div class="field"><label>Birth Year*</label><input type="number" name="birthYear" min="1900" max="2100" autocomplete="new-password" required></div>
         <div class="field"><label>Qualification*</label><input type="text" name="qualification" placeholder="e.g. B.Tech, MCA" autocomplete="new-password" required></div>
-        <div class="field"><label>LinkedIn URL</label><input type="text" name="linkedinUrl" placeholder="linkedin.com/in/username" autocomplete="new-password"></div>
+        <div class="field url-field">
+          <label>LinkedIn URL</label>
+          <div class="url-input-group">
+            <input type="text" name="linkedinUrl" placeholder="linkedin.com/in/username" autocomplete="new-password">
+            <div class="url-actions">
+              <button type="button" class="url-action-btn copy-url" title="Copy link"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 9h8a2 2 0 0 1 2 2v8"></path><rect x="5" y="5" width="10" height="10" rx="2"></rect><path d="M13 13l6-6"></path><path d="M14 7h5v5"></path></svg></button>
+              <button type="button" class="url-action-btn open-url" title="Open link"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 5h5v5"></path><path d="M10 14L19 5"></path><path d="M19 13v6a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2h6"></path></svg></button>
+            </div>
+          </div>
+          <span class="url-feedback">Copied!</span>
+        </div>
       </div>
       <div style="margin-top: 2rem; display: flex; flex-direction: column; gap: 1rem; align-items: center;">
         <button type="submit" style="width: 100%; max-width: 400px; padding: 1rem; font-size: 1.1rem; font-weight: bold; border-radius: 8px;">Create Account</button>

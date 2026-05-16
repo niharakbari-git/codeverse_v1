@@ -6,8 +6,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Participant Dashboard</title>
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=Syne:wght@700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/neo-viva-theme.css?v=20260415b">
-<script defer src="${pageContext.request.contextPath}/assets/js/neo-viva-theme.js?v=20260415b"></script>
+<link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/neo-viva-theme.css?v=20260512c">
+<script defer src="${pageContext.request.contextPath}/assets/js/neo-viva-theme.js?v=20260512c"></script>
 <style>
 .header{position:sticky;top:0;z-index:100;height:64px;display:flex;align-items:center;justify-content:space-between;gap:10px;padding:0 24px;background:rgba(247,244,236,.92);backdrop-filter:blur(8px);border-bottom:1px solid #d7dce5}
 .logo{display:flex;align-items:center;gap:10px;text-decoration:none;color:#1f2329}
@@ -37,8 +37,8 @@
 .app-metric{padding:12px;border:2px solid #1f2329;border-radius:14px;background:#fff;transition:transform .18s ease,box-shadow .18s ease}
 .app-metric:hover{transform:translateY(-2px);box-shadow:0 6px 14px rgba(31,41,55,.08)}
 .app-metric-label{font-size:11px;text-transform:uppercase;color:#5e6673;font-weight:700;letter-spacing:.05em}
-.app-metric-value{font-size:28px;font-family:"Syne",sans-serif;font-weight:800;line-height:1;margin-top:4px}
-.app-metric-status{font-size:11px;margin-top:6px;font-weight:500}
+.app-metric-value{font-size:28px;font-family:"Space Grotesk",sans-serif;font-weight:700;line-height:1.3;margin-top:4px;color:#1f2329}
+.app-metric-status{font-size:11px;margin-top:6px;font-weight:600;line-height:1.3}
 .status-applied{color:#0f766e}
 .status-approved{color:#1f2937}
 .status-submitted{color:#0369a1}

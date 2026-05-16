@@ -7,8 +7,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Edit User | CodeVerse</title>
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=Syne:wght@700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/neo-viva-theme.css?v=20260415b">
-<script defer src="${pageContext.request.contextPath}/assets/js/neo-viva-theme.js?v=20260415b"></script>
+<link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/neo-viva-theme.css?v=20260512c">
+<script defer src="${pageContext.request.contextPath}/assets/js/neo-viva-theme.js?v=20260512c"></script>
 <style>
 .wrap{max-width:980px;margin:24px auto;padding:0 16px}
 .card{padding:22px}
@@ -52,9 +52,14 @@
         <div class="field">
           <label for="gender">Gender</label>
           <select id="gender" name="gender" required>
-            <option value="Male" ${user.gender == 'Male' ? 'selected' : ''}>Male</option>
-            <option value="Female" ${user.gender == 'Female' ? 'selected' : ''}>Female</option>
-            <option value="Other" ${user.gender == 'Other' ? 'selected' : ''}>Other</option>
+            <option value="" disabled ${empty user.gender ? 'selected' : ''}>Select gender</option>
+            <option value="MALE" ${user.gender == 'MALE' ? 'selected' : ''}>Male</option>
+            <option value="FEMALE" ${user.gender == 'FEMALE' ? 'selected' : ''}>Female</option>
+            <option value="OTHER" ${user.gender == 'OTHER' ? 'selected' : ''}>Other</option>
+            <option value="PREFER_NOT_TO_SAY" ${user.gender == 'PREFER_NOT_TO_SAY' ? 'selected' : ''}>Prefer not to say</option>
+            <c:if test="${not empty user.gender && user.gender != 'MALE' && user.gender != 'FEMALE' && user.gender != 'OTHER' && user.gender != 'PREFER_NOT_TO_SAY'}">
+              <option value="${user.gender}" selected>${user.gender}</option>
+            </c:if>
           </select>
         </div>
         <div class="field">

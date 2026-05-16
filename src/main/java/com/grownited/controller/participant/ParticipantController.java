@@ -156,7 +156,7 @@ public class ParticipantController {
 	}
 
 	@PostMapping("/participant/profile/update-details")
-	public String updateProfileDetails(String firstName, String lastName, String email, String gender, String birthYear,
+	public String updateProfileDetails(String firstName, String lastName, String email, String birthYear,
 			String contactNum, String qualification, String city, String state, String country,
 			String linkedinUrl, HttpSession session) {
 		UserEntity currentUser = (UserEntity) session.getAttribute(AppConstants.SESSION_USER);
@@ -177,7 +177,6 @@ public class ParticipantController {
 		currentUser.setFirstName(trimToNull(firstName));
 		currentUser.setLastName(trimToNull(lastName));
 		currentUser.setEmail(normalizedEmail);
-		currentUser.setGender(trimToNull(gender));
 		currentUser.setBirthYear(parseBirthYear(birthYear));
 
 		currentUser.setContactNum(trimToNull(contactNum));

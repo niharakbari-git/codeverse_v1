@@ -1,0 +1,233 @@
+CodeVerse Viva Manual Test Flow
+Date: 2026-04-16
+
+Goal
+- Run a clean, confident live demo for faculty.
+- Show complete role-based flow (Admin/Organizer/Participant/Judge).
+- Show implemented basic features with expected outcomes.
+
+================================================================
+0) PRE-DEMO CHECKLIST (DO THIS FIRST)
+================================================================
+1. Start MySQL and ensure DB exists: codeversse
+2. In application-local.properties (or env vars), verify DB password is set.
+3. Optional but recommended for viva:
+   - Keep SQL logs ON if faculty wants technical proof.
+   - Set spring.jpa.show-sql=false if you want cleaner terminal output.
+4. Run from project root:
+   - mvn clean test
+   - mvn spring-boot:run
+5. Open app in browser:
+   - http://localhost:9797/login
+
+================================================================
+1) CREATE DEMO DATA (RECOMMENDED FOR VIVA)
+================================================================
+If you already have users/hackathons, skip this section.
+
+A. Turn ON seeding for one run
+1. In src/main/resources/application.properties set:
+   app.seed-demo-data=true
+2. Restart application.
+3. Wait until startup completes.
+
+B. Seeded users (all passwords are same)
+- Password for all seeded users: 00000000
+
+Admin
+- admin@codeverse.dev
+
+Organizers
+- organizer1@codeverse.dev
+- organizer2@codeverse.dev
+- organizer3@codeverse.dev
+- organizer4@codeverse.dev
+
+Participants
+- participant1@codeverse.dev
+- participant2@codeverse.dev
+- participant3@codeverse.dev
+
+Judges
+- judge1@codeverse.dev
+- judge2@codeverse.dev
+- judge3@codeverse.dev
+
+C. Turn OFF seeding after first successful run
+1. Set app.seed-demo-data=false
+2. Restart application
+(Prevents duplicate-style test noise in future runs.)
+
+================================================================
+2) DEMO FLOW SCRIPT (WHAT TO SHOW FACULTY)
+================================================================
+Use this exact order for smooth story.
+
+---------------------------------------------------------------
+STEP A: LOGIN + ROLE-BASED ACCESS
+---------------------------------------------------------------
+1. Login as Admin: admin@codeverse.dev / 00000000
+2. Show dashboard and role routes.
+3. Logout.
+4. Login as Organizer, then Participant, then Judge once each.
+Expected outcome:
+- Each role lands on role-specific area.
+- Unauthorized direct flow is blocked by session/role checks.
+
+---------------------------------------------------------------
+STEP B: HACKATHON CREATION WITH PROBLEM STATEMENT WORKFLOW
+---------------------------------------------------------------
+(Login as Organizer)
+1. Open Create Hackathon page.
+2. Fill all required core fields:
+   - Title, description, status, event type, payment
+   - Team size range
+   - Registration start/end
+   - Event start/end
+   - Submission deadline + grace period
+   - Problem title, problem statement, deliverables
+3. Save.
+4. Open View Hackathon page and show saved details.
+Expected outcome:
+- Form saves only with valid business constraints.
+- Problem statement fields are present and visible.
+
+---------------------------------------------------------------
+STEP C: LIFECYCLE AUTOMATION + EXPIRED VISIBILITY
+---------------------------------------------------------------
+1. As Organizer, edit one hackathon and set an old submission deadline (past date).
+2. Login as Participant and open Explore Home.
+Expected outcome:
+- Expired hackathon should not appear in participant listing.
+- If opening stale link, apply path is blocked as expired.
+
+---------------------------------------------------------------
+STEP D: PARTICIPANT APPLY + TEAM FLOW
+---------------------------------------------------------------
+(Login as Participant)
+1. Open an active hackathon.
+2. Click Apply With Team.
+3. Create team.
+4. Open My Teams and My Applications.
+Expected outcome:
+- Team is created.
+- Application status starts as APPLIED.
+- Payment status starts as PENDING (or WAIVED for free event via organizer updates).
+
+---------------------------------------------------------------
+STEP E: SUBMISSION VERSIONING + DEADLINE ENFORCEMENT
+---------------------------------------------------------------
+(Login as Participant)
+1. Open My Applications.
+2. Submit work:
+   - Demo URL
+   - Frontend/Backend Git links
+   - Description
+   - Optional file attachment (pdf/zip/image/txt/mp4)
+3. Submit again with changed content.
+Expected outcome:
+- Submission is saved.
+- Version count increases.
+- Attachment metadata stored and visible.
+- If deadline passed + grace exhausted, submission is rejected.
+
+---------------------------------------------------------------
+STEP F: ORGANIZER APPLICATION STATUS + PAYMENT STATUS UPDATE
+---------------------------------------------------------------
+(Login as Organizer)
+1. Open Organizer Applications.
+2. Change application status through allowed transitions
+   (example: APPLIED -> SHORTLISTED -> FINALIST).
+3. Update payment status where applicable.
+Expected outcome:
+- Invalid transitions are blocked.
+- Valid transitions save.
+- Participant receives notification log entry.
+- Audit log entry is created.
+
+---------------------------------------------------------------
+STEP G: JUDGE ASSIGNMENT + SCORING
+---------------------------------------------------------------
+(Login as Organizer)
+1. Open Judge Assignments.
+2. Assign judge to hackathon.
+Expected outcome:
+- Duplicate assignment is blocked.
+- Assignment saved and audited.
+
+(Login as Judge)
+3. Open Scorecards.
+4. Enter criterion-level scores (idea/design/execution/pitch) and remarks.
+5. Submit score.
+Expected outcome:
+- Score saved.
+- Unauthorized scoring attempts are blocked.
+- Score action logged in audit trail.
+
+---------------------------------------------------------------
+STEP H: ERROR HANDLING DEMO
+---------------------------------------------------------------
+1. Trigger a controlled invalid action:
+   - Bad status transition, invalid file type, or unauthorized application update.
+2. Show user-friendly error message.
+Expected outcome:
+- Safe error page/message appears.
+- Correlation/support reference is shown for debugging traceability.
+
+---------------------------------------------------------------
+STEP I: PAYMENT TRANSACTION TRACKING (BASELINE)
+---------------------------------------------------------------
+1. Open /charge
+2. Submit valid test amount/card input.
+Expected outcome:
+- Request accepted.
+- Payment transaction record is created with idempotency key baseline flow.
+Note:
+- This is baseline transaction tracking, not full production webhook/refund integration.
+
+================================================================
+3) WHAT TO SAY WHILE DEMOING (SHORT LINES)
+================================================================
+Use these one-liners during each step:
+- "This verifies role-based flow separation and access guard behavior."
+- "Here we enforce structured problem definition before event publication."
+- "This demonstrates lifecycle logic: expired events are not shown to participants."
+- "Submission is versioned, so no overwrite-loss and deadlines are strictly enforced."
+- "Organizer actions use controlled status transitions with audit trail."
+- "Judging is criterion-based for transparent, explainable scoring."
+- "Invalid operations return safe errors with traceable support IDs."
+
+================================================================
+4) FACULTY QUESTIONS: QUICK ANSWERS
+================================================================
+Q: Is this fully production-ready?
+A: Core operational workflow is working end-to-end; advanced enterprise hardening is on roadmap.
+
+Q: What proves reliability?
+A: Build/tests pass, role guards are active, transition validation exists, and audit logs capture key changes.
+
+Q: What is your strongest implemented part?
+A: Cross-role lifecycle flow: organizer setup -> participant apply/submit -> judge score -> organizer results.
+
+================================================================
+5) DEMO FAILURE RECOVERY PLAN (IMPORTANT)
+================================================================
+If anything behaves unexpectedly live:
+1. Restart app once.
+2. Verify DB connection.
+3. Re-login and repeat from Step A.
+4. Use seeded users listed above.
+5. Keep one known active hackathon and one expired hackathon ready.
+
+Extra note for terminal output:
+- If you see repeated SQL lines like "select ... from hackathon", that is usually Hibernate SQL logging, not a crash.
+- It appears because spring.jpa.show-sql=true.
+- If you want cleaner terminal during viva, set:
+   spring.jpa.show-sql=false
+   spring.jpa.properties.hibernate.format_sql=false
+   then restart app.
+
+================================================================
+6) FINAL VIVA CLOSING LINE
+================================================================
+"This demo shows the complete operational loop, not isolated screens: event setup, controlled participation, deadline-aware submissions, governed evaluation, and auditable decisions."

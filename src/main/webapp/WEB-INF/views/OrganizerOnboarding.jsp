@@ -7,8 +7,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Organizer Onboarding | CodeVerse</title>
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=Syne:wght@700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/neo-viva-theme.css?v=20260415b">
-<script defer src="${pageContext.request.contextPath}/assets/js/neo-viva-theme.js?v=20260415b"></script>
+<link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/neo-viva-theme.css?v=20260512c">
+<script defer src="${pageContext.request.contextPath}/assets/js/neo-viva-theme.js?v=20260512c"></script>
 <style>
 .page{max-width:1080px;margin:24px auto;padding:0 16px;display:grid;gap:12px}
 .hero{padding:16px;background:#1f2937;color:#fff}
@@ -54,8 +54,8 @@
         <div class="field"><label>City*</label><input type="text" name="city" value="${onboardingRequest.city}" autocomplete="new-password" required></div>
         <div class="field"><label>State*</label><input type="text" name="state" value="${onboardingRequest.state}" autocomplete="new-password" required></div>
         <div class="field"><label>Country*</label><input type="text" name="country" value="${empty onboardingRequest.country ? 'India' : onboardingRequest.country}" autocomplete="new-password" required></div>
-        <div class="field"><label>Website URL*</label><input type="text" name="websiteUrl" value="${onboardingRequest.websiteUrl}" placeholder="www.example.com" autocomplete="new-password" required></div>
-        <div class="field full"><label>LinkedIn URL</label><input type="text" name="linkedinUrl" value="${onboardingRequest.linkedinUrl}" placeholder="www.linkedin.com/in/username" autocomplete="new-password"></div>
+        <div class="field url-field"><label>Website URL*</label><div class="url-input-group"><input type="text" name="websiteUrl" value="${onboardingRequest.websiteUrl}" placeholder="www.example.com" autocomplete="new-password" required><div class="url-actions"><button type="button" class="url-action-btn copy-url" title="Copy link"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 9h8a2 2 0 0 1 2 2v8"></path><rect x="5" y="5" width="10" height="10" rx="2"></rect><path d="M13 13l6-6"></path><path d="M14 7h5v5"></path></svg></button><button type="button" class="url-action-btn open-url" title="Open link"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 5h5v5"></path><path d="M10 14L19 5"></path><path d="M19 13v6a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2h6"></path></svg></button></div></div><span class="url-feedback">Copied!</span></div>
+        <div class="field full url-field"><label>LinkedIn URL</label><div class="url-input-group"><input type="text" name="linkedinUrl" value="${onboardingRequest.linkedinUrl}" placeholder="www.linkedin.com/in/username" autocomplete="new-password"><div class="url-actions"><button type="button" class="url-action-btn copy-url" title="Copy link"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 9h8a2 2 0 0 1 2 2v8"></path><rect x="5" y="5" width="10" height="10" rx="2"></rect><path d="M13 13l6-6"></path><path d="M14 7h5v5"></path></svg></button><button type="button" class="url-action-btn open-url" title="Open link"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 5h5v5"></path><path d="M10 14L19 5"></path><path d="M19 13v6a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2h6"></path></svg></button></div></div><span class="url-feedback">Copied!</span></div>
         <div class="field full"><label>Event Experience</label><textarea name="eventExperience" rows="4" placeholder="Share hackathon/event operations experience" autocomplete="new-password">${onboardingRequest.eventExperience}</textarea></div>
       </div>
 

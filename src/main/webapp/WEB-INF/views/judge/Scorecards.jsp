@@ -7,8 +7,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Judge Scorecards</title>
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=Syne:wght@700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/neo-viva-theme.css?v=20260415b">
-<script defer src="${pageContext.request.contextPath}/assets/js/neo-viva-theme.js?v=20260415b"></script>
+<link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/neo-viva-theme.css?v=20260512c">
+<script defer src="${pageContext.request.contextPath}/assets/js/neo-viva-theme.js?v=20260512c"></script>
 <style>
 .header{position:sticky;top:0;z-index:100;height:64px;display:flex;align-items:center;justify-content:space-between;gap:10px;padding:0 24px;background:rgba(247,244,236,.92);backdrop-filter:blur(8px);border-bottom:1px solid #d7dce5}
 .logo{display:flex;align-items:center;gap:10px;text-decoration:none;color:#1f2329}
@@ -121,13 +121,31 @@
                 <p class="submission-desc">${s.application.submissionDescription}</p>
               </c:if>
               <c:if test="${not empty s.application.submissionUrl}">
-                <a href="${s.application.submissionUrl}" target="_blank" class="submission-link">Project Link &#8599;</a>
+                <div class="url-display-row">
+                  <a href="${s.application.submissionUrl}" target="_blank" class="submission-link">Project Link &#8599;</a>
+                  <div class="url-actions">
+                    <button type="button" class="url-action-btn copy-url" data-url="${s.application.submissionUrl}" title="Copy link"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 9h8a2 2 0 0 1 2 2v8"></path><rect x="5" y="5" width="10" height="10" rx="2"></rect><path d="M13 13l6-6"></path><path d="M14 7h5v5"></path></svg></button>
+                    <button type="button" class="url-action-btn open-url" data-url="${s.application.submissionUrl}" title="Open link"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 5h5v5"></path><path d="M10 14L19 5"></path><path d="M19 13v6a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2h6"></path></svg></button>
+                  </div>
+                </div>
               </c:if>
               <c:if test="${not empty s.application.frontendGithubLink}">
-                <a href="${s.application.frontendGithubLink}" target="_blank" class="submission-link">Frontend GitHub Link &#8599;</a>
+                <div class="url-display-row">
+                  <a href="${s.application.frontendGithubLink}" target="_blank" class="submission-link">Frontend GitHub Link &#8599;</a>
+                  <div class="url-actions">
+                    <button type="button" class="url-action-btn copy-url" data-url="${s.application.frontendGithubLink}" title="Copy link"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 9h8a2 2 0 0 1 2 2v8"></path><rect x="5" y="5" width="10" height="10" rx="2"></rect><path d="M13 13l6-6"></path><path d="M14 7h5v5"></path></svg></button>
+                    <button type="button" class="url-action-btn open-url" data-url="${s.application.frontendGithubLink}" title="Open link"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 5h5v5"></path><path d="M10 14L19 5"></path><path d="M19 13v6a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2h6"></path></svg></button>
+                  </div>
+                </div>
               </c:if>
               <c:if test="${not empty s.application.backendGithubLink}">
-                <a href="${s.application.backendGithubLink}" target="_blank" class="submission-link">Backend GitHub Link &#8599;</a>
+                <div class="url-display-row">
+                  <a href="${s.application.backendGithubLink}" target="_blank" class="submission-link">Backend GitHub Link &#8599;</a>
+                  <div class="url-actions">
+                    <button type="button" class="url-action-btn copy-url" data-url="${s.application.backendGithubLink}" title="Copy link"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 9h8a2 2 0 0 1 2 2v8"></path><rect x="5" y="5" width="10" height="10" rx="2"></rect><path d="M13 13l6-6"></path><path d="M14 7h5v5"></path></svg></button>
+                    <button type="button" class="url-action-btn open-url" data-url="${s.application.backendGithubLink}" title="Open link"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 5h5v5"></path><path d="M10 14L19 5"></path><path d="M19 13v6a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2h6"></path></svg></button>
+                  </div>
+                </div>
               </c:if>
             </div>
           </c:if>

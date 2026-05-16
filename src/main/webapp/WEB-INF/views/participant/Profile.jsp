@@ -8,8 +8,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>My Profile</title>
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=Syne:wght@700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/neo-viva-theme.css?v=20260415b">
-<script defer src="${pageContext.request.contextPath}/assets/js/neo-viva-theme.js?v=20260415b"></script>
+<link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/neo-viva-theme.css?v=20260512c">
+<script defer src="${pageContext.request.contextPath}/assets/js/neo-viva-theme.js?v=20260512c"></script>
 <style>
 .header{position:sticky;top:0;z-index:100;height:64px;display:flex;align-items:center;justify-content:space-between;gap:10px;padding:0 24px;background:rgba(247,244,236,.92);backdrop-filter:blur(8px);border-bottom:1px solid #d7dce5}
 .logo{display:flex;align-items:center;gap:10px;text-decoration:none;color:#1f2329}
@@ -116,7 +116,7 @@
             <input type="hidden" name="_csrf" value="${_csrfToken}">
             <input id="participantPfpInput" class="pfp-file" type="file" name="profilePic" accept="image/*" required>
             <button class="pfp-btn" type="button" onclick="document.getElementById('participantPfpInput').click();" title="Update Profile Picture" aria-label="Change profile picture">
-              <svg viewBox="0 0 24 24"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zm2.92 2.33H5v-.92l9.06-9.06.92.92L5.92 19.58zM20.71 7.04a1 1 0 0 0 0-1.41L18.37 3.3a1 1 0 0 0-1.41 0l-1.13 1.13 3.75 3.75 1.13-1.14z"/></svg>
+              <svg viewBox="0 0 24 24"><path fill="#1f2329" d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zm2.92 2.33H5v-.92l9.06-9.06.92.92L5.92 19.58zM20.71 7.04a1 1 0 0 0 0-1.41L18.37 3.3a1 1 0 0 0-1.41 0l-1.13 1.13 3.75 3.75 1.13-1.14z"/></svg>
             </button>
           </form>
           <form method="post" action="<c:url value='/participant/profile/remove-pfp' />">
@@ -198,10 +198,6 @@
             <input type="email" name="email" value="${profileUser.email}" maxlength="120" required>
           </div>
           <div class="field">
-            <label>Gender</label>
-            <input type="text" name="gender" value="${profileUser.gender}" maxlength="20" placeholder="e.g. MALE / FEMALE / OTHER">
-          </div>
-          <div class="field">
             <label>Birth Year</label>
             <input type="number" name="birthYear" value="${profileUser.birthYear}" min="1950" max="2100">
           </div>
@@ -225,9 +221,16 @@
             <label>Country</label>
             <input type="text" name="country" value="${profileUserDetail.country}" maxlength="80" placeholder="Country">
           </div>
-          <div class="field full">
+          <div class="field full url-field">
             <label>LinkedIn URL</label>
-            <input type="url" name="linkedinUrl" value="${profileUserDetail.linkedinUrl}" maxlength="255" placeholder="https://linkedin.com/in/your-profile">
+            <div class="url-input-group">
+              <input type="url" name="linkedinUrl" value="${profileUserDetail.linkedinUrl}" maxlength="255" placeholder="https://linkedin.com/in/your-profile">
+              <div class="url-actions">
+                <button type="button" class="url-action-btn copy-url" title="Copy link"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 9h8a2 2 0 0 1 2 2v8"></path><rect x="5" y="5" width="10" height="10" rx="2"></rect><path d="M13 13l6-6"></path><path d="M14 7h5v5"></path></svg></button>
+                <button type="button" class="url-action-btn open-url" title="Open link"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 5h5v5"></path><path d="M10 14L19 5"></path><path d="M19 13v6a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2h6"></path></svg></button>
+              </div>
+            </div>
+            <span class="url-feedback">Copied!</span>
           </div>
         </div>
         <div class="panel-actions">

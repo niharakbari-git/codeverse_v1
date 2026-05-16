@@ -6,7 +6,7 @@
   --cv-accent: #1f2329;
   --cv-accent-2: #0f766e;
   --cv-warn: #d97706;
-  --cv-border: #d5dde8;
+  --cv-border: #e6edf3;
   --cv-radius: 14px;
   --cv-shadow: 0 10px 26px rgba(15, 23, 42, 0.08);
   --cv-ring: 0 0 0 3px rgba(31, 35, 41, 0.18);
@@ -22,7 +22,11 @@ body {
   color: var(--cv-ink);
   font-family: "Space Grotesk", "Plus Jakarta Sans", "Segoe UI", sans-serif;
   letter-spacing: 0.01em;
+  font-size: 17px;
 }
+
+/* Increase global line-height for readability */
+html, body { line-height: 1.45; }
 
 a { color: inherit; }
 button, input, select, textarea { font: inherit; color: inherit; }
@@ -80,13 +84,58 @@ th {
   letter-spacing: 0.08em;
 }
 
-.neo-shell { max-width: 1180px; margin: 24px auto; padding: 0 12px 22px; }
+.neo-shell { max-width: 1400px; margin: 24px auto; padding: 0 18px 28px; }
+.neo-shell.page {
+  /* allow the page to grow and use native scrolling so long forms can extend below the fold */
+  height: auto;
+  overflow: visible;
+}
+.neo-shell.page > main,
+.neo-shell.page > .content {
+  min-height: 0;
+  height: auto;
+  overflow-y: visible;
+}
+.neo-shell.page .side {
+  position: sticky;
+  top: 16px;
+  align-self: start;
+  max-height: calc(100vh - 96px);
+  overflow-y: auto;
+}
+.neo-shell.page .top {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background: var(--cv-surface);
+  border-bottom: 1px solid var(--cv-border);
+}
 .neo-panel {
   background: var(--cv-surface);
   border: 1px solid var(--cv-border);
   border-radius: var(--cv-radius);
-  box-shadow: var(--cv-shadow);
+  box-shadow: 0 6px 18px rgba(15, 23, 42, 0.06);
+  padding: 14px;
 }
+
+/* Reduce heavyweight borders used across the app so layouts feel lighter */
+.stat, .workspace-card, .workspace-actions a, .stat-button, .app-card, .neo-panel {
+  border-width: 1px !important;
+}
+
+/* Slightly larger interactive areas and more whitespace */
+button, .btn, .stat-button {
+  padding: 0.66rem 1rem !important;
+}
+
+/* Wider app grid by default (overrides narrow defaults used on some pages) */
+.app-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(520px,1fr));gap:18px;justify-content:center}
+
+/* Make form fields more readable and give submit forms room */
+.field { margin-bottom: 14px; }
+.field label { display:block; margin-bottom:6px; font-weight:600; color:var(--cv-ink); }
+.submit-form input, .submit-form textarea { font-size:13px; padding:10px 12px; border-radius:10px; }
+.submit-form textarea { min-height:200px; }
 
 .neo-title {
   margin: 0;
@@ -114,6 +163,86 @@ th {
 .neo-metric { border: 1px solid var(--cv-border); border-radius: 14px; background: #fff; padding: 12px; }
 .neo-metric .k { font-size: 0.72rem; font-weight: 700; text-transform: uppercase; color: var(--cv-muted); }
 .neo-metric .v { margin-top: 6px; font-family: "Syne", "Space Grotesk", sans-serif; font-size: clamp(1.9rem, 4vw, 2.5rem); line-height: 1; }
+
+.url-input-group {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+.url-input-group input {
+  flex: 1;
+}
+.url-actions {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+.url-action-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.35rem;
+  height: 2.35rem;
+  min-width: 2.35rem;
+  min-height: 2.35rem;
+  border: 0 !important;
+  background: transparent !important;
+  background-color: transparent !important;
+  color: #5e6673 !important;
+  cursor: pointer;
+  box-shadow: none;
+  padding: 0;
+  margin: 0;
+  border-radius: 0;
+  appearance: none;
+  -webkit-appearance: none;
+  line-height: 0;
+  outline: none;
+  flex: 0 0 auto;
+  transition: color 0.15s ease, opacity 0.15s ease, transform 0.15s ease;
+}
+.url-action-btn:hover:not(:disabled) {
+  color: var(--cv-ink) !important;
+  opacity: 0.82;
+  transform: translateY(-1px);
+}
+.url-action-btn:active:not(:disabled) {
+  opacity: 0.7;
+  transform: translateY(0);
+}
+.url-action-btn:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+.url-action-btn svg {
+  width: 20px;
+  height: 20px;
+  display: block;
+  pointer-events: none;
+}
+.url-display-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+}
+.url-display-row a {
+  color: var(--cv-accent-2);
+  font-weight: 600;
+  text-decoration: none;
+}
+.url-display-row a:hover {
+  text-decoration: underline;
+}
+.url-feedback {
+  font-size: 0.75rem;
+  color: var(--cv-accent-2);
+  opacity: 0;
+  transition: opacity 0.18s ease;
+}
+.url-feedback.show {
+  opacity: 1;
+}
 
 [data-reveal] { opacity: 1; transform: none; }
 

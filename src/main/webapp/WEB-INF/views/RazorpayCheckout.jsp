@@ -7,8 +7,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Complete Payment | CodeVerse</title>
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=Syne:wght@700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/neo-viva-theme.css?v=20260415b">
-<script defer src="${pageContext.request.contextPath}/assets/js/neo-viva-theme.js?v=20260415b"></script>
+<link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/neo-viva-theme.css?v=20260512c">
+<script defer src="${pageContext.request.contextPath}/assets/js/neo-viva-theme.js?v=20260512c"></script>
 <style>
 .wrap{min-height:100vh;display:grid;place-items:center;padding:16px}
 .card{width:min(760px,100%);padding:24px;display:grid;gap:14px}
@@ -18,6 +18,9 @@
 .value{margin-top:4px;font-weight:700;color:#1f2329}
 .actions{display:flex;gap:10px;flex-wrap:wrap}
 .hint{font-size:13px;color:#5e6673;line-height:1.5}
+.upi-box{display:grid;gap:10px;padding:12px;border:1px solid #d7dce5;border-radius:12px;background:#f9fbff}
+.upi-box input{border:1px solid #d7dce5;border-radius:10px;padding:9px 10px;background:#fff;font-size:14px;width:100%}
+.upi-note{margin:0;font-size:12px;color:#6b7280}
 @media(max-width:720px){.meta{grid-template-columns:1fr}}
 </style>
 <script src="${checkout.checkoutScriptUrl}"></script>
@@ -39,6 +42,12 @@
     </div>
 
     <p id="checkout-status" class="hint">Opening secure checkout. If popup is blocked, use the button below.</p>
+
+    <div class="upi-box">
+      <label for="vpa-input" class="label" style="margin:0">UPI VPA</label>
+      <input id="vpa-input" type="text" placeholder="example@bank" maxlength="255" autocomplete="off">
+      <p class="upi-note">Optional. If filled, Razorpay opens the UPI flow with this VPA preselected.</p>
+    </div>
 
     <div class="actions">
       <button id="open-checkout-btn" type="button">Open Checkout</button>
@@ -64,6 +73,9 @@
   const openButton = document.getElementById('open-checkout-btn');
   const pageLoadedAt = Date.now();
 
+  const vpaInput = document.getElementById('vpa-input');
+  const vpaValue = vpaInput ? vpaInput.value.trim() : '';
+
   const options = {
     key: '<c:out value="${checkout.keyId}" />',
     amount: <c:out value="${checkout.amountPaise}" />,
@@ -78,7 +90,10 @@
       document.getElementById('payment-verify-form').submit();
     },
     prefill: {
-      name: '<c:out value="${checkout.participantName}" />'
+      name: '<c:out value="${checkout.participantName}" />',
+      email: '<c:out value="${checkout.participantEmail}" />',
+      contact: '<c:out value="${checkout.participantContact}" />',
+      method: 'upi'
     },
     theme: {
       color: '#1f2329'
@@ -87,10 +102,14 @@
       escape: false,
       confirm_close: true,
       ondismiss: function () {
-        window.location.href = '${checkout.cancelUrl}?msg=Payment+was+closed+before+completion&type=error';
+        window.location.href = '${checkout.cancelUrl}';
       }
     }
   };
+
+  if (vpaValue) {
+    options.prefill.vpa = vpaValue;
+  }
 
   function checkoutHasExpired() {
     return (Date.now() - pageLoadedAt) > PAGE_EXPIRES_AFTER_MS;

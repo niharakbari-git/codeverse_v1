@@ -1,0 +1,167 @@
+CodeVerse Missing Features Roadmap (Basic + Advanced)
+Date: 2026-04-16
+
+Purpose:
+- Identify must-have gaps that can block real-world usage.
+- Separate immediate/basic necessities from advanced differentiators.
+- Give a practical implementation sequence.
+
+Current tactical direction (viva-safe, practical):
+- Campus-first operations with optional Open-to-All discoverability.
+- Organizer-owned judge sourcing (platform handles assignment + scoring workflow).
+
+============================================================
+A) BASIC NECESSARY FEATURES MISSING OR PARTIAL (HIGH PRIORITY)
+============================================================
+
+1) Dynamic hackathon lifecycle automation
+Status: Partial
+Current issue:
+- Some views rely on manual status labels (UPCOMING/ONGOING/COMPLETED).
+- Date-based expiration logic was inconsistent across screens.
+Needed:
+- Scheduled status updater based on registration/event dates.
+- Single source of truth utility for "isOpen/isExpired/isLive".
+Impact:
+- Prevents stale listings and incorrect apply behavior.
+
+2) Problem statement/challenge statement workflow
+Status: Missing/Incomplete (as you identified)
+Current issue:
+- Hackathon problem statement specification is not fully modeled/enforced.
+Needed:
+- Structured fields: problem statement, constraints, deliverables, evaluation criteria, submission checklist.
+- Validation before publishing a hackathon.
+Impact:
+- Improves submission quality and judging consistency.
+
+3) File upload security and validation
+Status: Partial
+Needed:
+- Strict file-type validation, size limits, malware scanning hooks, random filename strategy.
+- Store-only metadata in DB; secure download endpoint authorization.
+Impact:
+- Prevents exploit upload vectors and broken submissions.
+
+4) Access-control hardening
+Status: Partial
+Needed:
+- Method-level authorization checks on every update/delete path.
+- Anti-IDOR checks for all role-specific resources.
+- Session hardening and logout-all-sessions option.
+Impact:
+- Prevents unauthorized data access/edit.
+
+5) Payment workflow integrity
+Status: Basic mock-level flow
+Needed:
+- Transaction record table, idempotency key, callback verification, refund and failure reconciliation.
+- Payment gateway sandbox integration (real flow) and webhook signatures.
+Impact:
+- Required for real paid event operations.
+
+6) Submission versioning + deadlines
+Status: Missing
+Needed:
+- Versioned submissions (v1, v2...) with lock after deadline.
+- Grace-period and late-submission policy controls.
+Impact:
+- Prevents confusion and disputes.
+
+7) Notification system
+Status: Partial
+Needed:
+- Email/in-app notifications for status changes, judge feedback release, deadline reminders.
+Impact:
+- Critical for usability and operational smoothness.
+
+8) Error handling and user-safe feedback
+Status: Partial
+Needed:
+- Centralized exception handling and user-facing error pages with correlation IDs.
+Impact:
+- Better reliability and easier support.
+
+9) Data validation and business rule tests
+Status: Partial
+Needed:
+- Validation annotations + service-level tests for status transitions and scoring constraints.
+Impact:
+- Prevents regressions and invalid records.
+
+10) Audit logs for critical actions
+Status: Missing
+Needed:
+- Who changed what and when: score edits, status changes, assignment changes, deletions.
+Impact:
+- Mandatory for fairness and dispute handling.
+
+============================================================
+B) ADVANCED FEATURES MISSING (MEDIUM/HIGH VALUE)
+============================================================
+
+1) Advanced judging engine
+- Weighted criteria templates by track.
+- Judge normalization (bias correction).
+- Consensus and tie-break workflows.
+
+2) Plagiarism and originality checks
+- Code similarity scan integration.
+- Duplicate project detection across submissions.
+
+3) Team collaboration workspace
+- Team invite links, role management, chat/comments, task checklist.
+
+4) Public showcase and leaderboard
+- Published finalist gallery with score breakdown transparency controls.
+
+5) Analytics and reporting
+- Funnel: registration -> team creation -> submission -> shortlist -> winner.
+- Judge turnaround time and scoring variance dashboard.
+
+6) Multi-tenant support
+- Department-wise/institute-wise isolated hackathon spaces.
+
+7) Compliance and privacy controls
+- Consent tracking, retention policy, data export/delete requests.
+
+8) DevOps and observability
+- Structured logs, metrics, alerts, health checks, backup/restore strategy.
+
+9) Recommendation engine
+- Suggest hackathons to participants by skills/interests.
+
+10) AI-assisted moderation (optional future)
+- Basic eligibility pre-check, rule-compliance checklist, rubric-assist for judges.
+
+============================================================
+C) TOP IMPLEMENTATION ORDER (PRACTICAL)
+============================================================
+Phase 0 (already started)
+- Added participation scope in hackathon creation: CAMPUS_ONLY vs OPEN_TO_ALL.
+- Explore supports scope visibility/filtering so public events are explicit.
+- Organizer judge assignment improved with direct assign-by-email for existing judge accounts.
+
+Phase 1 (Immediate stability: 1-2 weeks)
+- Unified lifecycle rules and expiration handling.
+- Problem statement model + mandatory validation.
+- Access-control hardening and audit logs.
+- Basic test coverage for critical workflows.
+
+Phase 2 (Operational readiness: 2-4 weeks)
+- Submission versioning and deadline enforcement.
+- Notification engine (email + in-app).
+- Payment integrity upgrades (idempotency/webhook checks).
+
+Phase 3 (Differentiation: 4+ weeks)
+- Advanced judging engine and analytics.
+- Plagiarism checks and public showcase.
+- Compliance and observability hardening.
+
+============================================================
+D) WHAT TO TELL FACULTY ABOUT INCOMPLETENESS
+============================================================
+Use this honest statement:
+"Yes, this project is incomplete for production scale. We have identified the gaps in priority order. Core role workflows are working, and we now have a concrete roadmap that addresses reliability, fairness, security, and scalability in phases."
+
+That answer shows engineering maturity better than claiming everything is finished.

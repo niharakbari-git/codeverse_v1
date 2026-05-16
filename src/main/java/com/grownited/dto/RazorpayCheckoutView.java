@@ -8,6 +8,8 @@ public class RazorpayCheckoutView {
     private String hackathonTitle;
     private String teamName;
     private String participantName;
+    private String participantEmail;
+    private String participantContact;
     private String keyId;
     private String orderId;
     private String currency;
@@ -65,6 +67,22 @@ public class RazorpayCheckoutView {
 
     public void setParticipantName(String participantName) {
         this.participantName = participantName;
+    }
+
+    public String getParticipantEmail() {
+        return participantEmail;
+    }
+
+    public void setParticipantEmail(String participantEmail) {
+        this.participantEmail = participantEmail;
+    }
+
+    public String getParticipantContact() {
+        return participantContact;
+    }
+
+    public void setParticipantContact(String participantContact) {
+        this.participantContact = participantContact;
     }
 
     public String getKeyId() {

@@ -1,0 +1,63 @@
+CodeVerse Rapid Viva Script (3-5 Minutes)
+Date: 2026-04-16
+
+Use this when faculty gives very little time.
+
+============================================================
+1) OPENING (20-30 seconds)
+============================================================
+"CodeVerse is a role-based hackathon operations platform for Admin, Organizer, Participant, and Judge. We focused on practical institute-level execution: controlled workflows, submission lifecycle, and auditable decisions."
+
+============================================================
+2) LIVE FLOW (ABOUT 3 MINUTES)
+============================================================
+
+Step A - Organizer creates structured hackathon (45 sec)
+- Login as organizer.
+- Open Create Hackathon.
+- Show required fields: problem title, statement, deliverables, dates, deadline, grace period.
+- Save.
+Say:
+"We enforce structured problem definition before publishing, so participants and judges work against clear requirements."
+
+Step B - Participant applies and submits (60 sec)
+- Login as participant.
+- Open Explore and pick active hackathon.
+- Apply with team.
+- Open My Applications.
+- Submit work with links + optional file.
+Say:
+"Submission is versioned and deadline-aware, so updates are tracked and post-deadline actions are controlled."
+
+Step C - Organizer reviews application status (35 sec)
+- Login as organizer.
+- Open Applications.
+- Change status APPLIED -> SHORTLISTED.
+Say:
+"Status transitions are validated and logged; invalid transitions are blocked."
+
+Step D - Judge scoring (40 sec)
+- Login as judge.
+- Open Scorecards.
+- Submit criterion-level score (idea/design/execution/pitch).
+Say:
+"Scoring is structured and auditable instead of a single opaque mark."
+
+============================================================
+3) WHAT TO QUICKLY MENTION (40-60 sec)
+============================================================
+- Lifecycle automation: expired events are hidden from participant explore flow.
+- Notification baseline: key actions generate notification logs.
+- Audit trail baseline: assignment/status/score changes are recorded.
+- Safe error handling: user-friendly error messages with reference ID.
+- Build reliability: tests pass and app runs end-to-end.
+
+============================================================
+4) STRONG CLOSING LINE (10 sec)
+============================================================
+"This is not just UI pages; it is a full operational loop from event creation to participant submission to judge evaluation with governance controls and traceability."
+
+============================================================
+5) IF FACULTY ASKS: "WHAT IS NEW IF SUCH PLATFORMS EXIST?" (15 sec)
+============================================================
+"Global platforms exist, but our focus is institute-owned workflow control: role governance, customizable process rules, and local operational transparency without external platform dependency."
